@@ -1,0 +1,29 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+#myProd{
+  height: 600px;
+}
+.zoom{
+  display: none;
+  border: 1px solid white;
+  height: 600px;
+  width: 500px;
+  overflow: hidden;
+  background-color: transparent;
+  margin-top: 10px;
+}
+.zoom > img{
+  object-fit: contain;
+  height: 250%;
+  transform: translate3d(0px, 0px, 0px);
+}
+.cart__item{
+  object-fit: contain;
+  
+}

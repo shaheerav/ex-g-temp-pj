@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend Setter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/admin/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/admin/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link href="/admin/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Normalize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+
+    <!-- Template Stylesheet -->
+    <link href="/admin/css/style.css" rel="stylesheet">
+    <!-- Cropper CSS -->
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.4/cropper.min.css'>
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
+    <style>
+        .preview-container{
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .preview-image{
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+        }
+        
+        .page{
+            margin: 1em auto;
+            max-width: 750px;
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            height: 100%;
+        }
+
+        .box{
+            padding:0.5em;
+            width: 100%;
+            margin: 0.5em;
+        }
+        .box-2{
+            padding: 0.5em;
+            width: calc(100%/2 -1em);
+        }
+
+        .option label,
+        .option input{
+            width: 4em;
+            padding: 0.5em;
+        }
+        .btn{
+            background: white;
+            color: black;
+            border: 1px solid black;
+            padding: 0.5em 1em;
+            text-decoration: none;
+            margin:0.8em 0.3em;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .hide{
+            display: none;
+        }
+        img{
+            max-width: 100%;
+        }
+        .error{
+            color: red;
+            font-size: 0.8em;
+            margin-top:0.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-xxl position-relative bg-white d-flex p-0">
+        <!-- Spinner Start -->
+        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+
+
+        <!-- Sidebar Start -->
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-light navbar-light">
+                <a href="/admin/home" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary">Trend Setter</h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        
+                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0"><%= admin.name  %></h6>
+                        <span>Admin</span>
+                    </div>
+                </div>
+                <div class="navbar-nav w-100">
+                    <a href="/admin/home" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="/admin/userdata" class="nav-item nav-link"><i class="bi bi-person"></i>Customers</a>
+                    <a href="/product" class="nav-item nav-link"><i class="bi bi-minecart"></i>Products</a>
+                    <a href="/category" class="nav-item nav-link"><i class="bi bi-layout-wtf"></i>Category</a>
+                    <a href="chart.html" class="nav-item nav-link"><i class="bi bi-truck"></i>Orders</a>
+                    <a href="chart.html" class="nav-item nav-link"><i class="bi bi-bar-chart"></i>Sales Report</a>
+                    <a href="chart.html" class="nav-item nav-link"><i class="bi bi-star"></i>Coupon Management</a>
+                    <a href="chart.html" class="nav-item nav-link"><i class="bi bi-file-richtext"></i>Banner Management</a>
+                </div>
+            </nav>
+        </div>
+        <!-- Sidebar End -->
+    
+
+        <!-- Content Start -->
+        <div class="content">
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+                <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
+                </a>
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars"></i>
+                </a>
+                <form class="d-none d-md-flex ms-4">
+                    <input class="form-control border-0" type="search" placeholder="Search">
+                </form>
+                <div class="navbar-nav align-items-center ms-auto">
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa fa-envelope me-lg-2"></i>
+                            <span class="d-none d-lg-inline-flex">Message</span>
+                        </a>
+
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa fa-bell me-lg-2"></i>
+                            <span class="d-none d-lg-inline-flex">Notification</span>
+                        </a>
+                        
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <span class="d-none d-lg-inline-flex"><%= admin.name %></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                            <a href="#" class="dropdown-item">My Profile</a>
+                            <a href="#" class="dropdown-item">Settings</a>
+                            <a href="/admin/adlogout" class="dropdown-item">Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>  <!-- Navbar End -->
+            <div class="container-fluid pt-4 px-4">    
+                <div class="row g-4">
+                    <div class="col-sm-12 col-xl-12">
+                        <div class="bg-light rounded h-100 p-4">
+                            <h6 class="mb-4">Add Product</h6>
+                            <form method="post" action="" enctype="multipart/form-data" id="addProductForm">
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" name="name" id='name'required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Brand</label>
+                                <input type="text" class="form-control" name="brand" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <input type="text" class="form-control" name="description" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="category">Category</label>
+                                <select id="category" name="category" class="form-control" required>
+                                    <option value="">Select Category</option>
+                                    <% if(category.length > 0)
+                                    for(let i = 0;i<category.length;i++){ %>
+                                        <option value="<%= category[i]._id %>"><%= category[i].name %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Size</label>
+                                <select class="form-control" name="size" required>
+                                    <% validSizes.forEach(size => { %>
+                                    <option value="<%= size %>"><%= size %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Price</label>
+                                <input type="text" class="form-control" name="price" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Stock</label>
+                                <input type="text" class="form-control" name="stock" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Image</label>
+                                <input type="file" class="form-control" name="image" required accept=".jpg, .jpeg, .png" id="inputImage" multiple >
+                                <div id="previewContainer" class="preview-container"></div>
+
+                            </div>
+                            
+                            <div class="page">
+                                <label class="form-check-label" for="isFeatured">Main Image</label>
+                                <div class="box">
+                                    <input type="file" id="file-input" name="main" required>
+                                    <div>
+                                        <div class="box-2">
+                                            <div class="result"></div>
+                                        </div>
+                                        <div class="box-2 img-result hide">
+                                            <img class="cropped" src="" alt="">
+                                        </div>
+                                        <div class="box">
+                                            <div class="options hide">
+                                                <label>Width</label>
+                                                <input type="number" class="img-w" value="500" min="100" max="1200" />
+                                            </div>
+                                            <button class="btn Save hide">Save</button>
+                                            <button type="submit" class="btn btn-primary update">Add Product</button>
+                                        </div>
+                                    </div>
+                                </div>                        
+                            </div>
+
+                            <% if(typeof message!=='undefined'){ %>
+                            <p><%= message %></p>
+                            <% } %>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!-- Footer Start -->
+        <div class="container-fluid pt-4 px-4">
+        <div class="bg-light rounded-top p-4">
+            <div class="row">
+                <div class="col-12 col-sm-6 text-center text-sm-start">
+                    &copy; <a href="#">Your Site Name</a>, All Rights Reserved. 
+                </div>
+                <div class="col-12 col-sm-6 text-center text-sm-end">
+                    <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                    Designed By <a href="https://htmlcodex.com">HTML Codex</a>
+                </br>
+                Distributed By <a class="border-bottom" href="https://themewagon.com" target="_blank">ThemeWagon</a>
+                </div>
+            </div>
+        </div>
+        </div>
+<!-- Back to Top -->
+           <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+    </div>
+<!-- JavaScript Libraries -->
+<script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js'></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+<script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/lib/chart/chart.min.js"></script>
+<script src="/admin/lib/easing/easing.min.js"></script>
+<script src="/admin/lib/waypoints/waypoints.min.js"></script>
+<script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+<script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+<script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<!-- Template Javascript -->
+<script src="/admin/js/main.js"></script>
+<script src="/javascripts/product.js"></script>
+<script>
+    //*********************** PREVIEW IMAGE **************************//
+    const input = document.getElementById('inputImage');
+    const previewContainer = document.getElementById('previewContainer');
+    input.addEventListener('change', handleFileSelect);
+    function handleFileSelect(event){
+        const files = event.target.files;
+        previewContainer.innerHTML = '';
+
+        if(files){
+            for(let i= 0 ; i<files.length ;i++){
+                const file= files[i];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const img =  document . createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('preview-image');
+                    previewContainer.appendChild(img);  
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+    //************************* CROPPED IMAGE*****************
+    let result = document.querySelector('.result');
+    let save = document.querySelector('.save');
+    let updateBtn = document.querySelector('.update');
+    let cropper;
+
+    document.getElementById('file-input').addEventListener('change',function(event){
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(event){
+            const img = new image();
+            img.src = event.target.result;
+
+            result.innerHTML= "";
+
+            result.appendChild(img);
+
+            cropper = new cropper(img,{
+                aspectRatio:null,
+                viewMode:1
+            });
+            save.classList.remove('hide');
+            document.querySelector('options').classList.remove('hide');
+        };
+        reader.readAsDataURL(file);
+    });
+    save.addEventListener('click',function(event){
+        event.preventDefault();
+        const canvas = cropper.getCroppedCanvas({
+            width:parseInt(document.querySelector('.img-w').value )||
+        300,
+            height:parseInt(document.querySelector('.img-h').value)||300
+    });
+    document.querySelector('cropped').remove();
+    const croppedImg = document.createElement('img');
+    croppedImg.src = canvas.toDataURL();
+    result.appendChild(croppedImg);
+    updateBtn.classList.remove('hide');
+    document.getElementById('cropped-image').value = croppedImg.src
+    });
+    updateBtn.addEventListener('click',function(){
+        if(!valideForm()){
+            return;
+        }
+        const formData = new FormData(document.getElementById('product-form'));
+        formData.append('croppedImage',document.getElementById('cropped-image').value);
+        fetch ('/product',{
+            method:'POST',
+            body:formData
+        })
+        .then(respose=>{
+            if(!respose.ok){
+                throw new Error('Network response was not ok');
+            }
+            return respose.json();
+        })
+        .then(data=>{
+            console.log(data);
+        })
+        .catch(error=>{
+            console.error('there was a problem with the request',error);
+    });
+    });
+</script>
+
+</body>
+
+</html>

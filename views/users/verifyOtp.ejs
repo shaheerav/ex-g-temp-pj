@@ -1,0 +1,153 @@
+<%- include('../layouts/user/header.ejs') %>
+
+<!-- Start Hero Section -->
+<div class="hero">
+  <div class="container">
+    <div class="row justify-content-between">
+      <div class="col-lg-6">
+        <div class="hero-img-wrap">
+          <img
+            src="images/familypic.png"
+            class="img-fluid"
+            style="height: 500px"
+          />
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <h2 style="color: white">Verify OTP</h2>
+        <div class="intro-excerpt">
+          <form action="" method="post">
+            <div class="form-group">
+              <label style="color: white">Enter your OTP</label><br />
+              <input
+                type="text"
+                class="form-control"
+                name="otp"
+                style="background: transparent"
+              />
+              <div>Time left = <span id="timerDisplay"></span></div>
+              <p id="timer"></p>
+              <input type="hidden" name="user_id" value="<%= user_id %>" />
+            </div>
+            <div class="col">
+              <button
+              id="resendOtpButton"
+                onclick="resendOtp('<%= user_id %>')"
+                class="btn btn-primary"
+                type="button"
+              >
+                Resend otp</button
+              ><br /><br />
+            </div>
+            <div class="col">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                style="margin-left: 160px"
+              >
+                Verify OTP
+              </button>
+            </div>
+            <div>
+              <p>Don't have an account please <a href="/users">Register</a></p>
+            </div>
+            <% if (typeof message !== 'undefined') { %>
+            <p><%= message %> <a href="/login">login</a> now</p>
+            <% } %>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Hero Section -->
+<script>
+  function startResendTimer(){
+    let resendBtn = document.getElementById('resendOtpButton');
+    if(resendBtn){
+      resendBtn.style.display = "none";
+      
+    setTimeout(function(){
+      resendBtn.style.display ='block';
+      console.log("resend button work after three second")
+    },180000)
+    }else{
+      console.error('resend button has some error')
+    }
+    
+  }
+  window.onload = startResendTimer();
+
+    let userId ;
+    
+    async function resendOtp(userId) {
+      try{
+        userId= userId;
+        console.log('receiving resendOTP request:',userId);
+  
+      // Check if userId is a non-empty string before making the request
+      if (userId.trim() === "") {
+          console.error("Invalid userId:", userId);
+          alert("Invalid user ID");
+          return;
+        }
+  
+      const response = await fetch("/resendOtp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to resend OTP. Server returned status ${response.status}`);
+        }
+  
+        const data = await response.json();
+        console.log('Resend OTP response: ',data);
+        alert('OTP resent successfylly');
+  
+    } catch (error) {
+      console.error('Error during OTP resend :', error);
+      alert('Failed to resend OTP');
+    }
+  };
+  
+  //Shedule the resendOtp function after 5 minuts
+  setTimeout(async() => {
+    const userId = document.querySelector('#user_id').value;
+    await resendOtp(userId);
+  }, 5 * 60 * 1000);
+  
+  //timer
+  let timerOn = true;
+  
+  function timer(remaining) {
+    var m = Math.floor(remaining / 60);
+    var s = remaining % 60;
+    
+    m = m < 10 ? '0' + m : m;
+    s = s < 10 ? '0' + s : s;
+    document.getElementById('timerDisplay').innerHTML = m + ':' + s;
+    remaining -= 1;
+    
+    if(remaining >= 0 && timerOn) {
+      setTimeout(function() {
+          timer(remaining);
+      }, 1000);
+      return;
+    }
+  
+    if(!timerOn) {
+      // Do validate stuff here
+      return;
+    }
+    
+    // Do timeout stuff here
+    alert('Timeout for otp');
+  }
+  
+  timer(180);
+</script>
+<%- include('../layouts/user/footerlogin.ejs') %>

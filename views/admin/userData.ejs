@@ -1,0 +1,78 @@
+<%- include('../layouts/admin/header.ejs') %>
+
+<div class="col-12">
+  <div class="bg-light rounded h-100 p-4">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Mobile</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if(user.length > 0){ for(let i = 0 ; i< user.length;i++){ %>
+          <tr <% if(user[i].is_blocked) { %>
+            style='background-color:yellow'<%} %>>
+            <td><%= i+1 %></td>
+            <td><%= user[i].name %></td>
+            <td><%= user[i].username %></td>
+            <td><%= user[i].email %></td>
+            <td><%= user[i].mobile %></td>
+            <td>
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-primary">
+                  <a
+                    href="/admin/block-user?id=<%= user[i]._id %>"
+                    class="text-light"
+                    >Block</a
+                  >
+                </button>
+                <button type="button" class="btn btn-primary">
+                  <a
+                    href="/admin/unblock-user?id=<%= user[i]._id %>"
+                    class="text-light"
+                    >Unblock</a
+                  >
+                </button>
+                <button type="button" class="btn btn-primary">
+                  <a
+                    href="/admin/edit-user?id=<%= user[i]._id %>"
+                    class="text-light"
+                    >Edit</a
+                  >
+                </button>
+                <button type="button" class="btn btn-primary">
+                  <a
+                    href="/admin/delete-user?id=<%= user[i]._id %>"
+                    class="text-light"
+                    >Delete</a
+                  >
+                </button>
+              </div>
+            </td>
+          </tr>
+          <% } }else{ %>
+          <tr>
+            <td colspan="4 ">No users found</td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <ul class="pagination">
+        <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+          <a class="page-link" href="/admin/userdata?page=<%= i %>"><%= i %></a>
+        </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- Table End -->
+
+<%- include('../layouts/admin/footer.ejs') %>

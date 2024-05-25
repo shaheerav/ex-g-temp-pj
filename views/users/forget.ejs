@@ -1,0 +1,50 @@
+<%- include('../layouts/user/header.ejs')  %>
+
+		<!-- Start Hero Section -->
+			<div class="hero">
+				<div class="container">
+					<div class="row justify-content-between">
+                        <div class="col-lg-6">
+							<div class="hero-img-wrap">
+								<img src="images/familypic.png" class="img-fluid" style="height: 500px;">
+							</div>
+						</div>
+						<div class="col-lg-6">
+                            <h2 style="color: white;">Forget Password</h2>
+							<div class="intro-excerpt">
+								<form action="/forget" method="post">
+                                    <% if(typeof message!=='undefined'){ %>
+                                        <p><%= message %></p>
+                                        <% } %>
+                                    <div class="form-group">
+                                      <label style="color: white;"
+                                        >Email Address</label
+                                      ><br />
+                                      <input
+                                        type="text"
+                                        class="form-control"
+                                        name="email"
+                                        style="background: transparent;"
+                                      />
+                                    <div class="col m-2">
+                                      <button
+                                        type="submit"
+                                        class="btn btn-primary btn-lg"
+                                        style="margin-left: 160px"
+                                      >
+                                        Send Reset Link
+                                      </button>
+                                    </div>
+                                    <div>
+                                      <p>Don't have an account please <a href="/users">Register</a></p>
+                                    </div>
+                                    
+                                  </form>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		<!-- End Hero Section -->
+        <%- include('../layouts/user/footerlogin.ejs')  %>

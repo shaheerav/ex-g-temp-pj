@@ -1,0 +1,44 @@
+<%- include ('../layouts/user/header.ejs') %>
+
+<h1>showing Address</h1>
+<button class="btn btn-primary" ><a href="/addAddress?id=<%= isLoggedIn._id %>"style="color:black;" class="text-start">Add Address</a></button>
+<div class="col-12">
+    <div class="bg-light rounded h-100 p-4">
+      <div class="table-responsive m-3 col-lg-12">
+        
+            <% if(user.length > 0){ for(let i = 0 ; i< user.length;i++){ %>
+              <div class="m-3" style="background-color: lightgray; width: 250px; border: 5px solid black;  ">
+            <div style="font-weight: 30px; text-align: center;">
+                <h6><%= user[i].fullname  %></h6>
+                <h6><%= user[i].mobile %></h6>
+                <h6><%= user[i].street  %></h6>
+                <h6><%= user[i].city  %></h6>
+                <h6><%= user[i].state  %></h6>
+                <h6><%= user[i].country  %></h6>
+                <h6><%= user[i].pincode  %></h6>
+                
+            </div>
+            
+            </div>
+            <button type="button" class="btn btn-primary">
+                <a
+                  href="/deleteAddress?id=<%= user[i]._id %>"
+                  class="text-light"
+                  >Delete</a
+                >
+              </button>
+              <button type="button" class="btn btn-primary">
+                <a
+                  href="/editAddress?id=<%= user[i]._id %>"
+                  class="text-light"
+                  >Edit</a
+                >
+              </button>
+            <% } }else{ %>
+            <h1>no address</h1>
+            <% } %>
+      </div>
+    </div>
+  </div>
+
+<%- include ('../layouts/user/footer.ejs') %>

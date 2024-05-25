@@ -1,0 +1,106 @@
+<%- include('../layouts/user/header.ejs')  %>
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+      <div class="col-sm-12 col-xl-6">
+        <div class="bg-light rounded h-100 p-4">
+          <h6 class="mb-4">Edit Address</h6>
+          <form action="" method="post">
+            <input type="hidden" name:="id" value="<%=isLoggedIn._id%>">
+            <div class="mb-3">
+              <label for="fullname" class="form-label"
+                >Fullname</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="address-name"
+                name="fullname"
+                value="<%= user.fullname %>"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="mobile" class="form-label"
+                >Mobile</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="address-mob"
+                name="mobile"
+                value="<%= user.mobile %>"
+
+              />
+            </div>
+            <div class="mb-3">
+              <label for="pincode" class="form-label"
+                >Pincode</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="address-pin"
+                name="pincode"
+                value="<%= user.pincode %>"
+
+              />
+            </div>
+            <div class="mb-3">
+              <label for="street" class="form-label"
+                >Street</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                name="street"
+                id="address-str"
+                value="<%= user.street %>"
+
+              />
+            </div>
+            <div class="mb-3">
+                <label for="city" class="form-label"
+                  >City</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  name="city"
+                  id="address-cit"
+                value="<%= user.city %>"
+
+                />
+              </div>
+              <div class="mb-3">
+                <label for="state" class="form-label"
+                  >State</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  name="state"
+                  id="address-sta"
+                value="<%= user.state %>"
+
+                />
+              </div>
+              <div class="mb-3">
+                <label for="country" class="form-label"
+                  >Country</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  name="country"
+                  id="address-cou"
+                value="<%= user.country %>"
+
+                />
+              </div>
+  
+            <button type="submit" class="btn btn-primary">save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+<%- include('../layouts/user/footer.ejs')  %>

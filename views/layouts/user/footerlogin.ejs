@@ -1,0 +1,34 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+<script>
+    let eyeIcon = document.getElementById('eyeIcon');
+    let password = document.getElementById('password');
+
+    eyeIcon.onclick = function(){
+        if(password.type =='password'){
+            password.type = 'text';
+            eyeIcon.classList.replace('bi-eye-slash','bi-eye')
+        }else{
+            password.type = 'password';
+            eyeIcon.classList.replace('bi-eye','bi-eye-slash')
+        }
+    }
+</script>
+<script>
+    function showDetails(productId) {
+  // Redirect to the productDetails page with the productId as a query parameter
+  window.location.href = '/productDetails?productId=' + productId;
+}
+
+  </script>
+
+<script><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-currency-rupee" viewBox="0 0 16 16">
+<path d="M4 3.06h2.726c1.22 0 2.12.575 2.325 1.724H4v1.051h5.051C8.855 7.001 8 7.558 6.788 7.558H4v1.317L8.437 14h2.11L6.095 8.884h.855c2.316-.018 3.465-1.476 3.688-3.049H12V4.784h-1.345c-.08-.778-.357-1.335-.793-1.732H12V2H4z"/>
+</svg></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/tiny-slider.js"></script>
+<script src="js/custom.js"></script>
+<script src="/javascripts/register.js"></script>
+</body>
+
+</html>

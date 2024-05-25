@@ -1,0 +1,71 @@
+<%- include('../layouts/user/header.ejs')  %>
+
+		<!-- Start Hero Section -->
+			<div class="hero">
+				<div class="container">
+					<div class="row justify-content-between">
+                        <div class="col-lg-6">
+							<div class="hero-img-wrap">
+								<img src="images/familypic.png" class="img-fluid" style="height: 500px;">
+							</div>
+						</div>
+						<div class="col-lg-6">
+                            <h2 style="color: white;">Login</h2>
+							<div class="intro-excerpt">
+								<form action="/login" method="post">
+                                    <div class="form-group">
+                                      <label style="color: white;"
+                                        >Username or Email Address</label
+                                      ><br />
+                                      <input
+                                        type="text"
+                                        class="form-control"
+                                        name="username"
+                                        style="background: transparent;"
+                                      />
+                                    </div>
+                                    <div class="form-group">
+                                      <label class="form-lebel" style="color: white;">Password</label><br />
+                                      
+                                      <div style="position: relative;">
+                                        <input
+                                            type="password"
+                                            class="form-control"
+                                            name="password"
+                                            id="password"
+                                            style="background: transparent; padding-right: 30px;"
+                                        />
+                                        <i class="bi bi-eye-slash" id="eyeIcon" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer; color: white;"></i>
+                                    </div>
+                                      
+                                      <a href="/forget" style="margin-left: 280px">Forget Password</a>
+                                    </div>
+                                    <p>
+                                      By login, you agree to Trend Setter
+                                      <a href="/termsofuse">Terms of Use</a> &
+                                      <a href="/privacypolicy">Privacy Policy</a>
+                                    </p>
+                                    <div class="col">
+                                      <button
+                                        type="submit"
+                                        class="btn btn-primary btn-lg"
+                                        style="margin-left: 160px"
+                                      >
+                                        Login
+                                      </button>
+                                    </div>
+                                    <div>
+                                      <p>Don't have an account please <a href="/users">Register</a></p>
+                                    </div>
+                                    <% if(typeof message!=='undefined'){ %>
+                                    <p><%= message %></p>
+                                    <% } %>
+                                  </form>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		<!-- End Hero Section -->
+        <%- include('../layouts/user/footerlogin.ejs')  %>

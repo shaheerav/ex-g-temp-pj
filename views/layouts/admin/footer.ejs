@@ -1,0 +1,122 @@
+<!-- Footer Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light rounded-top p-4">
+        <div class="row">
+            <div class="col-12 col-sm-6 text-center text-sm-start">
+                &copy; <a href="#">Your Site Name</a>, All Right Reserved. 
+            </div>
+            <div class="col-12 col-sm-6 text-center text-sm-end">
+                <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                Designed By <a href="https://htmlcodex.com">HTML Codex</a>
+            </br>
+            Distributed By <a class="border-bottom" href="https://themewagon.com" target="_blank">ThemeWagon</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer End -->
+</div>
+<!-- Content End -->
+
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+<script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<script>
+    //*********************** PREVIEW IMAGE **************************//
+    const input = document.getElementById('inputImage');
+    const previewContainer = document.getElementById('previewContainer');
+    input.addEventListener('change', handleFileSelect);
+    function handleFileSelect(event){
+        const files = event.target.files;
+        previewContainer.innerHTML = '';
+
+        if(files){
+            for(let i= 0 ; i<files.length ;i++){
+                const file= files[i];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const img =  document . createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('preview-image');
+                    previewContainer.appendChild(img);  
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+    //************************* CROPPED IMAGE*****************
+    document.addEventListener('DOMContentLoaded', function () {
+        var inputImage = document.getElementById('inputImage');
+        var previewImage = document.getElementById('previewImage');
+        var croppedImageDataInput = document.getElementById('croppedImageData');
+        let croppedImage = document.getElementById('croppedImage');
+        let submitButton = document.getElementById('submitButton');
+        let form = document.getElementById('form');
+        let cropper;
+
+        inputImage.addEventListener('change', function () {
+            var file = this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+
+                if(cropper){
+                    cropper.destroy();
+                }
+                // Initialize Cropper.js
+                 cropper = new Cropper(previewImage, {
+                    aspectRatio: 1, // Set your desired aspect ratio
+                    viewMode: 1,    // Set the view mode (0, 1, 2, 3)
+                    crop: function () {
+                        var canvas = cropper.getCroppedCanvas();
+                        var croppedImageData = canvas.toDataURL('image/jpeg'); // Change to your preferred format
+
+                        // Set the cropped image data to the hidden input
+                        croppedImageDataInput.value = croppedImageData;
+                        croppedImage.src= croppedImageData;
+                    }
+                });
+                submitButton.removeAttribute('disabled')
+            };
+
+            reader.readAsDataURL(file);
+        });
+        submitButton.addEventListener('click',function(){
+            form.submit();
+        })
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/lib/chart/chart.min.js"></script>
+<script src="/admin/lib/easing/easing.min.js"></script>
+<script src="/admin/lib/waypoints/waypoints.min.js"></script>
+<script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+<script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+<script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<!-- Template Javascript -->
+<script src="/admin/js/main.js"></script>
+<script src="/javascripts/product.js"></script>
+
+</body>
+
+</html>
