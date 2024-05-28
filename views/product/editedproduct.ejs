@@ -1,0 +1,336 @@
+<%- include('../layouts/admin/header.ejs') %>
+<!-- Form Start -->
+<div class="container-fluid pt-4 px-4">
+  <div class="row g-4">
+    <div class="col-sm-12 col-xl-12">
+      <div class="bg-light rounded h-100 p-4">
+        <h6 class="mb-4">Edit Product</h6>
+        <form method="post" action="" enctype="multipart/form-data">
+          <input type="hidden" name="id" value="<%= product._id  %>">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              required
+              value="<%= product.name %>"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Brand</label>
+            <input
+              type="text"
+              class="form-control"
+              name="brand"
+              value="<%= product.brand %>"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <input
+              type="text"
+              class="form-control"
+              name="description"
+              required
+              value="<%= product.description %>"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="category">Category</label>
+            <select class="form-control" name="category" required>
+              <% categories.forEach(function(category) { %>
+                <option value="<%= category._id %>" <%= category._id.toString() === product.category.toString() ? 'selected' : '' %>>
+                  <%= category.name %>
+                </option>
+              <% }); %>
+            </select>
+          </div>
+          
+
+          <div class="mb-3">
+            <label class="form-label">Size</label>
+            <input
+              type="text"
+              class="form-control"
+              name="Size"
+              required
+              value=" <%= product.size %>"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Price</label>
+            <input
+              type="text"
+              class="form-control"
+              name="price"
+              required
+              value="<%= product.price %>"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Stock</label>
+            <input
+              type="text"
+              class="form-control"
+              name="stock"
+              required
+              value="<%= product.stock %>"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Existing Images</label>
+            <% product.image.forEach(function(pic) { %>
+              <img src="/uploads/<%= pic %>" alt="Product Image" style="width: 100px; height: auto; margin-right: 10px;">
+            <% }); %>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Add New Images</label>
+            <input type="file" class="form-control" name="image" accept="image/*" id="inputImage" multiple>
+          </div>
+          
+          <main class="page">
+            <label class="form-check-label" for="isFeatured">Main Image </label>
+            <!-- input file -->
+            <div class="box">
+                <input type="file" id="file-input" name="imagecr" required>
+                
+                <div class="error" id="image-error"></div>
+            </div>
+            <!-- leftbox -->
+            <div class="box-2">
+                <div class="result"></div>
+            </div>
+            <!--rightbox-->
+            <div class="box-2 img-result hide">
+                <!-- result of crop -->
+                <img class="cropped" src="" alt="">
+            </div>
+            <!-- input file -->
+            <div class="box">
+                <div class="options hide">
+                    <label> Width</label>
+                    <input type="number" class="img-w" value="500" min="100" max="1200" /> <!-- Adjust the default width here -->
+                    <label> Height</label>
+                    <input type="number" class="img-h" value="500" min="100" max="1200" /> <!-- Adjust the default height here -->
+                </div>
+                <!-- save btn -->
+                <button class="btn save hide btn-primary">Save</button>
+                <button class="btn update btn-primary">Add Product</button>
+            </div>
+        </main>
+
+          <button type="submit" class="btn btn-primary">Save</button>
+          <% if(typeof message!=='undefined'){ %>
+          <p><%= message %></p>
+          <% } %>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Form End -->
+<!-- Footer Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light rounded-top p-4">
+        <div class="row">
+            <div class="col-12 col-sm-6 text-center text-sm-start">
+                &copy; <a href="#">Your Site Name</a>, All Right Reserved. 
+            </div>
+            <div class="col-12 col-sm-6 text-center text-sm-end">
+                <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                Designed By <a href="https://htmlcodex.com">HTML Codex</a>
+            </br>
+            Distributed By <a class="border-bottom" href="https://themewagon.com" target="_blank">ThemeWagon</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer End -->
+</div>
+<!-- Content End -->
+
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+<script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/lib/chart/chart.min.js"></script>
+<script src="/admin/lib/easing/easing.min.js"></script>
+<script src="/admin/lib/waypoints/waypoints.min.js"></script>
+<script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+<script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+<script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+<script>
+  let result = document.querySelector('.result');
+        let save = document.querySelector('.save');
+        let updateBtn = document.querySelector('.update');
+        let cropper;
+
+        // Handle image selection event
+        document.getElementById('file-input').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const img = new Image();
+                img.src = event.target.result;
+
+                // Clear previous image
+                result.innerHTML = '';
+
+                // Append the image to the result div
+                result.appendChild(img);
+
+                // Initialize Cropper
+                cropper = new Cropper(img, {
+                    aspectRatio: null, // Aspect ratio for cropping
+                    viewMode: 1 // Set to 1 for restrict mode, 0 for unrestricted
+                });
+
+                // Show save button and cropping options
+                save.classList.remove('hide');
+                document.querySelector('.options').classList.remove('hide');
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // Handle save button click
+        save.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get cropped image data
+            const canvas = cropper.getCroppedCanvas({
+                width: parseInt(document.querySelector('.img-w').value) || 300, // Width of the cropped image
+                height: parseInt(document.querySelector('.img-h').value) || 300 // Height of the cropped image
+            });
+
+            // Clear previous cropped image
+            document.querySelector('.cropped').remove();
+
+            // Create new cropped image element and append it
+            const croppedImg = document.createElement('img');
+            croppedImg.classList.add('cropped');
+            croppedImg.src = canvas.toDataURL();
+            result.appendChild(croppedImg);
+
+            // Show update button
+            updateBtn.classList.remove('hide');
+
+            // Set the value of the hidden input field to the cropped image data URL
+            document.getElementById('cropped-image').value = croppedImg.src;
+        });
+
+        // Handle update button click
+        updateBtn.addEventListener('click', function () {
+            // Validate form fields
+            if (!validateForm()) {
+                return;
+            }
+
+            // Get the form data
+            const formData = new FormData(document.getElementById('product-form'));
+
+            // Append the cropped image data to formData
+            formData.append('croppedImage', document.getElementById('cropped-image').value);
+
+            // Send an AJAX request to the backend
+            fetch('/product/addProduct', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle success response
+                    console.log(data);
+                    // Redirect or update UI as needed
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('There was a problem with the request:', error);
+                });
+        });
+
+        // Function to validate form fields
+            function validateForm() {
+                let isValid = true;
+
+                // Reset previous error messages
+                document.querySelectorAll('.error').forEach(error => error.textContent = '');
+
+                // Validate each form field
+                const name = document.getElementById('name').value.trim();
+                if (name === '') {
+                    document.getElementById('name-error').textContent = 'Please enter product name';
+                    isValid = false;
+                }
+
+                const brand = document.getElementById('brand').value.trim();
+                if (brand === '') {
+                    document.getElementById('brand-error').textContent = 'Please enter brand name';
+                    isValid = false;
+                }
+
+                const description = document.getElementById('description').value.trim();
+                if (description === '') {
+                    document.getElementById('description-error').textContent = 'Please enter product description';
+                    isValid = false;
+                }
+
+                const category = document.getElementById('category').value;
+                if (category === '') {
+                    document.getElementById('category-error').textContent = 'Please select product category';
+                    isValid = false;
+                }
+
+                const price = document.getElementById('price').value.trim();
+                if (price === '' || isNaN(price) || parseFloat(price) <= 0) {
+                    document.getElementById('price-error').textContent = 'Please enter valid product price';
+                    isValid = false;
+                }
+
+                const stock = document.getElementById('stock').value.trim();
+                if (stock === '' || isNaN(stock) || parseInt(stock) < 0) {
+                    document.getElementById('stock-error').textContent = 'Please enter valid product stock';
+                    isValid = false;
+                }
+
+                const images = document.getElementById('images').files;
+                if (images.length === 0) {
+                    document.getElementById('images-error').textContent = 'Please select product image';
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+            document.getElementById('product-form').addEventListener('submit', function(event) {
+    if (!validateForm()) {
+        event.preventDefault();
+    }
+});
+</script>
+
+<!-- Template Javascript -->
+<script src="/admin/js/main.js"></script>
+<script src="/javascripts/product.js"></script>
+
+</body>
+
+</html>

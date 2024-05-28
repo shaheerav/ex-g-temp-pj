@@ -449,7 +449,7 @@
 
                 // Validate each form field
                 const name = document.getElementById('name').value.trim();
-                if (name === '') {
+                if (name === ''||!name.replace(/\s/g, '').length) {
                     document.getElementById('name-error').textContent = 'Please enter product name';
                     isValid = false;
                 }

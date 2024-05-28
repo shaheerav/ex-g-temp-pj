@@ -50,7 +50,7 @@ const addProduct = async (req,res)=>{
         const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
         const inputSize = req.body.size;
         
-        const categories = await Category.find();
+        const category = await Category.find();
 
         if (!validSizes.includes(inputSize)) {
             return res.render('addProduct', {
@@ -124,10 +124,10 @@ const editProduct = async(req,res)=>{
         const id = req.query.id;
         const product = await Product.findById({_id:id});
         const user = await User.findById(req.session.User_id);
-        const categories = await Category.find();
+        const category = await Category.find();
         console.log('product in edit page :', product)
         if(product){
-            res.render('edit-product',{product:product,admin:user,categories,validSizes:validSizes});
+            res.render('edit-product',{product:product,admin:user,category,validSizes:validSizes});
         }else{
             res.redirect('/product');
         }
@@ -140,34 +140,48 @@ const updateProduct = async (req,res)=>{
     try{
         const user = await User.findById(req.session.User_id);
         const category = await Category.find();
+
         const outputPath = path.join(__dirname, "../public/croppedImages");
         if (!fs.existsSync(outputPath)) {
             fs.mkdirSync(outputPath, { recursive: true });
           }
 
-          const arrayOfImages = [];
-          if(req.files && req.files.length > 0){
-            for (let i = 0; i < req.files.length; i++) {
-                let imageName = req.files[i].filename;
-                const imagePath = path.join(outputPath,imageName);
+
+            const arrayOfImages = [];
+          if(req.files && req.files['image']){
+            for (let i = 0; i < req.files['image'].length; i++) {
+                let imageName = req.files['image'][i].filename;
                 // Perform image cropping here using sharp
-                await sharp(req.files[i].path)
+                await sharp(req.files['image'][i].path)
                   .resize(200, 250) // Adjust the width and height as needed
-                  .toFile(imagePath);
+                  .toFile(path.join(outputPath, imageName));
                 arrayOfImages.push(imageName);
-              }
+                }
           }
-          const productId = req.body.id;
+            
+          
+          let imagecrPath = '';
+        if (req.files && req.files['imagecr'] && req.files['imagecr'][0]) {
+            const imagecrFile = req.files['imagecr'][0];
+            const imagecrName = imagecrFile.filename;
+            imagecrPath = path.join(outputPath, imagecrName);
+            await sharp(imagecrFile.path)
+                .resize(200, 250) // Adjust the width and height as needed
+                .toFile(imagecrPath);
+        }
+
+        const productId = req.body.id;
           if(!productId){
             return res.status(400).send('Product ID is required');
           }
-          
+
           const categoryObjectId = new mongoose.Types.ObjectId(req.body.category);
           const existingProduct = await Product.findById(productId);
           if(!existingProduct){
             return res.status(404).send('Product not found');
           }
-          const updatedImages = existingProduct.image?existingProduct.image.concat(arrayOfImages):arrayOfImages;
+          const updatedImages = existingProduct.image ? existingProduct.image.concat(arrayOfImages) : arrayOfImages;
+        
         const updateProduct = await Product.findByIdAndUpdate(productId,{
             $set:{
             name:req.body.name,
@@ -177,7 +191,8 @@ const updateProduct = async (req,res)=>{
             size:req.body.size,
             price:req.body.price,
             stock:req.body.stock,
-            image:updatedImages
+            image:updatedImages,
+            imagecr:imagecrPath
         },
     },
     {new:true}

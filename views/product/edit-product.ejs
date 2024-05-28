@@ -1,104 +1,271 @@
-<%- include('../layouts/admin/header.ejs') %>
-<!-- Form Start -->
-<div class="container-fluid pt-4 px-4">
-  <div class="row g-4">
-    <div class="col-sm-12 col-xl-12">
-      <div class="bg-light rounded h-100 p-4">
-        <h6 class="mb-4">Edit Product</h6>
-        <form method="post" action="" enctype="multipart/form-data">
-          <input type="hidden" name="id" value="<%= product._id  %>">
-          <div class="mb-3">
-            <label class="form-label">Name</label>
-            <input
-              type="text"
-              class="form-control"
-              name="name"
-              value="<%= product.name %>"
-            />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Brand</label>
-            <input
-              type="text"
-              class="form-control"
-              name="brand"
-              value="<%= product.brand %>"
-            />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Description</label>
-            <input
-              type="text"
-              class="form-control"
-              name="description"
-              value="<%= product.description %>"
-            />
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="category">Category</label>
-            <select class="form-control" name="category">
-              <% categories.forEach(function(category) { %>
-                <option value="<%= category._id %>" <%= category._id.toString() === product.category.toString() ? 'selected' : '' %>>
-                  <%= category.name %>
-                </option>
-              <% }); %>
-            </select>
-          </div>
-          
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend Setter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-          <div class="mb-3">
-            <label class="form-label">Size</label>
-            <input
-              type="text"
-              class="form-control"
-              name="Size"
-              value=" <%= product.size %>"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Price</label>
-            <input
-              type="text"
-              class="form-control"
-              name="price"
-              value="<%= product.price %>"
-              required
+    <!-- Libraries Stylesheet -->
+    <link href="/admin/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/admin/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
 
-            />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Stock</label>
-            <input
-              type="text"
-              class="form-control"
-              name="stock"
-              value="<%= product.stock %>"
-              required
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/admin/css/bootstrap.min.css" rel="stylesheet">
 
-            />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Existing Images</label>
-            <% product.image.forEach(function(pic) { %>
-              <img src="/uploads/<%= pic %>" alt="Product Image" style="width: 100px; height: auto; margin-right: 10px;">
-            <% }); %>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Add New Images</label>
-            <input type="file" class="form-control" name="image" accept="image/*" id="inputImage" multiple>
-          </div>
-          <button type="submit" class="btn btn-primary">Save</button>
-          <% if(typeof message!=='undefined'){ %>
-          <p><%= message %></p>
-          <% } %>
-        </form>
-      </div>
+    <!-- Template Stylesheet -->
+    <link href="/admin/css/style.css" rel="stylesheet">
+    <link href="/croperJs/cropper.css" rel="stylesheet">
+    <!-- Normalize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <!-- Cropper CSS -->
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.4/cropper.min.css'>
+    <style>
+         .preview-image-container {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+        .page {
+            margin: 1em auto;
+            max-width: 768px;
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            height: 100%;
+        }
+
+        .box {
+            padding: 0.5em;
+            width: 100%;
+            margin: 0.5em;
+        }
+
+        .box-2 {
+            padding: 0.5em;
+            width: calc(100% / 2 - 1em);
+        }
+
+        .options label,
+        .options input {
+            width: 4em;
+            padding: 0.5em 1em;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.8em;
+            margin-top: 0.2em;
+        }
+    </style>
+</head>
+<div class="container-xxl position-relative bg-white d-flex p-0">
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
     </div>
-  </div>
-</div>
-<!-- Form End -->
-<!-- Footer Start -->
+    <!-- Spinner End -->
+
+
+    <!-- Sidebar Start -->
+    <div class="sidebar pe-4 pb-3">
+        <nav class="navbar bg-light navbar-light">
+            <a href="/admin/home" class="navbar-brand mx-4 mb-3">
+                <h3 class="text-primary">Trend Setter</h3>
+            </a>
+            <div class="d-flex align-items-center ms-4 mb-4">
+                <div class="position-relative">
+                    
+                    <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                </div>
+                <div class="ms-3">
+                    <h6 class="mb-0"><%= admin.name  %></h6>
+                    <span>Admin</span>
+                </div>
+            </div>
+            <div class="navbar-nav w-100">
+                <a href="/admin/home" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                <a href="/admin/userdata" class="nav-item nav-link"><i class="bi bi-person"></i>Customers</a>
+                <a href="/product" class="nav-item nav-link"><i class="bi bi-minecart"></i>Products</a>
+                <a href="/category" class="nav-item nav-link"><i class="bi bi-layout-wtf"></i>Category</a>
+                <a href="chart.html" class="nav-item nav-link"><i class="bi bi-truck"></i>Orders</a>
+                <a href="chart.html" class="nav-item nav-link"><i class="bi bi-bar-chart"></i>Sales Report</a>
+                <a href="chart.html" class="nav-item nav-link"><i class="bi bi-star"></i>Coupon Management</a>
+                <a href="chart.html" class="nav-item nav-link"><i class="bi bi-file-richtext"></i>Banner Management</a>
+            </div>
+        </nav>
+    </div>
+    <!-- Sidebar End -->
+
+
+    <!-- Content Start -->
+    <div class="content">
+        <!-- Navbar Start -->
+        <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+            <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
+                <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
+            </a>
+            <a href="#" class="sidebar-toggler flex-shrink-0">
+                <i class="fa fa-bars"></i>
+            </a>
+            <form class="d-none d-md-flex ms-4">
+                <input class="form-control border-0" type="search" placeholder="Search">
+            </form>
+            <div class="navbar-nav align-items-center ms-auto">
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fa fa-envelope me-lg-2"></i>
+                        <span class="d-none d-lg-inline-flex">Message</span>
+                    </a>
+
+                </div>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fa fa-bell me-lg-2"></i>
+                        <span class="d-none d-lg-inline-flex">Notificatin</span>
+                    </a>
+                    
+                </div>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <span class="d-none d-lg-inline-flex"><%= admin.name %></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                        <a href="#" class="dropdown-item">My Profile</a>
+                        <a href="#" class="dropdown-item">Settings</a>
+                        <a href="/admin/adlogout" class="dropdown-item">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Navbar End -->
+
+<body>
+    <div class="row">
+        <div class="container col-md-8 bg-light">
+            <h1 class="mb-4">Edit Product</h1>
+
+            <!-- Form for adding a product -->
+            <form id="productForm" action="" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id" value="<%= product._id  %>">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Product Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" value="<%= product.name %>" required>
+                    <div class="error" id="name-error"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Brand</label>
+                    <input type="text" class="form-control" name="brand" id="brand" value="<%= product.brand %>" required>
+                    <div class="error" id="brand-error"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <input class="form-control" id="description" name="description" value="<%= product.description %>" required>
+                    <div class="error" id="description-error"></div>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label" for="category">Category</label>
+                    <select class="form-control" name="category" required>
+                      <% category.forEach(function(category) { %>
+                        <option value="<%= category._id %>" <%= category._id.toString() === product.category.toString() ? 'selected' : '' %>>
+                          <%= category.name %>
+                        </option>
+                      <% }); %>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Size</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="Size"
+                      required
+                      value=" <%= product.size %>"
+                    />
+                  </div>
+                
+                  
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <input type="number" class="form-control" id="price" name="price" value="<%= product.price %>" required>
+                    <div class="error" id="price-error"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="stock" class="form-label">Stock:</label>
+                    <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>" required>
+                    <div class="error" id="stock-error"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Existing Images</label>
+                    <% product.image.forEach(function(pic) { %>
+                      <img src="/uploads/<%= pic %>" alt="Product Image" style="width: 100px; height: auto; margin-right: 10px;">
+                    <% }); %>
+                  </div>
+
+                <div class="mb-3">
+                    <label for="images" class="form-label">Additional Images:</label>
+                    <input type="file" class="form-control" id="inputImage" name="image"  accept=".jpg, .jpeg, .png" multiple>
+                    <div id="previewContainer" class="preview-container"></div>
+                </div>
+
+
+                <main class="page">
+                    <label class="form-check-label" for="isFeatured">Main Image </label>
+                    <!-- input file -->
+                    <div class="box">
+                        <input type="file" id="file-input" name="imagecr" required>
+                        
+                        <div class="error" id="image-error"></div>
+                    </div>
+                    <!-- leftbox -->
+                    <div class="box-2">
+                        <div class="result"></div>
+                    </div>
+                    <!--rightbox-->
+                    <div class="box-2 img-result hide">
+                        <!-- result of crop -->
+                        <img class="cropped" src="" alt="">
+                    </div>
+                    <!-- input file -->
+                    <div class="box">
+                        <div class="options hide">
+                            <label> Width</label>
+                            <input type="number" class="img-w" value="500" min="100" max="1200" /> <!-- Adjust the default width here -->
+                            <label> Height</label>
+                            <input type="number" class="img-h" value="500" min="100" max="1200" /> <!-- Adjust the default height here -->
+                        </div>
+                        <!-- save btn -->
+                        <button class="btn save hide btn-primary">Save</button>
+                        <button class="btn update btn-primary">Add Product</button>
+                    </div>
+                </main>
+            </form>
+        </div>
+    </div>
+    <!-- Footer Start -->
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light rounded-top p-4">
         <div class="row">
@@ -122,16 +289,14 @@
 <!-- Back to Top -->
 <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 </div>
-
-<!-- JavaScript Libraries -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
 <script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/admin/lib/chart/chart.min.js"></script>
 <script src="/admin/lib/easing/easing.min.js"></script>
 <script src="/admin/lib/waypoints/waypoints.min.js"></script>
@@ -144,6 +309,201 @@
 <script src="/admin/js/main.js"></script>
 <script src="/javascripts/product.js"></script>
 
+    <script>
+        //*********************** PREVIEW IMAGE **************************//
+    const input = document.getElementById('inputImage');
+    const previewContainer = document.getElementById('previewContainer');
+    input.addEventListener('change', handleFileSelect);
+    function handleFileSelect(event){
+        const files = event.target.files;
+        previewContainer.innerHTML = '';
+
+        if(files){
+            for(let i= 0 ; i<files.length ;i++){
+                const file= files[i];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+
+                    const container = document.createElement('div');
+                    container.classList.add('preview-image-container');
+
+                    const img =  document . createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('preview-image');
+
+                    const removeButton = document.createElement('button');
+                    removeButton.classList.add('remove-button');
+                    removeButton.textContent = 'x';
+                    removeButton.addEventListener('click',()=>{
+                        previewContainer.removeChild(container);
+                    });
+                    
+                    container.appendChild(img);
+                    container.appendChild(removeButton);
+                    previewContainer.appendChild(container);  
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+        // Variables
+        let result = document.querySelector('.result');
+        let save = document.querySelector('.save');
+        let updateBtn = document.querySelector('.update');
+        let cropper;
+
+        // Handle image selection event
+        document.getElementById('file-input').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const img = new Image();
+                img.src = event.target.result;
+
+                // Clear previous image
+                result.innerHTML = '';
+
+                // Append the image to the result div
+                result.appendChild(img);
+
+                // Initialize Cropper
+                cropper = new Cropper(img, {
+                    aspectRatio: null, // Aspect ratio for cropping
+                    viewMode: 1 // Set to 1 for restrict mode, 0 for unrestricted
+                });
+
+                // Show save button and cropping options
+                save.classList.remove('hide');
+                document.querySelector('.options').classList.remove('hide');
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // Handle save button click
+        save.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get cropped image data
+            const canvas = cropper.getCroppedCanvas({
+                width: parseInt(document.querySelector('.img-w').value) || 300, // Width of the cropped image
+                height: parseInt(document.querySelector('.img-h').value) || 300 // Height of the cropped image
+            });
+
+            // Clear previous cropped image
+            document.querySelector('.cropped').remove();
+
+            // Create new cropped image element and append it
+            const croppedImg = document.createElement('img');
+            croppedImg.classList.add('cropped');
+            croppedImg.src = canvas.toDataURL();
+            result.appendChild(croppedImg);
+
+            // Show update button
+            updateBtn.classList.remove('hide');
+
+            // Set the value of the hidden input field to the cropped image data URL
+            document.getElementById('cropped-image').value = croppedImg.src;
+        });
+
+        // Handle update button click
+        updateBtn.addEventListener('click', function () {
+            // Validate form fields
+            if (!validateForm()) {
+                return;
+            }
+
+            // Get the form data
+            const formData = new FormData(document.getElementById('product-form'));
+
+            // Append the cropped image data to formData
+            formData.append('croppedImage', document.getElementById('cropped-image').value);
+
+            // Send an AJAX request to the backend
+            fetch('/product/addProduct', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle success response
+                    console.log(data);
+                    // Redirect or update UI as needed
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('There was a problem with the request:', error);
+                });
+        });
+
+        // Function to validate form fields
+            function validateForm() {
+                let isValid = true;
+
+                // Reset previous error messages
+                document.querySelectorAll('.error').forEach(error => error.textContent = '');
+
+                // Validate each form field
+                const name = document.getElementById('name').value.trim();
+                if (name === ''||!name.replace(/\s/g, '').length) {
+                    document.getElementById('name-error').textContent = 'Please enter product name';
+                    isValid = false;
+                }
+
+                const brand = document.getElementById('brand').value.trim();
+                if (brand === '') {
+                    document.getElementById('brand-error').textContent = 'Please enter brand name';
+                    isValid = false;
+                }
+
+                const description = document.getElementById('description').value.trim();
+                if (description === '') {
+                    document.getElementById('description-error').textContent = 'Please enter product description';
+                    isValid = false;
+                }
+
+                const category = document.getElementById('category').value;
+                if (category === '') {
+                    document.getElementById('category-error').textContent = 'Please select product category';
+                    isValid = false;
+                }
+
+                const price = document.getElementById('price').value.trim();
+                if (price === '' || isNaN(price) || parseFloat(price) <= 0) {
+                    document.getElementById('price-error').textContent = 'Please enter valid product price';
+                    isValid = false;
+                }
+
+                const stock = document.getElementById('stock').value.trim();
+                if (stock === '' || isNaN(stock) || parseInt(stock) < 0) {
+                    document.getElementById('stock-error').textContent = 'Please enter valid product stock';
+                    isValid = false;
+                }
+
+                const images = document.getElementById('images').files;
+                if (images.length === 0) {
+                    document.getElementById('images-error').textContent = 'Please select product image';
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+            document.getElementById('product-form').addEventListener('submit', function(event) {
+    if (!validateForm()) {
+        event.preventDefault();
+    }
+});
+
+    </script>
 </body>
 
 </html>
+ 
