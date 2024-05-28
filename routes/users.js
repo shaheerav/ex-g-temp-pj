@@ -134,7 +134,7 @@ userRouts.get('/women',controller.womenCategory);
 userRouts.get('/kids',controller.kidsCategory);
 userRouts.get('/footwear',controller.footwearCategory);
 userRouts.get('/userDetails',auth.isLogin,controller.userDetails);
-userRouts.get('/editProfile',controller.editProfileLoad);
+userRouts.get('/editProfile',auth.isLogin,controller.editProfileLoad);
 userRouts.post('/editProfile',controller.updateProfile);
 userRouts.get('/showAddress',controller.addresspageLoad);
 userRouts.get('/addAddress',controller.addAddressLoad);

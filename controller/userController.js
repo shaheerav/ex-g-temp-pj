@@ -13,14 +13,19 @@ const Address = require('../models/address');
 const Cart = require('../models/cart');
 const { session, use } = require("passport");
 const userRouts = require("../routes/users");
+const category = require("../models/category");
 
-let count =null;
+let count =0;
 const homepage = async (req, res) => {
   try {
-    const men = await Product.find({category:'65d48d3fe8dd60e36487fd99'}).limit(3);
-    const women = await Product.find({category:'65d556dc99a61d9341709237'}).limit(3);
-    const kids = await Product.find({category:'65d556f099a61d934170923a'}).limit(3);
-    const footwear = await Product.find({category:'65fb1b1111e313d0bc1c1c37'}).limit(3);
+    const catman = await Category.find({name:'men'});
+    const catwomen = await Category.find({name:'women'});
+    const catkids = await Category.find({name:'kids'});
+    const catfootwear = await Category.find({name:'footwear'});
+    const men = await Product.find({category:catman}).limit(3);
+    const women = await Product.find({category:catwomen}).limit(3);
+    const kids = await Product.find({category:catkids}).limit(3);
+    const footwear = await Product.find({category:catfootwear}).limit(3);
     const isLoggedIn = req.session.user || req.user;
     if(isLoggedIn){
       const id = isLoggedIn._id;
@@ -220,7 +225,7 @@ const loginValidate = async (req, res) => {
     });
 
     if (!userData) {
-      return res.render('login',{message:'Username/email incorrect',isLoggedIn:false})
+      return res.render('login',{message:'Username/email incorrect',isLoggedIn:false,count:count})
     }
       const passwordMatch = await bcrypt.compare(password, userData.password);
 
@@ -481,7 +486,9 @@ const privacypolicy = async (req,res)=>{
 const menCategory = async (req,res)=>{
   try{
     const isLoggedIn = req.session.user;
-    const productList = await Product.find({category:'65d48d3fe8dd60e36487fd99'});
+    const category = await Category.find({name:'men'});
+    const productList = await Product.find({category:category});
+    
     res.render('men',{product:productList,isLoggedIn:isLoggedIn,count:count})
   }catch(error){
     console.log(error.message);
@@ -490,7 +497,9 @@ const menCategory = async (req,res)=>{
 const womenCategory = async (req,res)=>{
   try{
     const isLoggedIn = req.session.user;
-    const productList = await Product.find({category:'65d556dc99a61d9341709237'});
+    const categoryWomen = await Category.find({name:'women'});
+    const productList = await Product.find({category:categoryWomen});
+    
     res.render('women',{product:productList,isLoggedIn:isLoggedIn,count:count})
   }catch(error){
     console.log(error.message);
@@ -499,7 +508,8 @@ const womenCategory = async (req,res)=>{
 const kidsCategory = async (req,res)=>{
   try{
     const isLoggedIn = req.session.user;
-    const productList = await Product.find({category:'65d556f099a61d934170923a'});
+    const categoryKids = await Category.find({name:'kids'})
+    const productList = await Product.find({category:categoryKids});
     res.render('kids',{product:productList,isLoggedIn:isLoggedIn,count:count})
   }catch(error){
     console.log(error.message);
@@ -508,7 +518,8 @@ const kidsCategory = async (req,res)=>{
 const footwearCategory = async (req,res)=>{
   try{
     const isLoggedIn = req.session.user;
-    const productList = await Product.find({category:'65fb1b1111e313d0bc1c1c37'});
+    const categoryFootwear = await category.find({name:'footwear'})
+    const productList = await Product.find({category:categoryFootwear});
     res.render('footwear',{product:productList,isLoggedIn:isLoggedIn,count:count})
   }catch(error){
     console.log(error.message);
@@ -518,7 +529,14 @@ const footwearCategory = async (req,res)=>{
 const userDetails = async (req,res)=>{
   try{
     const isLoggedIn = req.session.user;
-    res.render('userDetails',{isLoggedIn:isLoggedIn,count:count});
+    const id = isLoggedIn._id;
+    console.log(id,'userDetailes');
+    const userData = await User.findById(id);
+    if(userData){
+      res.render('userDetails',{isLoggedIn:isLoggedIn,count:count});
+    }else{
+      res.status(400).send('some error happend');
+    }    
   }catch(error){
     console.log(error.message);
   }
@@ -539,17 +557,16 @@ const editProfileLoad = async (req,res) =>{
 };
 const updateProfile = async (req,res)=>{
   try{
-    const userData = await User.findByIdAndUpdate({_id:req.query.id},{
-      $set:
+    const id = req.body.id;
+    const userDataUpdated = 
       {
         name:req.body.name,
         username:req.body.username,
         email:req.body.email,
         mobile:req.body.mobile
       }
-    });
-    
-    res.redirect('/userDetails')
+      await User.findByIdAndUpdate(id,userDataUpdated,{new:true});
+    res.redirect(`/userDetails?id=${id}`)
 
   }catch(error){
     console.log(error.message);
@@ -691,67 +708,9 @@ const addToCart = async (req, res) => {
 };
 
 const addproducttoCart = async (req, res) => {
-  try {
-    const userId = req.session.user;
-    const productId = req.body.id;
+  
 
-    // Find the product by ID
-    const product = await Product.findById(productId);
-    console.log(product.stock, 'product quantity');
-    if (!product) {
-      return res.status(404).send('No product found');
-    }
-
-    // Check if product is in stock
-    if (product.stock <= 0) {
-      return res.status(400).send('Product is out of stock');
-    }
-
-    // Find the user's cart
-    let userCart = await Cart.findOne({ userid: userId });
-    let totalQuantity = 0;
-    for(const product of userCart.products){
-      totalQuantity += product.quantity;
-    }
-    console.log(totalQuantity,'quantity');
-    const maximumallowedQuantity = 10;
-    if(totalQuantity +1 > maximumallowedQuantity){
-      return res.status(400).send('Maximum Quantity Exceeded')
-    }
-
-
-    if (userCart) {
-      // Check if the product is already in the cart
-      const productIndex = userCart.products.findIndex(p => p.productId.toString() === productId);
-
-      if (productIndex !== -1) {
-        // Increment the quantity of the product in the cart
-        userCart.products[productIndex].quantity += 1;
-      } else {
-        // Add the product to the cart
-        userCart.products.push({ productId: productId, quantity: 1 });
-      }
-
-      // Increment the total price of the cart
-      userCart.total += product.price;
-    } else {
-      // Create a new cart for the user
-      userCart = new Cart({
-        userid: userId,
-        products: [{ productId: productId, quantity: 1 }],
-        total: product.price
-      });
-    }
-
-    // Decrement the product stock
-    product.stock -= 1;
-
-    // Save the cart and the product
-    await userCart.save();
-    await product.save();
-
-    res.redirect('/');
-  } catch (error) {
+  if (error) {
     console.error(error.message);
     res.status(500).send('Internal server error');
   }

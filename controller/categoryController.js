@@ -56,7 +56,7 @@ const editCategory = async(req,res)=>{
         const id = req.query.id;
         const category = await Category.findById ({_id:id});
         if(category){
-            res.render('edit-category',{category:category,admin:user})
+            res.render('edit-category',{category:category,admin:user,message:''})
         }else{
             res.redirect('/category');
         }
@@ -66,14 +66,27 @@ const editCategory = async(req,res)=>{
 };
 const updateCategory = async (req,res)=>{
     try{
-        const category = await Category.findByIdAndUpdate({_id:req.body.id},{$set:{
+    const id = req.body.id
+    console.log(id,'category id');
+        const category = await Category.findByIdAndUpdate(id,{$set:{
             name:req.body.name,
             description:req.body.description
         }});
         res.redirect('/category');
 
     }catch(error){
-        console.log(error.message);
+        const user = await User.findById(req.session.User_id);
+        const id = req.body.id;
+        const category = await Category.findById(id);
+    
+            if (error.code === 11000 && error.keyPattern && error.keyPattern.name) {
+                // Duplicate key error
+                res.render('edit-category', { admin: user,category:category, message: 'Category with this name already exists.' });
+            } else {
+                // Other error
+                console.log(error.message);
+                res.render('edit-category', { admin: user,category:category, message: 'An error occurred while adding the category.' });
+            }
     }
 };
 const deleteCategory = async (req,res)=>{

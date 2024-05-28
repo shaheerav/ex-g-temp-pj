@@ -4,7 +4,13 @@
         <div class="col-sm-12 col-xl-8">
             <div class="bg-light rounded h-100 p-4">
                 <h6 class="mb-4">Edit Category</h6>
+                <% if( message){ %>
+                    <div class="alert alert-danger" role="alert">
+                        <%= message %>
+                    </div>
+                <% } %>
                 <form method="post" action="">
+                    <input type="hidden" name="id" value="<%= category._id %>">
                     <div class="mb-3">
                         <label class="form-label">Name</label>
                         <input type="text" class="form-control" name="name" value="<%= category.name %>">

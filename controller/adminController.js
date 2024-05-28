@@ -22,7 +22,7 @@ const adminVerify = async (req,res)=>{
                 req.session.User_id = adminData._id;
                 res.redirect('/admin/home');
             }else{
-                res.render('login',{message:'not allow to enter the admin side'});
+                res.render('login',{message:'Please check your password'});
             }
         }else{
             res.render('login',{message:'not allow to enter the admin side'});
