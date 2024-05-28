@@ -125,11 +125,11 @@ const editProduct = async(req,res)=>{
         const product = await Product.findById({_id:id});
         const user = await User.findById(req.session.User_id);
         const categories = await Category.find();
-        console.log('product in edit page :', product._id)
+        console.log('product in edit page :', product)
         if(product){
             res.render('edit-product',{product:product,admin:user,categories,validSizes:validSizes});
         }else{
-            res.redirect('/admin/product');
+            res.redirect('/product');
         }
 
     }catch(error){
@@ -193,7 +193,6 @@ if(!updateProduct){
 };
 const deleteProduct = async(req,res)=>{
     try{
-        console.log('inside the delete fuction')
         const id = req.query.id;
         await Product.deleteOne({_id:id});
         res.redirect('/product');
@@ -237,7 +236,9 @@ const showImages = async (req,res)=>{
     }
 };
 const deleteImage = async (req, res) => {
-    try {
+    try{
+        console.log('code come to deletion code');
+        const user = await User.findById(req.session.User_id);
       const productId = req.params.productId;
       const index = parseInt(req.params.index);
   
@@ -246,27 +247,22 @@ const deleteImage = async (req, res) => {
       if (!product || index < 0 || index >= product.image.length) {
         return res.status(404).send('Image not found');
       }
-  
-      const updateProduct = await Product.updateOne({productId},{
-        $pull:{image:index}
-      });
+      const deletedImage = product.image[index];
+      product.image.splice(index,1);
+      await product.save();
 
-      if(updateProduct){
-        console.log('product image delete successfully')
-      }
-  
-      // Assuming images are stored locally, delete the file from the filesystem
+      const imagePath = path.join (__dirname,'../public/uploads',deletedImage);
       
-      const imagePath = path.join(__dirname, '../public/uploads', deletedImage);
-
-      fs.unlink(imagePath, (err) => {
-        if (err) {
-          console.error('Failed to delete image file:', err);
+      fs.unlink(imagePath,(err)=>{
+        if(err){
+            console.error('Failed to delete image file:',err);
+        }else{
+            console.log('Image file deleted successfully');
+            res.redirect(`/product/showImages?id=${productId}`)
         }
       });
-  
-      res.status(200).send('Image deleted successfully');
-    } catch (error) {
+      
+    }catch (error) {
       console.error('Error deleting image:', error);
       res.status(500).send('Internal Server Error');
     }

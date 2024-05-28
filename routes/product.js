@@ -60,7 +60,7 @@ productRouts.post("/edit-product",
 }
 );
 productRouts.get('/showImages',controllProduct.showImages);
-productRouts.delete('/products/:productId/images/:index', controllProduct.deleteImage);
+productRouts.post('/showImages/:productId/:index', controllProduct.deleteImage);
 
 productRouts.get("/delete-product", controllProduct.deleteProduct);
 
