@@ -445,7 +445,7 @@
         });
 
         // Function to validate form fields
-            function validateForm() {
+        function validateForm() {
                 let isValid = true;
 
                 // Reset previous error messages
@@ -453,7 +453,7 @@
 
                 // Validate each form field
                 const name = document.getElementById('name').value.trim();
-                if (name === ''||!name.replace(/\s/g, '').length) {
+                if (name === '') {
                     document.getElementById('name-error').textContent = 'Please enter product name';
                     isValid = false;
                 }
@@ -501,6 +501,7 @@
         event.preventDefault();
     }
 });
+
 
     </script>
 </body>

@@ -163,9 +163,14 @@
 
             <!-- Form for adding a product -->
             <form id="productForm" action="" method="POST" enctype="multipart/form-data">
+                <% if( message){ %>
+                    <div class="alert alert-danger" role="alert">
+                        <%= message %>
+                    </div>
+                <% } %>
                 <div class="mb-3">
                     <label for="name" class="form-label">Product Name:</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+                    <input type="text" class="form-control" id="name" name="name" minlength="4" maxlength="60" required>
                     <div class="error" id="name-error"></div>
                 </div>
 
@@ -285,6 +290,8 @@
 <!-- Back to Top -->
 <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
 <script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
@@ -449,7 +456,7 @@
 
                 // Validate each form field
                 const name = document.getElementById('name').value.trim();
-                if (name === ''||!name.replace(/\s/g, '').length) {
+                if (name === '') {
                     document.getElementById('name-error').textContent = 'Please enter product name';
                     isValid = false;
                 }

@@ -14,6 +14,7 @@ const Cart = require('../models/cart');
 const { session, use } = require("passport");
 const userRouts = require("../routes/users");
 const category = require("../models/category");
+const products = require("../models/products");
 
 let count =0;
 const homepage = async (req, res) => {
@@ -708,11 +709,74 @@ const addToCart = async (req, res) => {
 };
 
 const addproducttoCart = async (req, res) => {
-  
+  try{
+    const user = req.session.user;
+    if(!user){
+      console.log("User not found in the session");
+      return res.status(400).send('user not authenticated');
+    }
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+    if(!product){
+      console.log('Product not found');
+      return res.status(400).send('product not found');
+    }
+    console.log('Request Body:', req.body);
+    const quantity = parseInt(req.body.quantity, 10);
+    console.log(quantity,'product quantity')
 
-  if (error) {
-    console.error(error.message);
-    res.status(500).send('Internal server error');
+    if (isNaN(quantity) || quantity <= 0) {
+      console.log('invalide quantity')
+      return res.status(400).send('Invalid quantity');
+    }
+    console.log(quantity,'product quantity')
+
+    const id = user._id
+    const userCart = await Cart.findOne({userId:id});
+     
+    if(userCart){
+      const productIndex = await userCart.products.findIndex(p=>p.productId.toString() ===productId.toString());
+      console.log(productIndex,'same product');
+      if(productIndex>-1){
+        const existingQuantity = userCart.products[productIndex].quantity;
+        const newQuantity = parseInt(req.body.quantity, 10);
+            if (isNaN(newQuantity) || newQuantity <= 0) {
+              console.log('Invalid quantity');
+              return res.status(400).send('Invalid quantity');
+            }
+            let newqt = existingQuantity+ newQuantity;
+            console.log(newqt,'new quantity')
+           newCart = ({
+            quantity:newqt
+           });
+           await Cart.updateOne({userId:id,'products.productId':productId},{$inc:{'products.$.quantity':newQuantity}});
+      }else{
+        newCart =({
+          productId:productId,
+          quantity:quantity,
+          name:product.name,
+          price:product.price
+        });
+        await Cart.updateOne({userId:id},{$push:{products:newCart}});
+        console.log('product added sucessfully')
+      }
+    }else{
+      const newCart = new Cart ({
+        userId:user,
+        products:[{
+          productId:productId,
+          quantity:quantity,
+          name:product.name,
+          price:product.price
+        }]
+      });
+      await newCart.save();
+      
+    }
+    console.log('product save to cart')
+    res.redirect(`/productDetails?id=${productId}`)
+  }catch(error){
+    console.log(error.message);
   }
 };
 
