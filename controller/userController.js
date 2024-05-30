@@ -15,6 +15,7 @@ const { session, use } = require("passport");
 const userRouts = require("../routes/users");
 const category = require("../models/category");
 const products = require("../models/products");
+const cart = require("../models/cart");
 
 let count =0;
 const homepage = async (req, res) => {
@@ -30,11 +31,14 @@ const homepage = async (req, res) => {
     const isLoggedIn = req.session.user || req.user;
     if(isLoggedIn){
       const id = isLoggedIn._id;
+    const cart = await Cart.findOne({userId:id});
     
-    const cart = await Cart.findOne({userid:id});
     if(cart){
-      count = cart.products.reduce((total, product) => total + product.quantity, 0);;
+      count = countCart(cart);
+    }else{
+      count = 0;
     }
+
     console.log(isLoggedIn,"is login")
     }
     
@@ -43,6 +47,11 @@ const homepage = async (req, res) => {
     console.log(error.message);
   }
 };
+function countCart(product){
+  
+  let count = product.products.reduce((total, product) => total + product.quantity, 0);
+  return count;
+}
 function isEmptyValue(obj){
   let values = Object.values(obj);
   for(let value of values){
@@ -661,49 +670,50 @@ const deleteAddress = async(req,res)=>{
 };
 
 const addToCart = async (req, res) => {
-  try {
-    const isLoggedIn = await User.findById(req.session.user);
-    if (!isLoggedIn) {
-      return res.redirect('/login')
+  try{
+    const userId = req.session.user;
+    const isLoggedIn = userId
+    const userCart = await Cart.findOne({ userId: userId });
+    console.log(userCart);
+    if (!userCart) {
+      return res.render('addtocart', { isLoggedIn: isLoggedIn, productList: [], count: 0 });
     }
-
-    const id = isLoggedIn._id;
-    
+    console.log(userId,'userid')
     const cartData = await Cart.aggregate([
-      { $match: { userid: id } },
-      { $unwind: "$products" },
+      { $match: { userId: new mongoose.Types.ObjectId(userId._id) } },
       {
-        $lookup: {
-          from: "products", // Ensure the collection name is correct
-          localField: "products.productId",
-          foreignField: "_id",
-          as: "productDetails"
-        }
-      },
-      { $unwind: "$productDetails" },
-      {
-        $group: {
-          _id: "$_id",
-          userid: { $first: "$userid" },
-          products: { $push: { productId: "$products.productId", quantity: "$products.quantity", details: "$productDetails" } }
+        $lookup:{
+          from:'products',
+          localField:'products.productId',
+          foreignField:'_id',
+          as:'productDetails'
         }
       }
     ]);
 
+    console.log('Cart Data:', cartData);
+
     if (cartData.length === 0) {
       return res.render('addtocart', { isLoggedIn: isLoggedIn, productList: [], count: 0 });
     }
-
-    const productList = cartData[0].products.map(p => ({
-      ...p.details,
-      quantity: p.quantity
+    
+    let productList = cartData[0].products.map(item => ({
+      _id:item._id,
+      productId: item.productId,
+      quantity: item.quantity,
+      price:item.price,
+      name:item.name,
+      image: cartData[0].productDetails.find(product => product._id.toString() === item.productId.toString()).image,
+      stock:cartData[0].productDetails.find(product => product._id.toString() === item.productId.toString()).stock
     }));
+      console.log(productList,'product list')
 
-    const count = productList.reduce((total, product) => total + product.quantity, 0);
+    // Calculate total count of products in the cart
+    let count = productList.reduce((total, product) => total + product.quantity, 0);
 
     res.render('addtocart', { isLoggedIn: isLoggedIn, productList: productList, count: count });
-  } catch (error) {
-    console.error(error.message);
+  }catch (error) {
+    console.error('Error:', error.message);
     res.status(500).send('Internal server error');
   }
 };
@@ -793,13 +803,7 @@ const removeProduct = async (req, res) => {
   try {
     const productId = req.body.productId;
     const userId = req.session.user;
-
-    // Check if productId is a valid ObjectId
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ success: false, message: 'Invalid product ID' });
-    }
-
-    // Find the product in the Product collection
+    
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
@@ -840,27 +844,24 @@ const removeProduct = async (req, res) => {
 
 const updateQuantity = async (req,res)=>{
   try{
-    const {productId, quantity} = req.body;
-    if(!quantity || !productId || isNaN(quantity)){
-      return res.status(400).json({success:false,message:'Invalid productId or Quantity'});
+    let {cart,product,count} = req.body;
+    const user = req.session.user;
+    count=parseInt(count);
+    console.log(cart,product,count)
+    const userCart = await Cart.find({userId :user});
+    console.log('userCart',userCart);
+    if(userCart ){
+      await Cart.updateOne({userId:user,'products.productId':product},{$inc:{'products.$.quantity':count}});
+      console.log('cart updated successfully');
+      return res.status(200).json({ success: true, message: "Cart updated successfully" });
     }
-    const product = await Product.findById(productId);
-    if(!product){
-      return res.status(404).json({success:false, message:'product not found'});
+    else{
+      return res.status(404).json({ success: false, message: "User cart not found" });
     }
-
-    const currentQuantity = product.stock;
-    const newQuantity = parseInt(quantity);
-    const quantityDifference = newQuantity - currentQuantity;
-
-    if(quantityDifference >0 && product.stock < quantityDifference){
-      return res.status(400).json({success:false,message:'Not enough stock available'});
-    }
-    product.stock = newQuantity;
-    await product.save();
-    res.json({success:true,message:'Quantity updated successfully'});
+    
   }catch(error){
     console.error(error.message);
+    return res.status(500).json({ success: false, message: "An error occurred while updating the cart" });
   }
 };
 const showOrder = async(req,res)=>{

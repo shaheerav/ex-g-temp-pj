@@ -22,7 +22,6 @@
 		<div class="untree_co-section before-footer-section">
             <div class="container">
               <div class="row mb-5">
-                <form class="col-md-12" method="post">
                   <div class="site-blocks-table">
                     <table class="table">
                       <thead>
@@ -39,22 +38,20 @@
                         <% productList.forEach(product=>{ %>
                           <tr class="product-row" data-product-id="<%= product._id %>">
                             <td class="product-thumbnail">
-                              <img src="uploads/<%= product.image[0] %>" alt="Image" class="img-fluid">
+                              <% if (product.image && product.image.length > 0) { %>
+                                <img src="uploads/<%= product.image[0] %>" alt="Image" class="img-fluid">
+                              <% } else { %>
+                                <p>No image available</p>
+                              <% } %>
                             </td>
                             <td class="product-name">
                               <h2 class="h5 text-black"><%= product.name%></h2>
                             </td>
                             <td class="product-price"><i class="bi bi-currency-rupee"></i><%= product.price%></td>
                             <td>
-                              <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
-                                <div class="input-group-prepend">
-                                  <button class="btn btn-outline-black decrease" type="button">&minus;</button>
-                                </div>
-                                <input type="text" class="form-control text-center quantity-amount" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
-                                <div class="input-group-append">
-                                  <button class="btn btn-outline-black increase" type="button">&plus;</button>
-                                </div>
-                              </div>
+                              <button class="cart-item-count mr-3" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>',-1)" <% if (product.quantity <= 1) { %>style="display:none;"<% } %>>-</button>
+                              <%= product.quantity  %>
+                              <button class="cart-item-count mr-3" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>',1)">+</button>
                             </td>
                               <td class="product-total"><i class="bi bi-currency-rupee"></i></td>
                         <td>
@@ -66,7 +63,6 @@
                       </tbody>
                     </table>
                   </div>
-                </form>
               </div>
         
               <div class="row">
@@ -232,6 +228,7 @@
   </div>
 </footer>
 <!-- End Footer Section -->	
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-currency-rupee" viewBox="0 0 16 16">
 <path d="M4 3.06h2.726c1.22 0 2.12.575 2.325 1.724H4v1.051h5.051C8.855 7.001 8 7.558 6.788 7.558H4v1.317L8.437 14h2.11L6.095 8.884h.855c2.316-.018 3.465-1.476 3.688-3.049H12V4.784h-1.345c-.08-.778-.357-1.335-.793-1.732H12V2H4z"/>
@@ -240,74 +237,31 @@
 <script src="js/tiny-slider.js"></script>
 <script src="js/custom.js"></script>
 <script>
-  $(document).ready(function () {
-        // Function to calculate and update cart totals
-        function updateCartTotals() {
-            var total = 0;
-
-            // Loop through each product row in the table
-            $('.product-row').each(function () {
-                var price = parseFloat($(this).find('.product-price').text().replace(/\D/g,''));
-                var quantity = parseInt($(this).find('.quantity-amount').val());
-                var productTotal = price * quantity;
-
-                // Update product total
-                $(this).find('.product-total').text('₹' +productTotal.toFixed(2));
-
-                // Add product total to subtotal
-                total += productTotal ;
-            });
-
-            // Update subtotal
-            $('.subtotal-amount').text('₹'+total.toFixed(2));
-
-            // Update total (assuming subtotal is the total for now)
-            $('.total-amount').text(total.toFixed(2));
+  function changeQuantity(cartId,productId,count){
+    console.log(`Cart ID: ${cartId}, Product ID: ${productId}, Count: ${count}`);
+    $.ajax({
+      url:'/cart/updateQuantity',
+      method:'POST',
+      data:{
+        cart:cartId,
+        product:productId,
+        count:count
+      },
+      success:(response)=>{
+        if(success.response){
+          alert(response.message);
+        }else{
+          alert(response.message);
+        }
+        error: () => {
+          console.error('AJAX Error:', error);
+          alert('An error occurred while updating the quantity');
         }
 
-        // Calculate and update cart totals on page load
-        updateCartTotals();
+      }
+    });
+      }
 
-        // Bind quantity change event to update totals
-
-            $('.quantity-amount').on('change',function(){
-              updateCartTotals();
-              let productId = $(this).closest('.product-row').data('product-id');
-              let quantity = parseInt($(this).val());
-              updateQuantityInCart(productId,quantity);
-            });
-
-            $('.increase').on('click',function(){
-              let input = $(this).closest('.quantity-container').find('.quantity-amount');
-              let newValue = parseInt(input.val())+1;
-              input.val(newValue).change();
-
-            });
-
-            $('decrease').on('click',function(){
-              let input = $(this).closest('.quantity-container').find('quantity-amoount');
-              let newValue= parseInt(input.val())-1;
-              if(newValue >=1){
-                input.val(newValue).change();
-              }
-            })
-        });
-
-    function updateQuantityInCart(productId,quantity){
-      $.ajax({
-        url:'/cart/updateQuantity',
-        method:'POST',
-        data:{productId:productId,quantity:quantity},
-        success:function(response){
-          if(!response.success){
-            alert("Error updating quantity ", response.message);
-          }
-        },
-        error:function(){
-          alert('An error occured while updating quantity');
-        }
-      })
-    }
     //remove product from the cart
     $('.remove-product-btn').on('click',function(){
       let productId = $(this).data('product-id');
