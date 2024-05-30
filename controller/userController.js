@@ -800,43 +800,22 @@ const checkoutLoad = async (req,res) =>{
   }
 };
 const removeProduct = async (req, res) => {
-  try {
+  try{
     const productId = req.body.productId;
+    console.log(productId,'productid')
     const userId = req.session.user;
-    
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
-    }
 
-    console.log(`Removing product ${productId} for user ${userId}`);
-
-    // Find the user's cart
-    const userCart = await Cart.findOne({ userid: userId });
+    const userCart = await Cart.findOne({ userId: userId });
+    console.log('userCart:',userCart);
     if (userCart) {
-      // Find the index of the product in the cart's products array
-      const productIndex = userCart.products.findIndex(p => p.productId.toString() === productId);
-      if (productIndex > -1) {
-        // Adjust the total price
-        const removedQuantity = userCart.products[productIndex].quantity;
-
-        userCart.total -= product.price * removedQuantity;
-
-        product.stock += 
-        // Remove the product from the array
-        userCart.products.splice(productIndex, 1);
-        // Save the updated cart
-        await userCart.save();
-        await product.save();
-        console.log(`Product ${productId} removed from cart`);
-        return res.json({ success: true, message: 'Product removed from cart' });
-      } else {
-        return res.status(404).json({ success: false, message: 'Product not found in cart' });
-      }
+      await Cart.updateOne({userId:userId},{$pull:{'products':{'productId':new mongoose.Types.ObjectId(productId)}}});
+      console.log('product removed from the list');
+      return res.status(200).json({ success: true, message: 'Product removed from the cart'})
     } else {
+      console.log('some error came')
       return res.status(404).json({ success: false, message: 'Cart not found' });
     }
-  } catch (error) {
+  }catch (error) {
     console.error(error.message);
     return res.status(500).json({ success: false, message: 'An error occurred' });
   }

@@ -55,7 +55,7 @@
                             </td>
                               <td class="product-total"><i class="bi bi-currency-rupee"></i></td>
                         <td>
-                            <button type="button" class="btn btn-black btn-sm remove-product-btn" data-product-id="<%= product._id %>">X</button>
+                            <button type="button" class="btn btn-black btn-sm remove-product-btn" onclick="deleteProduct('<%= product.productId%>')">X</button>
                       </tr>
                               </td>
                        <% }) %>
@@ -262,29 +262,27 @@
     });
       }
 
-    //remove product from the cart
-    $('.remove-product-btn').on('click',function(){
-      let productId = $(this).data('product-id');
-      let productRow = $(this).closest('.product-row');
-      
+    function deleteProduct(productId){
       $.ajax({
-        url:'/cart/remove',
+        url:'/cart/delete',
         method:'POST',
-        data:{productId:productId},
-        success:function(response){
-          if(response.success){
-            productRow.remove();
-            updateCartTotal();
-          }else{
-            alert('Error removing product: ',response.message);
-          }
+        data:{
+          productId:productId
         },
-        error:function(){
-          alert('An error occurred while removing the product');
+        success:(response)=>{
+        if(success.response){
+          alert(response.message);
+        }else{
+          alert(response.message);
         }
-      })
-    })
+        error: () => {
+          console.error('AJAX Error:', error);
+          alert('An error occurred while deleting the produt');
+        }
 
+      }
+      })
+    }
 
   
   //---------------product detailes----------------
