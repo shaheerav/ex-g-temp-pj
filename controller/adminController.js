@@ -226,6 +226,15 @@ const resetPasswordMail = async (name, email, token) => {
       console.log(error.message)
     }
   };
+  const orderList = async (req,res)=>{
+    try{
+        const user = await User.findById(req.session.User_id);
+        res.render('')
+    }catch(error){
+        console.error(error.message)
+    }
+
+  }
 module.exports={
     adminPage,
     adminVerify,
@@ -240,5 +249,5 @@ module.exports={
     forget,
     forgetverify,
     forgetPasswordLoad,
-    resetPassword
+    resetPassword,orderList
 }

@@ -38,6 +38,11 @@ const orderSchema = new mongoose.Schema({
         type:Number,
         default:0,
         require:true,
+    },
+    status:{
+        type:Boolean,
+        default:false,
+        require:true,
     }
 });
 

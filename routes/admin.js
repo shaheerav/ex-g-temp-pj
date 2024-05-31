@@ -33,8 +33,9 @@ adminRouts.get('/userdata',authAdmin.isLogin,controllAdmin.userManagement);
 adminRouts.get('/edit-user',authAdmin.isLogin,controllAdmin.edituser);
 adminRouts.post('/edit-user',controllAdmin.updateUser);
 adminRouts.get('/delete-user',controllAdmin.deleteUser);
-adminRouts.get('/block-user', controllAdmin.blockUser);
-adminRouts.get('/unblock-user',controllAdmin.unblockUser);
+adminRouts.get('/block-user', authAdmin.isLogin,controllAdmin.blockUser);
+adminRouts.get('/unblock-user',authAdmin.isLogin,controllAdmin.unblockUser);
+adminRouts.get('/orderList',authAdmin.isLogin,controllAdmin.orderList)
 
 
 module.exports = adminRouts;

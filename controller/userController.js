@@ -993,6 +993,15 @@ const placeOrder = async(req,res)=>{
     console.error('Error placing order:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
+};
+const searchProduct = async(req,res)=>{
+  try{
+    const isLoggedIn = req.session.user;
+    const product = await Product.find().populate('category')
+    res.render('searchProduct',{isLoggedIn:isLoggedIn,count:0,product})
+  }catch(error){
+    console.log(error.message)
+  }
 }
 module.exports = {
   registration,
@@ -1032,5 +1041,6 @@ module.exports = {
   checkoutLoad,
   addproducttoCart,removeProduct,
   updateQuantity,
-  showOrder,placeOrder
+  showOrder,placeOrder,
+  searchProduct
 };
