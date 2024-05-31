@@ -49,13 +49,13 @@
                             </td>
                             <td class="product-price"><i class="bi bi-currency-rupee"></i><%= product.price%></td>
                             <td>
-                              <button class="cart-item-count mr-3" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>',-1)" <% if (product.quantity <= 1) { %>style="display:none;"<% } %>>-</button>
-                              <%= product.quantity  %>
-                              <button class="cart-item-count mr-3" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>',1)">+</button>
+                              <button class="cart-item-count mr-3 decrease-quantity" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>',-1)" <% if (product.quantity <= 1) { %>style="display:none;"<% } %>>-</button>
+                              <span id="quantityNumber"><%= product.quantity  %></span>
+                              <button class="cart-item-count mr-3 increase-quantity" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>',1)">+</button>
                             </td>
-                              <td class="product-total"><i class="bi bi-currency-rupee"></i></td>
+                              <td class="product-total"><i class="bi bi-currency-rupee"></i><%= product.price*product.quantity  %></td>
                         <td>
-                            <button type="button" class="btn btn-black btn-sm remove-product-btn" onclick="deleteProduct('<%= product.productId%>')">X</button>
+                            <button type="button" class="btn btn-black btn-sm remove-product-btn" onclick="deleteProduct('<%= product.productId%>')"><i class="bi bi-trash"></i></button>
                       </tr>
                               </td>
                        <% }) %>
@@ -101,7 +101,7 @@
                           <span class="text-black">Subtotal</span>
                         </div>
                         <div class="col-md-6 text-right">
-                          <strong class="text-black subtotal-amount"></strong>
+                          <strong class="text-black subtotal-amount"><i class="bi bi-currency-rupee"></i><%= total %></strong>
                         </div>
                       </div>
                       <div class="row mb-5">
@@ -109,7 +109,7 @@
                           <span class="text-black" >Total</span>
                         </div>
                         <div class="col-md-6 text-right">
-                          <strong class="text-black total-amount "></strong>
+                          <strong class="text-black total-amount "><i class="bi bi-currency-rupee"></i><%= total %></strong>
                         </div>
                       </div>
         
@@ -239,6 +239,7 @@
 <script>
   function changeQuantity(cartId,productId,count){
     console.log(`Cart ID: ${cartId}, Product ID: ${productId}, Count: ${count}`);
+    let quantity = parseInt(document.getElementById('quantityNumber').innerHTML);
     $.ajax({
       url:'/cart/updateQuantity',
       method:'POST',
@@ -249,9 +250,10 @@
       },
       success:(response)=>{
         if(success.response){
-          alert(response.message);
+          quantity.getElementById('quantityNumber')=quantity+count;
         }else{
           alert(response.message);
+
         }
         error: () => {
           console.error('AJAX Error:', error);
@@ -271,7 +273,8 @@
         },
         success:(response)=>{
         if(success.response){
-          alert(response.message);
+          alert(response.message); 
+          window.location.reload();
         }else{
           alert(response.message);
         }

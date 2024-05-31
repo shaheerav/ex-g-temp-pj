@@ -1,3 +1,50 @@
 <%- include ('../layouts/user/header.ejs')  %>
+<!-- Start Hero Section -->
+<div class="hero">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-5">
+                <div class="intro-excerpt">
+                    <h1>Order</h1>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Hero Section -->
 
-<%- include ('../layouts/user/fooer.ejs')  %>
+<div class="col-md-12 mt-5 mb-5" style="padding-bottom: 150px;">
+    <%if(userOrder.length >0){ %>
+        <% for(let i = 0; i < userOrder.length; i++){ %>
+    
+    <div class="col-md-12 pl-5">
+<table class="table table-info " style="font-size: 18px; ">
+    <thead>
+      <tr>
+        <th scope="col" width="10%">#</th>
+        <th scope="col"width="40%">Products</th>
+        <th scope="col"width="30%">Address</th>
+        <th scope="col"width="10%">Payment Method</th>
+        <th scope="col"width="10%">Total Amount</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row"><%= i+1 %></th>
+        <td>Mark</td>
+        <td>Otto</td>
+        <td><%= userOrder[i].payment %></td>
+        <td><%= userOrder[i].totalAmount  %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<%} %>
+<%} %>
+
+</div>
+<%- include ('../layouts/user/footer.ejs')  %>

@@ -145,6 +145,7 @@ userRouts.get('/deleteAddress',controller.deleteAddress);
 userRouts.get('/cart',auth.isLogin,controller.addToCart);
 userRouts.post('/add-to-cart/:id',controller.addproducttoCart);
 userRouts.get('/checkout',auth.isLogin,controller.checkoutLoad);
+userRouts.post('/checkout',controller.placeOrder)
 userRouts.post('/cart/delete',controller.removeProduct);
 userRouts.post('/cart/updateQuantity',controller.updateQuantity);
 userRouts.get('/orders',controller.showOrder)

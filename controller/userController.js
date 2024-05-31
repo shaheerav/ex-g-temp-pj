@@ -10,12 +10,15 @@ const Category = require('../models/category')
 
 const Product = require("../models/products");
 const Address = require('../models/address');
+const Order = require("../models/order");
 const Cart = require('../models/cart');
 const { session, use } = require("passport");
 const userRouts = require("../routes/users");
 const category = require("../models/category");
 const products = require("../models/products");
 const cart = require("../models/cart");
+ 
+const address = require("../models/address");
 
 let count =0;
 const homepage = async (req, res) => {
@@ -676,7 +679,7 @@ const addToCart = async (req, res) => {
     const userCart = await Cart.findOne({ userId: userId });
     console.log(userCart);
     if (!userCart) {
-      return res.render('addtocart', { isLoggedIn: isLoggedIn, productList: [], count: 0 });
+      return res.render('addtocart', { isLoggedIn: isLoggedIn, productList: [], count: 0,total:0 });
     }
     console.log(userId,'userid')
     const cartData = await Cart.aggregate([
@@ -692,10 +695,29 @@ const addToCart = async (req, res) => {
     ]);
 
     console.log('Cart Data:', cartData);
+    let totalAmount = await Cart.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userId._id) } }, // Match the cart with the given userId
+    { $unwind: '$products' }, // Unwind the products array
+    {
+      $group: {
+        _id: '$userId',
+        totalAmount: {
+          $sum: {
+            $multiply: [
+              { $toDouble: '$products.price' }, // Convert price to double
+              '$products.quantity'
+            ]
+          }
+        }
+      }
+    }
+    ]);
+    console.log(totalAmount[0].totalAmount,'total amount')
+    let total = totalAmount[0].totalAmount
 
     if (cartData.length === 0) {
-      return res.render('addtocart', { isLoggedIn: isLoggedIn, productList: [], count: 0 });
-    }
+      return res.render('addtocart', { isLoggedIn: isLoggedIn, productList: [], count: 0,total:0 });
+    }else{
     
     let productList = cartData[0].products.map(item => ({
       _id:item._id,
@@ -711,7 +733,8 @@ const addToCart = async (req, res) => {
     // Calculate total count of products in the cart
     let count = productList.reduce((total, product) => total + product.quantity, 0);
 
-    res.render('addtocart', { isLoggedIn: isLoggedIn, productList: productList, count: count });
+    res.render('addtocart', { isLoggedIn: isLoggedIn, productList: productList, count: count,total:total });
+  }
   }catch (error) {
     console.error('Error:', error.message);
     res.status(500).send('Internal server error');
@@ -791,14 +814,7 @@ const addproducttoCart = async (req, res) => {
 };
 
 
-const checkoutLoad = async (req,res) =>{
-  try{
-      const isLoggedIn = await User.findById(req.session.user);
-      res.render('checkout',{isLoggedIn:isLoggedIn});
-  }catch(error){
-      console.error(error.message);
-  }
-};
+
 const removeProduct = async (req, res) => {
   try{
     const productId = req.body.productId;
@@ -846,9 +862,136 @@ const updateQuantity = async (req,res)=>{
 const showOrder = async(req,res)=>{
   try{
     const isLoggedIn = await User.findById(req.session.user);
-    res.render('order',{isLoggedIn:isLoggedIn}); 
-  }catch(error){
+    console.log(isLoggedIn);
+    const id = isLoggedIn._id;
+    const userOrder = await Order.find({userId:id}).lean();
+    console.log(userOrder,'orderList');
+
+    const formattedOrders = await Promise.all(
+      userOrder.map(async (order) => {
+        const address = await Address.findById(order.address).lean();
+        const products = order.products.map((product) => {
+          return {
+            productName: product.name,
+            productImage: `image_url_for_${product.productId}` 
+          };
+        });
+        return {
+          address: address ? address.details : 'Address not found', 
+          products: products,
+          payment: order.payment,
+          totalAmount: order.totalAmount
+        };
+      })
+    );
+    console.log(formattedOrders)
+
+    res.render('order', { isLoggedIn: isLoggedIn, count: 0, userOrder: formattedOrders });
+  } catch (error) {
     console.log(error.message);
+  }
+};
+const checkoutLoad = async (req,res) =>{
+  try{
+      const isLoggedIn = await User.findById(req.session.user);
+      console.log(isLoggedIn,'user details')
+      const id = isLoggedIn._id
+    const userCart = await Cart.findOne({userId:id});
+    count = countCart(userCart)
+    let totalAmount = await Cart.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(id) } }, // Match the cart with the given userId
+    { $unwind: '$products' }, // Unwind the products array
+    {
+      $group: {
+        _id: '$userId',
+        totalAmount: {
+          $sum: {
+            $multiply: [
+              { $toDouble: '$products.price' }, // Convert price to double
+              '$products.quantity'
+            ]
+          }
+        }
+      }
+    }
+    ]);
+    console.log(totalAmount[0].totalAmount,'total amount')
+    let total = totalAmount[0].totalAmount;
+    const cartData = await Cart.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(id) } },
+      {
+        $lookup:{
+          from:'products',
+          localField:'products.productId',
+          foreignField:'_id',
+          as:'productDetails'
+        }
+      }
+    ]);
+    let productList = cartData[0].products.map(item => ({
+      _id:item._id,
+      productId: item.productId,
+      quantity: item.quantity,
+      price:item.price,
+      name:item.name,
+      image: cartData[0].productDetails.find(product => product._id.toString() === item.productId.toString()).image,
+      stock:cartData[0].productDetails.find(product => product._id.toString() === item.productId.toString()).stock
+    }));
+    const address = await Address.find({user:new mongoose.Types.ObjectId(id)});
+    console.log(address,'useraddrss')
+
+      res.render('checkout',{isLoggedIn:isLoggedIn,count:count,total:total,product:productList,address:address});
+  }catch(error){
+      console.error(error.message);
+  }
+};
+const placeOrder = async(req,res)=>{
+  
+  try {
+    const { addressId, paymentMethod, totalAmount } = req.body;
+    console.log(addressId, paymentMethod, totalAmount, 'address and payment method');
+
+    
+    if (!mongoose.Types.ObjectId.isValid(addressId)) {
+      throw new Error('Invalid address ID format');
+    }
+
+    const userid = req.session.user;
+    if (!mongoose.Types.ObjectId.isValid(userid._id)) {
+      throw new Error('Invalid user ID format');
+    }
+
+    console.log(userid, "userData");
+
+    const userCart = await Cart.findOne({ userId: userid });
+    if (!userCart || !userCart.products) {
+      throw new Error('User cart or products are undefined');
+    }
+
+    const productIds = userCart.products
+
+    console.log(userid, addressId, productIds, paymentMethod, totalAmount);
+    
+    const order = new Order({
+      userId:userid,
+      address:addressId,
+      products:productIds,
+      payment:paymentMethod,
+      totalAmount:totalAmount
+    });
+    await order.save();
+    if(order)await Cart.deleteOne({userId:userid});
+
+    if(paymentMethod === 'COD'){
+      
+      res.json({ success: true, message: 'Order placed successfully' });
+    }else{
+      res.json({success:true,message:'payment pending'});
+    }
+
+  } catch (error) {
+    console.error('Error placing order:', error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 module.exports = {
@@ -889,5 +1032,5 @@ module.exports = {
   checkoutLoad,
   addproducttoCart,removeProduct,
   updateQuantity,
-  showOrder
+  showOrder,placeOrder
 };

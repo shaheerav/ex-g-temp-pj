@@ -12,18 +12,16 @@ const orderSchema = new mongoose.Schema({
         ref:'Address',
         require:true,
     },
-    product :[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User',
+    products :[{
+        type:String,
         require:true,
     }],
     DateOrder:{
         type:Date,
         default:Date.now
     },
-    paymentId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Payment',
+    payment:{
+        type:String,
         require:true
     },
     shippingCharge:{
