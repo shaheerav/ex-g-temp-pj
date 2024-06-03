@@ -34,6 +34,7 @@ userRouts.use(bodyParser.urlencoded({extended:true}));
 
 const controller = require('../controller/userController');
 const auth = require('../middleware/userAuth');
+const validate = require('../middleware/validation');
 const { token } = require("morgan");
 
 userRouts.get('/',controller.homepage)
@@ -135,7 +136,7 @@ userRouts.get('/kids',controller.kidsCategory);
 userRouts.get('/footwear',controller.footwearCategory);
 userRouts.get('/userDetails',auth.isLogin,controller.userDetails);
 userRouts.get('/editProfile',auth.isLogin,controller.editProfileLoad);
-userRouts.post('/editProfile',controller.updateProfile);
+userRouts.post('/editProfile',validate.validateUpdateProfile,controller.updateProfile);
 userRouts.get('/showAddress',controller.addresspageLoad);
 userRouts.get('/addAddress',controller.addAddressLoad);
 userRouts.post('/addAddress',controller.addAddress);
@@ -150,4 +151,5 @@ userRouts.post('/cart/delete',controller.removeProduct);
 userRouts.post('/cart/updateQuantity',controller.updateQuantity);
 userRouts.get('/orders',auth.isLogin,controller.showOrder);
 userRouts.get('/search',controller.searchProduct);
+userRouts.post('/cancelOrder',controller.cancelOrder)
 module.exports = userRouts;

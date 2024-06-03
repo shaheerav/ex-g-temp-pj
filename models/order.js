@@ -13,7 +13,8 @@ const orderSchema = new mongoose.Schema({
         require:true,
     },
     products :[{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Product',
         require:true,
     }],
     DateOrder:{
@@ -43,7 +44,13 @@ const orderSchema = new mongoose.Schema({
         type:Boolean,
         default:false,
         require:true,
-    }
+    },
+    orderStatus:[
+        {
+            reason:{type:String,require:true,default:'no'},
+            success:{type:Boolean,require:true,default:true}
+        }
+    ]
 });
 
 module.exports = mongoose.model('Order',orderSchema);

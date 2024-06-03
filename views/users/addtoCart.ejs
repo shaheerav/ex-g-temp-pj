@@ -47,12 +47,17 @@
                             <td class="product-name">
                               <h2 class="h5 text-black"><%= product.name%></h2>
                             </td>
-                            <td class="product-price"><i class="bi bi-currency-rupee"></i><%= product.price%></td>
-                            <td>
-                              <button class="cart-item-count mr-3 decrease-quantity" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>',-1)" <% if (product.quantity <= 1) { %>style="display:none;"<% } %>>-</button>
-                              <span id="quantityNumber"><%= product.quantity  %></span>
-                              <button class="cart-item-count mr-3 increase-quantity" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>',1)">+</button>
+                            <td class="product-price">
+                              <h2 class="h6 text-black"><i class="bi bi-currency-rupee"></i><%= product.price%></h2>
                             </td>
+                            
+                            <td>
+                              <button class="cart-item-count mr-3 decrease-quantity" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>', -1)">-</button>
+                              <span id="quantityNumber_<%= product.productId %>"><%= product.quantity %></span>
+                              <button class="cart-item-count mr-3 increase-quantity" onclick="changeQuantity('<%= product._id %>','<%= product.productId %>', 1)">+</button>
+                          </td>
+                          
+                            
                               <td class="product-total"><i class="bi bi-currency-rupee"></i><%= product.price*product.quantity  %></td>
                         <td>
                             <button type="button" class="btn btn-black btn-sm remove-product-btn" onclick="deleteProduct('<%= product.productId%>')"><i class="bi bi-trash"></i></button>
@@ -237,55 +242,60 @@
 <script src="js/tiny-slider.js"></script>
 <script src="js/custom.js"></script>
 <script>
-  function changeQuantity(cartId,productId,count){
-    console.log(`Cart ID: ${cartId}, Product ID: ${productId}, Count: ${count}`);
-    let quantity = parseInt(document.getElementById('quantityNumber').innerHTML);
-    $.ajax({
-      url:'/cart/updateQuantity',
-      method:'POST',
-      data:{
-        cart:cartId,
-        product:productId,
-        count:count
-      },
-      success:(response)=>{
-        if(success.response){
-          quantity.getElementById('quantityNumber')=quantity+count;
-        }else{
-          alert(response.message);
+  function changeQuantity(cartId, productId, count) {
+  console.log(`Cart ID: ${cartId}, Product ID: ${productId}, Count: ${count}`);
+  let quantityElement = document.getElementById(`quantityNumber_${productId}`);
 
-        }
-        error: () => {
-          console.error('AJAX Error:', error);
-          alert('An error occurred while updating the quantity');
-        }
+  $.ajax({
+    url: '/cart/updateQuantity',
+    method: 'POST',
+    data: {
+      cart: cartId,
+      product: productId,
+      count: count
+    },
+    success: (response) => {
+      console.log(response); // Log the response to check its structure
 
+      if (response.success) {
+        quantityElement.innerHTML = response.newQuantity;
+        if (response.newTotalPrice !== undefined) {
+          let totalPriceElement = document.getElementById('totalPrice');
+          totalPriceElement.innerHTML = response.newTotalPrice;
+        }
+      } else {
+        alert(response.message);
       }
-    });
-      }
-
-    function deleteProduct(productId){
-      $.ajax({
-        url:'/cart/delete',
-        method:'POST',
-        data:{
-          productId:productId
-        },
-        success:(response)=>{
-        if(success.response){
-          alert(response.message); 
-          window.location.reload();
-        }else{
-          alert(response.message);
-        }
-        error: () => {
-          console.error('AJAX Error:', error);
-          alert('An error occurred while deleting the produt');
-        }
-
-      }
-      })
+    },
+    error: (error) => {
+      console.error('AJAX Error:', error);
+      alert('An error occurred while updating the quantity');
     }
+  });
+}
+
+
+
+function deleteProduct(productId) {
+    $.ajax({
+        url: '/cart/delete',
+        method: 'POST',
+        data: {
+            productId: productId
+        },
+        success: (response) => {
+            if (response.success) {
+                window.location.reload(); // Reload the page after successful deletion
+            } else {
+                alert(response.message);
+            }
+        },
+        error: (error) => {
+            console.error('AJAX Error:', error);
+            alert('An error occurred while deleting the product');
+        }
+    });
+} 
 
   
   //---------------product detailes----------------

@@ -17,28 +17,38 @@
 <!-- End Hero Section -->
 
 <div class="col-md-12 mt-5 mb-5" style="padding-bottom: 150px;">
-    <%if(userOrder.length >0){ %>
-        <% for(let i = 0; i < userOrder.length; i++){ %>
+    <%if(orderForm.length >0){ %>
+        <% for(let i = 0; i < orderForm.length; i++){ %>
     
     <div class="col-md-12 pl-5">
 <table class="table table-info " style="font-size: 18px; ">
     <thead>
       <tr>
         <th scope="col" width="10%">#</th>
-        <th scope="col"width="40%">Products</th>
+        <th scope="col"width="30%">Products</th>
         <th scope="col"width="30%">Address</th>
         <th scope="col"width="10%">Payment Method</th>
         <th scope="col"width="10%">Total Amount</th>
+        <th scope="col"width="10%">Date</th>
+
 
       </tr>
     </thead>
     <tbody>
       <tr>
         <th scope="row"><%= i+1 %></th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td><%= userOrder[i].payment %></td>
-        <td><%= userOrder[i].totalAmount  %></td>
+        <td><% orderForm[i].products.forEach(product => { %>
+          <li>
+            <strong>Name:</strong> <%= product.productName %><br>
+            <strong>Price:</strong> <%= product.price %><br>
+            <img src="/uploads/<%= product.image[0] %>" alt=productimage style="width: 50px; height: 60px;">
+          </li>
+        <% }) %></td>
+        <td><%= orderForm[i].address.fullname %>,<%= orderForm[i].address.mobile %>,<%= orderForm[0].address.pincode %>
+        <td><%= orderForm[i].payment %></td>
+        <td><%= orderForm[i].totalAmount  %></td>
+        <td><%= new Date (orderForm[i].dateOrder).toDateString()%></td>
+
       </tr>
     </tbody>
   </table>

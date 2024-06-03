@@ -243,10 +243,10 @@ const loginValidate = async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, userData.password);
 
       if (!passwordMatch) {
-        return res.render('login',{message:'Username or password icorrect',isLoggedIn:false});
+        return res.render('login',{message:'Username or password icorrect',isLoggedIn:false,count:0});
       }
       if(userData.is_blocked){
-        return res.render('login',{message:'admin blocked you!',isLoggedIn:false});
+        return res.render('login',{message:'admin blocked you!',isLoggedIn:false,count:0});
       }
         req.session.user_id = userData._id;
       req.session.user = userData;
@@ -362,11 +362,7 @@ const productDetails = async (req, res) => {
     const size = product.size;
     console.log(size)
 console.log(product.stock,'product stock')
-    if(product.stock<=0){
-      return res.status(400).send('product stock over');
-    }else{
-      res.render("productDetails", { product: product, isLoggedIn: isLoggedIn,ratingData:ratingData,size:size,count:count });
-    }
+      res.render("productDetails", { product: product, isLoggedIn: isLoggedIn,ratingData:ratingData,size:size,count:count,isOutOfStock: product.stock === 0 });
     
     
   } catch (error) {
@@ -578,11 +574,15 @@ const updateProfile = async (req,res)=>{
         email:req.body.email,
         mobile:req.body.mobile
       }
-      await User.findByIdAndUpdate(id,userDataUpdated,{new:true});
-    res.redirect(`/userDetails?id=${id}`)
-
-  }catch(error){
-    console.log(error.message);
+      const updatedUser = await User.findByIdAndUpdate(id, userDataUpdated, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    req.session.user = await User.findById(id);
+    res.redirect(`/userDetails?id=${id}`);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
   }
 };
 
@@ -656,6 +656,7 @@ const updateAddress = async (req,res)=>{
       country:req.body.country
       }
     });
+    req.session.user = await User.findById(isLoggedIn._id);
     res.redirect('/showAddress')
   }catch(error){
     console.log(error.message);
@@ -681,7 +682,8 @@ const addToCart = async (req, res) => {
     if (!userCart) {
       return res.render('addtocart', { isLoggedIn: isLoggedIn, productList: [], count: 0,total:0 });
     }
-    console.log(userId,'userid')
+    console.log(userId,'userid');
+    
     const cartData = await Cart.aggregate([
       { $match: { userId: new mongoose.Types.ObjectId(userId._id) } },
       {
@@ -804,7 +806,6 @@ const addproducttoCart = async (req, res) => {
         }]
       });
       await newCart.save();
-      
     }
     console.log('product save to cart')
     res.redirect(`/productDetails?id=${productId}`)
@@ -824,9 +825,14 @@ const removeProduct = async (req, res) => {
     const userCart = await Cart.findOne({ userId: userId });
     console.log('userCart:',userCart);
     if (userCart) {
-      await Cart.updateOne({userId:userId},{$pull:{'products':{'productId':new mongoose.Types.ObjectId(productId)}}});
+      if(userCart.products.length === 1){
+        await userCart.deleteOne();
+        return res.status(200).json({success:true,massage:'product Removed from the cart'})
+      }else{
+        await Cart.updateOne({userId:userId},{$pull:{'products':{'productId':new mongoose.Types.ObjectId(productId)}}});
       console.log('product removed from the list');
       return res.status(200).json({ success: true, message: 'Product removed from the cart'})
+      }  
     } else {
       console.log('some error came')
       return res.status(404).json({ success: false, message: 'Cart not found' });
@@ -839,56 +845,129 @@ const removeProduct = async (req, res) => {
 
 const updateQuantity = async (req,res)=>{
   try{
-    let {cart,product,count} = req.body;
+  let { cart, product, count } = req.body;
     const user = req.session.user;
-    count=parseInt(count);
-    console.log(cart,product,count)
-    const userCart = await Cart.find({userId :user});
-    console.log('userCart',userCart);
-    if(userCart ){
-      await Cart.updateOne({userId:user,'products.productId':product},{$inc:{'products.$.quantity':count}});
+    count = parseInt(count);
+    console.log(cart, product, count);
+
+    const userCart = await Cart.findOne({ userId: user });
+    console.log('userCart', userCart);
+
+    if (userCart && userCart.products) {
+      const productInCart = userCart.products.find(p => p.productId.toString() === product);
+      
+      if (!productInCart) {
+        return res.status(404).json({ success: false, message: "Product not found in cart" });
+      }
+      
+      const productDetails = await Product.findById(product);
+      if(!productDetails){
+        return res.status(404).json ({success:false,message:'product detailes not found'});
+      }
+
+      const newQuantity = productInCart.quantity + count;
+      if (newQuantity > productDetails.stock) {
+        return res.status(400).json({ success: false, message: "Exceeds available stock" });
+      }
+      productInCart.quantity = newQuantity;
+      await userCart.save();
+
+      const newTotalPrice = userCart.products.reduce((total, p) => total + p.quantity * p.price, 0);
+
       console.log('cart updated successfully');
-      return res.status(200).json({ success: true, message: "Cart updated successfully" });
+      return res.status(200).json({
+        success: true,
+        message: "Cart updated successfully",
+        newQuantity: productInCart.quantity,
+        newTotalPrice: newTotalPrice
+      });
+    } else {
+      return res.status(404).json({ success: false, message: "User cart not found or cart has no products" });
     }
-    else{
-      return res.status(404).json({ success: false, message: "User cart not found" });
-    }
-    
-  }catch(error){
+  } catch (error) {
     console.error(error.message);
     return res.status(500).json({ success: false, message: "An error occurred while updating the cart" });
   }
 };
+
 const showOrder = async(req,res)=>{
-  try{
+  try {
     const isLoggedIn = await User.findById(req.session.user);
-    console.log(isLoggedIn);
-    const id = isLoggedIn._id;
-    const userOrder = await Order.find({userId:id}).lean();
-    console.log(userOrder,'orderList');
+    if (!isLoggedIn) {
+      return res.status(401).send('User not logged in');
+    }
 
-    const formattedOrders = await Promise.all(
-      userOrder.map(async (order) => {
-        const address = await Address.findById(order.address).lean();
-        const products = order.products.map((product) => {
-          return {
-            productName: product.name,
-            productImage: `image_url_for_${product.productId}` 
-          };
-        });
+    const userId = isLoggedIn._id;
+    console.log(userId, 'user');
+
+    const orderDetails = await Order.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+      { $unwind: '$products' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'products',
+          foreignField: '_id',
+          as: 'productDetails'
+        }
+      },
+      {
+        $lookup: {
+          from: 'addresses',
+          localField: 'address',
+          foreignField: '_id',
+          as: 'AddressOn'
+        }
+      },
+      {
+        $project: {
+          'AddressOn': 1,
+          'productDetails': 1,
+          'payment': 1,
+          'totalAmount': 1,
+          'DateOrder': 1
+        }
+      }
+    ]);
+    console.log(orderDetails, 'orderForm');
+    
+    const cart = await Cart.find({ userId: userId });
+    let count = 0;
+
+    if (orderDetails.length > 0) {
+      const orderDetailedList = orderDetails.map(order => {
+        const productList = order.productDetails.map(product => ({
+          productName: product.name,
+          price: product.price,
+          image: product.image[0],
+        }));
+
+        const addressList = order.AddressOn.length > 0 ? order.AddressOn[0] : {};
+
         return {
-          address: address ? address.details : 'Address not found', 
-          products: products,
+          orderId: order._id,
           payment: order.payment,
-          totalAmount: order.totalAmount
+          totalAmount: order.totalAmount,
+          orderDate: order.DateOrder,
+          products: productList,
+          address: {
+            fullname: addressList.fullname || '',
+            pincode: addressList.pincode || '',
+            mobile: addressList.mobile || '',
+            street: addressList.street || '',
+            city: addressList.city || ''
+          }
         };
-      })
-    );
-    console.log(formattedOrders)
+      });
 
-    res.render('order', { isLoggedIn: isLoggedIn, count: 0, userOrder: formattedOrders });
+      res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: orderDetailedList });
+    } else {
+      res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: '' });
+    }
+
   } catch (error) {
-    console.log(error.message);
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
   }
 };
 const checkoutLoad = async (req,res) =>{
@@ -899,15 +978,15 @@ const checkoutLoad = async (req,res) =>{
     const userCart = await Cart.findOne({userId:id});
     count = countCart(userCart)
     let totalAmount = await Cart.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(id) } }, // Match the cart with the given userId
-    { $unwind: '$products' }, // Unwind the products array
+      { $match: { userId: new mongoose.Types.ObjectId(id) } }, 
+    { $unwind: '$products' }, 
     {
       $group: {
         _id: '$userId',
         totalAmount: {
           $sum: {
             $multiply: [
-              { $toDouble: '$products.price' }, // Convert price to double
+              { $toDouble: '$products.price' }, 
               '$products.quantity'
             ]
           }
@@ -921,22 +1000,28 @@ const checkoutLoad = async (req,res) =>{
       { $match: { userId: new mongoose.Types.ObjectId(id) } },
       {
         $lookup:{
-          from:'products',
-          localField:'products.productId',
-          foreignField:'_id',
-          as:'productDetails'
+          from: 'products',
+          localField: 'products.productId',
+          foreignField: '_id',
+          as: 'productDetails'
         }
       }
     ]);
-    let productList = cartData[0].products.map(item => ({
-      _id:item._id,
-      productId: item.productId,
-      quantity: item.quantity,
-      price:item.price,
-      name:item.name,
-      image: cartData[0].productDetails.find(product => product._id.toString() === item.productId.toString()).image,
-      stock:cartData[0].productDetails.find(product => product._id.toString() === item.productId.toString()).stock
-    }));
+    
+    let productList = cartData[0].products.map(item => {
+      const productDetail = cartData[0].productDetails.find(product => product._id.toString() === item.productId.toString());
+      return {
+        _id: item._id,
+        productId: productDetail._id,
+        quantity: item.quantity,
+        price: item.price,
+        name: productDetail.name,
+        image: productDetail.image,
+        stock: productDetail.stock
+      };
+    });
+    
+    console.log(productList, 'list');
     const address = await Address.find({user:new mongoose.Types.ObjectId(id)});
     console.log(address,'useraddrss')
 
@@ -948,8 +1033,8 @@ const checkoutLoad = async (req,res) =>{
 const placeOrder = async(req,res)=>{
   
   try {
-    const { addressId, paymentMethod, totalAmount } = req.body;
-    console.log(addressId, paymentMethod, totalAmount, 'address and payment method');
+    const { addressId, paymentMethod, totalAmount,productName } = req.body;
+    console.log(addressId, paymentMethod, totalAmount,productName, 'address and payment method');
 
     
     if (!mongoose.Types.ObjectId.isValid(addressId)) {
@@ -968,9 +1053,11 @@ const placeOrder = async(req,res)=>{
       throw new Error('User cart or products are undefined');
     }
 
-    const productIds = userCart.products
+    const productIds = userCart.products.map(product => product.productId); // Extracting product IDs from the cart
 
-    console.log(userid, addressId, productIds, paymentMethod, totalAmount);
+        console.log(productIds, 'productIds');
+
+    console.log(userid, addressId, productName, paymentMethod, totalAmount);
     
     const order = new Order({
       userId:userid,
@@ -1001,6 +1088,18 @@ const searchProduct = async(req,res)=>{
     res.render('searchProduct',{isLoggedIn:isLoggedIn,count:0,product})
   }catch(error){
     console.log(error.message)
+  }
+};
+const cancelOrder = async (req,res)=>{
+  try{
+    const {reason} = req.body;
+    const userid = req.session.user;
+    await Order.findOneAndUpdate({userId:userid},{$set:{'orderStatus.reason':reason,success:false}});
+    res.json({ success: true });
+
+  }catch(error){
+    console.error(error.message);
+    res.json({success:false})
   }
 }
 module.exports = {
@@ -1042,5 +1141,6 @@ module.exports = {
   addproducttoCart,removeProduct,
   updateQuantity,
   showOrder,placeOrder,
-  searchProduct
+  searchProduct,
+  cancelOrder
 };

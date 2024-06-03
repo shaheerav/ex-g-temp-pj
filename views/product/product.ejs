@@ -30,7 +30,13 @@
                 <td><%= product[i].category ? product[i].category.name : 'N/A' %></td>
                 <td><%= product[i].size %></td>
                 <td><%= product[i].price %></td>
-                <td><%= product[i].stock %></td>
+                <td>
+                  <% if(product[i].stock === 0) { %>
+                    <span style="color: red;">Out of Stock</span>
+                  <% } else { %>
+                    <%= product[i].stock %>
+                  <% } %>
+                </td>
                 <td><% if(product[i].image){ %>
                   <a href="/product/showImages?id=<%= product[i]._id %>"><img src="/uploads/<%= product[i].image[0] %>" style="width: 50px; height: 60px;" alt="product Image"></a>
                   <% } else { %>

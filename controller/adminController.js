@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const Order = require('../models/order')
 const bcrypt = require("bcrypt");
 const randomString = require('randomstring');
 const nodemailer = require('nodemailer');
@@ -228,13 +229,27 @@ const resetPasswordMail = async (name, email, token) => {
   };
   const orderList = async (req,res)=>{
     try{
-        const user = await User.findById(req.session.User_id);
-        res.render('')
+        const adminData = await User.findById({_id:req.session.User_id});
+        const orders = await Order.find();
+        res.render('orderList',{admin:adminData,order:orders});
     }catch(error){
         console.error(error.message)
     }
 
+  };
+
+  const updateOrderStatus =async (req,res)=>{
+    const { orderId, status } = req.body;
+  
+  try {
+    await Order.findByIdAndUpdate(orderId, { status: status });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.json({ success: false });
   }
+};
 module.exports={
     adminPage,
     adminVerify,
@@ -249,5 +264,6 @@ module.exports={
     forget,
     forgetverify,
     forgetPasswordLoad,
-    resetPassword,orderList
+    resetPassword,orderList,
+    updateOrderStatus
 }

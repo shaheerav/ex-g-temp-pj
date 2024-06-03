@@ -15,6 +15,31 @@
 				</div>
 			</div>
 		<!-- End Hero Section -->
+  <!-- Cancel Order Modal -->
+  <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <label for="cancelReason" class="form-label">Reason for Cancellation:</label>
+          <select id="cancelReason" class="form-control">
+            <option value="Changed mind">Changed mind</option>
+            <option value="Found better price">Found a better price</option>
+            <option value="Order mistake">Ordered by mistake</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="text" id="cancelReasonOther" class="form-control mt-2" placeholder="Please specify if 'Other'" style="display:none;">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="confirmCancelOrder()">Confirm Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
 <form action="" id="checkoutForm">
 		<div class="untree_co-section">
 		    <div class="container">
@@ -125,9 +150,11 @@
 		                  </thead>
 		                  <tbody>
 		                    <tr>
+								
 								<% product.forEach(product=>{ %>
-		                      <td><%= product.name  %> <strong class="mx-2">x</strong> <%= product.quantity %></td>
+		                      <td name="productName"><%= product.name  %> <strong class="mx-2">x</strong> <%= product.quantity %></td>
 		                      <td><i class="bi bi-currency-rupee"></i><%= product.price*product.quantity  %></td>
+							  <input type="hidden" name="productIds" value="<%=product._id  %>">
 		                    </tr>
 		                    <tr>
 								<% }) %>
@@ -141,7 +168,7 @@
 		                  </tbody>
 		                </table>
 						<form id="checkoutForm">
-							<div class="form-group">
+							<div class="form-group m-5">
 							  <label for="payment-method">Choose payment method:</label>
 							  <select name="payment" id="payment" class="form-control">
 								<option value="COD">COD</option>
@@ -149,9 +176,11 @@
 							  </select>
 							</div>
 						  
-							<div class="form-group">
+							<div class="form-group m-5">
 							  <button type="button" class="btn btn-black btn-lg py-3 btn-block" onclick="placeOrder()">Place Order</button>
+							  <button type="button" class="btn btn-black btn-lg py-3 btn-block" onclick="cancelOrder()">Cancel Order</button>
 							</div>
+							
 						  </form>
 					
 		              </div>
@@ -270,6 +299,7 @@
 					return;
 				}
 				const totalAmount = <%= total %>;
+				const productName = Array.from(document.getElementsByName('productName')).map(input =>input.innerText.trim())
 				fetch('/checkout', {
 					method: 'POST',
 					headers: {
@@ -278,7 +308,8 @@
 					body: JSON.stringify({
 					addressId: selectedAddressId,
 					paymentMethod: paymentMethod,
-					totalAmount: totalAmount
+					totalAmount: totalAmount,
+					productName :productName
 					})
 				})
 				.then(response => response.json())
@@ -290,12 +321,62 @@
 					}
 				});
 				}
+				document.getElementById('cancelReason').addEventListener('change', function() {
+						if (this.value === 'Other') {
+						document.getElementById('cancelReasonOther').style.display = 'block';
+						} else {
+						document.getElementById('cancelReasonOther').style.display = 'none';
+						}
+					});
+
+					function cancelOrder() {
+						var cancelOrderModal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+						cancelOrderModal.show();
+					}
+
+					function confirmCancelOrder() {
+						const reasonSelect = document.getElementById('cancelReason');
+						let cancelReason = reasonSelect.value;
+
+						if (cancelReason === 'Other') {
+						const otherReason = document.getElementById('cancelReasonOther').value.trim();
+						if (otherReason) {
+							cancelReason = otherReason;
+						} else {
+							alert('Please specify the reason for cancellation.');
+							return;
+						}
+						}
+
+						fetch(`/cancelOrder`, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({
+							reason: cancelReason
+						})
+						})
+						.then(response => response.json())
+						.then(data => {
+						if (data.success) {
+							alert('Order cancelled successfully.');
+							window.location.href = '/orders';
+						} else {
+							alert('Error cancelling order: ' + data.message);
+						}
+						})
+						.catch(error => {
+						console.error('Error:', error);
+						alert('An error occurred while cancelling the order.');
+						});
+					}
 		</script>
 
 <script src="js/bootstrap.bundle.min.js"></script>
 <script src="js/tiny-slider.js"></script>
 <script src="js/custom.js"></script>
-<script src="javascripts/zoomImage.js"></script>
+
 </body>
 
 </html>
