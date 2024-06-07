@@ -1,10 +1,3 @@
-<!-- /*
-* Bootstrap 5
-* Template Name: Furni
-* Template Author: Untree.co
-* Template URI: https://untree.co/
-* License: https://creativecommons.org/licenses/by/3.0/
-*/ -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -36,15 +29,53 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
     />
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" />
-  
-<script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="stylesheets/style.css" />
+  </head>
+
+  <body>
     <style>
-      .error {
-        color: red;
+      /*zooming*/
+      * {
+        box-sizing: border-box;
       }
-      /* Style for the container */
+
+      .img-zoom-container {
+        position: relative;
+      }
+
+      .img-zoom-lens {
+        position: absolute;
+        visibility: hidden;
+        border: 1px solid #d4d4d4;
+
+        /*set the size of the lens:*/
+        width: 100px;
+        height: 100px;
+      }
+      .img-container:hover .img-zoom-result {
+        display: block;
+        transition: opacity 0.3s ease;
+      }
+      .img-container .img-zoom-result {
+        border: 1px solid #d4d4d4;
+        /*set the size of the result div:*/
+        width: 500px;
+        height: 300px;
+        /* Add other styling properties as needed */
+        border-radius: 10x;
+      }
+      .img-container:hover {
+        cursor: zoom-in;
+      }
+      .position-static {
+        height: 500px;
+        width: 100%;
+        background-color: black;
+        color: white;
+      }
       .cart-container {
         position: relative;
         display: inline-block;
@@ -63,17 +94,6 @@
         transform: translateX(-50%);
       }
     </style>
-    <script>
-      window.onload = function () {
-        // Prevent back navigation to the login page after login
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, null, window.location.href);
-        }
-      };
-    </script>
-  </head>
-
-  <body>
     <!-- Start Header/Navigation -->
     <nav
       class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
@@ -94,16 +114,16 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarsTrend">
+        <div class="collapse navbar-collapse" id="navbarsFurni">
           <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-            <li class="home active">
+            <li class="nav-item active">
               <a class="nav-link" href="/">Home</a>
             </li>
             <li><a class="nav-link" href="/men">Men</a></li>
             <li><a class="nav-link" href="/women">Women</a></li>
             <li><a class="nav-link" href="/kids">Kids</a></li>
             <li><a class="nav-link" href="/footwear">Footwear</a></li>
-            <li><a class="nav-link" href="/search">Search Product</a></li>
+            <li><a class="nav-link" href="contact.html">Contact us</a></li>
           </ul>
 
           <div class="nav-item dropdown ms-auto mb-2 mb-md-0">
@@ -116,19 +136,15 @@
                 ><img src="images/user.svg" />
                 <% if (isLoggedIn) { %>
                 <!-- Content to show when the user is logged in -->
-                <% if(isLoggedIn.displayName) {%>
-                <samp><%= isLoggedIn.displayName %></samp>
-                <% } else if (isLoggedIn.name) {%>
                 <samp><%= isLoggedIn.name %></samp>
-                <% } %>
                 <!-- Other content for logged-in users -->
-                <% } else { %> Sign in <% } %></a
+                <% } else { %> signIn <% } %></a
               >
               <div class="dropdown-menu bg-transparent border-0">
                 <a href="/userDetails" class="dropdown-item">Your Account</a>
                 <a href="/orders" class="dropdown-item">Your Order</a>
                 <a href="element.html" class="dropdown-item">Wish List</a>
-                <a href="/users" class="dropdown-item">Sign Up</a>
+                <a href="/users" class="dropdown-item">Register</a>
                 <% if (isLoggedIn){ %>
                 <a href="/logout" class="dropdown-item">Logout</a>
                 <%} else { %>
@@ -139,19 +155,10 @@
           </div>
           <li>
             <a class="nav-link" href="/cart">
-              <div class="cart-container">
-                <img src="images/cart.svg" class="cart-image" />
-                <span class="badge badge-light"><%if(count){%>
-					<%= count %>
-				<%}else{%>
-				0
-			<%}%></span>
-              </div>
+              <img src="images/cart.svg">
+              <span class="badge badge-light" id="cart-count"><%= count %></span>
             </a>
           </li>
         </div>
       </div>
     </nav>
-    <!-- End Header/Navigation -->
-  </body>
-</html>

@@ -151,5 +151,8 @@ userRouts.post('/cart/delete',controller.removeProduct);
 userRouts.post('/cart/updateQuantity',controller.updateQuantity);
 userRouts.get('/orders',auth.isLogin,controller.showOrder);
 userRouts.get('/search',controller.searchProduct);
-userRouts.post('/cancelOrder',controller.cancelOrder)
+userRouts.post('/cancelOrder',controller.cancelOrder);
+userRouts.get('/orderDetails',controller.showOrderDetails);
+userRouts.get('/cancelledList',controller.orderCancelledList);
+userRouts.post('/order-product/delete',controller.orderProductDelete);
 module.exports = userRouts;

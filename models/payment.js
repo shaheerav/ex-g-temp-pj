@@ -8,12 +8,18 @@ const paymentSchema = new mongoose.Schema({
     },
     paymentMethod:{
         type:String,
+        enum:['Cash-On-Delivery(COD)','Cart-Payment','Bank-transger','PayPal','Razorpay'],
         require:true
     },
     amount:{
         type:Number,
         require:true
     },
+    status:{
+        type:String,
+        enum:['pending','paid'],
+        require:true
+    },
 });
 
-module.exports = mongoose.Schema.Types.ObjectId('Payment',paymentSchema);
+module.exports = mongoose.model('Payment',paymentSchema);

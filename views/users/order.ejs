@@ -1,60 +1,366 @@
-<%- include ('../layouts/user/header.ejs')  %>
-<!-- Start Hero Section -->
-<div class="hero">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="author" content="Untree.co" />
+    <link rel="shortcut icon" href="favicon.png" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap5" />
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link href="css/tiny-slider.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+    <title>Trend Setter</title>
+    <style>
+    .corner-box {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 10px;
+    }
+    </style>
+</head>
+<body class="m-5">
+    <!-- Start Header/Navigation -->
+    <nav
+    class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
+    arial-label="Furni navigation bar" 
+  >
     <div class="container">
-        <div class="row justify-content-between">
-            <div class="col-lg-5">
-                <div class="intro-excerpt">
-                    <h1>Order</h1>
-                </div>
+      <a class="navbar-brand" href="index.html">Trend Setter<span>.</span></a>
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarsFurni"
+        aria-controls="navbarsFurni"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsFurni">
+        <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li><a class="nav-link" href="/men">Men</a></li>
+          <li><a class="nav-link" href="/women">Women</a></li>
+          <li><a class="nav-link" href="/kids">Kids</a></li>
+          <li><a class="nav-link" href="/footwear">Footwear</a></li>
+          <li><a class="nav-link" href="contact.html">Contact us</a></li>
+        </ul>
+
+        <div class="nav-item dropdown ms-auto mb-2 mb-md-0">
+          <li>
+            <a
+              href="#"
+              class="nav-link dropdown-toggle"
+              data-bs-toggle="dropdown"
+              style="color: white"
+              ><img src="images/user.svg" />
+              <% if (isLoggedIn) { %>
+              <!-- Content to show when the user is logged in -->
+              <samp><%= isLoggedIn.name %></samp>
+              <!-- Other content for logged-in users -->
+              <% } else { %> signIn <% } %></a
+            >
+            <div class="dropdown-menu bg-transparent border-0">
+              <a href="/userDetails" class="dropdown-item">Your Account</a>
+              <a href="/orders" class="dropdown-item">Your Order</a>
+              <a href="element.html" class="dropdown-item">Wish List</a>
+              <a href="/users" class="dropdown-item">Register</a>
+              <% if (isLoggedIn){ %>
+              <a href="/logout" class="dropdown-item">Logout</a>
+              <%} else { %>
+              <a href="/login" class="dropdown-item">Login</a>
+              <% } %>
             </div>
-            <div class="col-lg-7">
-                
+          </li>
+        </div>
+        <li>
+          <a class="nav-link" href="/cart">
+            <img src="images/cart.svg">
+            
+          </a>
+        </li>
+      </div>
+    </div>
+  </nav>
+
+    <!-- Start Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-lg-5">
+                    <div class="intro-excerpt">
+                        <h1>Order</h1>
+                    </div>
+                </div>
+                <div class="col-lg-7"></div>
             </div>
         </div>
     </div>
-</div>
-<!-- End Hero Section -->
-
-<div class="col-md-12 mt-5 mb-5" style="padding-bottom: 150px;">
-    <%if(orderForm.length >0){ %>
-        <% for(let i = 0; i < orderForm.length; i++){ %>
-    
-    <div class="col-md-12 pl-5">
-<table class="table table-info " style="font-size: 18px; ">
-    <thead>
-      <tr>
-        <th scope="col" width="10%">#</th>
-        <th scope="col"width="30%">Products</th>
-        <th scope="col"width="30%">Address</th>
-        <th scope="col"width="10%">Payment Method</th>
-        <th scope="col"width="10%">Total Amount</th>
-        <th scope="col"width="10%">Date</th>
-
-
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row"><%= i+1 %></th>
-        <td><% orderForm[i].products.forEach(product => { %>
-          <li>
-            <strong>Name:</strong> <%= product.productName %><br>
-            <strong>Price:</strong> <%= product.price %><br>
-            <img src="/uploads/<%= product.image[0] %>" alt=productimage style="width: 50px; height: 60px;">
+    <!-- End Hero Section -->
+    <div class="card text-center">
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="true" href="/orders">Ordered</a>
           </li>
-        <% }) %></td>
-        <td><%= orderForm[i].address.fullname %>,<%= orderForm[i].address.mobile %>,<%= orderForm[0].address.pincode %>
-        <td><%= orderForm[i].payment %></td>
-        <td><%= orderForm[i].totalAmount  %></td>
-        <td><%= new Date (orderForm[i].dateOrder).toDateString()%></td>
+          <li class="nav-item">
+            <a class="nav-link" href="/cancelledList">Cancelled</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <label for="cancelReason" class="form-label">Reason for Cancellation:</label>
+            <select id="cancelReason" class="form-control">
+              <option value="Changed mind">Changed mind</option>
+              <option value="Found better price">Found a better price</option>
+              <option value="Order mistake">Ordered by mistake</option>
+              <option value="Other">Other</option>
+            </select>
+            <input type="text" id="cancelReasonOther" class="form-control mt-2" placeholder="Please specify if 'Other'" style="display:none;">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="confirmCancelOrder()">Confirm Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% if (orderForm.length > 0) { %>
+      <% for (let i = 0; i < orderForm.length; i++) { %>
+    <div class="card m-5 " style="margin-bottom: 150px;">
+        <div class="card-header ">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item p-3">
+                    <h6>ORDER PLACED</h6>
+                    <h5 class="font-weight-bold"><script>
+                      document.write(new Date('<%= orderForm[i].orderDate %>').toLocaleString());
+                  </script></h5>
+                </li>
+                <li class="nav-item p-3">
+                    <h6>TOTAL</h6>
+                    <h5 class="font-weight-bold">₹<%= orderForm[i].totalAmount %></h5>
+                </li>
+                <li class="nav-item p-3 dropdown"> 
+                  <h6>SHIP TO</h6>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <%= orderForm[i].address.fullname %>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <p class="text-center p-3"><%= orderForm[i].address.mobile %>, <%= orderForm[0].address.pincode %> <%= orderForm[0].address.street %></p>
+                    </div>
+                </li>
+                <li class="nav-item p-3">
+                  <a class="orderDetails" onclick="orderDetails('<%= orderForm[i].orderId%>')">View Order Details</a>
+                </li>
+            </ul>
+            <div class="corner-box">
+              <h6 class="p-3" >OrderId:<%= orderForm[i].orderId %></h6>
+          </div>
+          
+        </div>
 
-      </tr>
-    </tbody>
-  </table>
-</div>
-<%} %>
-<%} %>
+        <div class="card-body">
+          <% orderForm[i].products.forEach(product => { %>
+            <li>
+                <%= product.productName %><br>
+                <img src="/uploads/<%= product.image %>" alt="productimage" style="width: 50px; height: 60px;">
+            </li>
+        <% }) %>
+        <input value="<%= orderForm[i].orderId %>" id="orderIdInput" type="hidden"> 
+            <a href="#" class="btn btn-primary m-3" onclick="cancelOrder()">Cancel Your Order</a>
+        </div>
+    </div>
+    <% } %>
+        <% } %>
+        <div class="pagination">
+          <% for (let page = 1; page <= totalPages; page++) { %>
+            <button class="page-link" onclick="fetchOrders(<%= page %>)"><%= page %></button>
+          <% } %>
+        </div>
 
-</div>
-<%- include ('../layouts/user/footer.ejs')  %>
+    <!-- Start Footer Section -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="sofa-img">
+                <!--<img src="images/logo1.png" style="padding-top: 1600px;" alt="Image" class="img-fluid">-->
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="subscription-form">
+                        <h3 class="d-flex align-items-center"><span class="me-1"><img src="images/envelope-outline.svg" alt="Image" class="img-fluid"></span><span>Subscribe to Newsletter</span></h3>
+                        <form action="#" class="row g-3">
+                            <div class="col-auto">
+                                <input type="text" class="form-control" placeholder="Enter your name">
+                            </div>
+                            <div class="col-auto">
+                                <input type="email" class="form-control" placeholder="Enter your email">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary"><span class="fa fa-paper-plane"></span></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-5 mb-5">
+                <div class="col-lg-4">
+                    <div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">Trend Setter<span>.</span></a></div>
+                    <p class="mb-4">Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique. Pellentesque habitant</p>
+
+                    <ul class="list-unstyled custom-social">
+                        <li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-twitter"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-instagram"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-linkedin"></span></a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="row links-wrap">
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">About us</a></li>
+                                <li><a href="#">Services</a></li>
+                                <li><a href="#">Blog</a></li>
+                                <li><a href="#">Contact us</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Support</a></li>
+                                <li><a href="#">Knowledge base</a></li>
+                                <li><a href="#">Live chat</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Jobs</a></li>
+                                <li><a href="#">Our team</a></li>
+                                <li><a href="#">Leadership</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Nordic Chair</a></li>
+                                <li><a href="#">Kruzo Aero</a></li>
+                                <li><a href="#">Ergonomic Chair</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-top copyright">
+                <div class="row pt-4">
+                    <div class="col-lg-6">
+                        <p class="mb-2 text-center text-lg-start">Copyright &copy;<script>document.write(new Date().getFullYear());</script>. All Rights Reserved. &mdash; Designed with love by <a href="https://untree.co">Untree.co</a> Distributed By <a href="https://themewagon.com">ThemeWagon</a> <!-- License information: https://untree.co/license/ --></p>
+                    </div>
+                    <div class="col-lg-6 text-center text-lg-end">
+                        <ul class="list-unstyled d-inline-flex ms-auto">
+                            <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- End Footer Section -->
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="js/tiny-slider.js"></script>
+    <script src="js/custom.js"></script>
+    <script>
+      //order details
+      function orderDetails(orderId){
+        console.log(orderId,'orderid')
+        window.location.href='/orderDetails?id='+orderId
+      }
+        // Changing the images
+        function changeMainImage(newImageSrc) {
+            document.getElementById('myimage').src = '/uploads/' + newImageSrc;
+        }
+        // Changing the nav bar activation
+        function changingNavBar() {
+            let bar = document.getElementById("navbarsFurni");
+            if (bar.className === 'home') {
+                bar.className += " active";
+            }
+        }
+
+        document.getElementById('cancelReason').addEventListener('change', function() {
+						if (this.value === 'Other') {
+						document.getElementById('cancelReasonOther').style.display = 'block';
+						} else {
+						document.getElementById('cancelReasonOther').style.display = 'none';
+						}
+					});
+
+					function cancelOrder() {
+						var cancelOrderModal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+						cancelOrderModal.show();
+					}
+
+					function confirmCancelOrder() {
+						const reasonSelect = document.getElementById('cancelReason');
+						let cancelReason = reasonSelect.value;
+
+						if (cancelReason === 'Other') {
+						const otherReason = document.getElementById('cancelReasonOther').value.trim();
+						if (otherReason) {
+							cancelReason = otherReason;
+						} else {
+							alert('Please specify the reason for cancellation.');
+							return;
+						}
+						}
+            const orderId = document.getElementById('orderIdInput').value;
+						fetch(`/cancelOrder`, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({
+							reason: cancelReason,
+              orderId:orderId
+						})
+						})
+						.then(response => response.json())
+						.then(data => {
+						if (data.success) {
+							alert('Order cancelled successfully.');
+							window.location.href = '/orders';
+						} else {
+							alert('Error cancelling order: ' + data.message);
+						}
+						})
+						.catch(error => {
+						console.error('Error:', error);
+						alert('An error occurred while cancelling the order.');
+						});
+					}
+    </script>
+</body>
+</html>

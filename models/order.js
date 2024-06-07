@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { transformAuthInfo } = require('passport');
 
 const orderSchema = new mongoose.Schema({
     userId :{
@@ -22,8 +21,9 @@ const orderSchema = new mongoose.Schema({
         default:Date.now
     },
     payment:{
-        type:String,
-        require:true
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Payment',
+        require:true,
     },
     shippingCharge:{
         type:Number,
@@ -41,16 +41,15 @@ const orderSchema = new mongoose.Schema({
         require:true,
     },
     status:{
-        type:Boolean,
-        default:false,
+        type:String,
+        enum:['Ordered','Shipped','Out-For-Delivery','Delivered','Cancelled'],
         require:true,
     },
-    orderStatus:[
-        {
-            reason:{type:String,require:true,default:'no'},
-            success:{type:Boolean,require:true,default:true}
-        }
-    ]
+    orderStatus:{
+        type:String,
+        default:'',
+        require:true
+    }
 });
 
 module.exports = mongoose.model('Order',orderSchema);

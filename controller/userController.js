@@ -12,6 +12,8 @@ const Product = require("../models/products");
 const Address = require('../models/address');
 const Order = require("../models/order");
 const Cart = require('../models/cart');
+const Payment = require('../models/payment');
+const {getOderDetails} = require('../config/aggregation');
 const { session, use } = require("passport");
 const userRouts = require("../routes/users");
 const category = require("../models/category");
@@ -54,6 +56,9 @@ function countCart(product){
   
   let count = product.products.reduce((total, product) => total + product.quantity, 0);
   return count;
+};
+function getEnumValues(schema,path){
+  return schema.path (path).enumValues;
 }
 function isEmptyValue(obj){
   let values = Object.values(obj);
@@ -900,8 +905,12 @@ const showOrder = async(req,res)=>{
     const userId = isLoggedIn._id;
     console.log(userId, 'user');
 
+    const page = parseInt(req.query.page) || 1;
+
+    const skip = (page - 1) * 5;
+
     const orderDetails = await Order.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+      { $match: { userId: new mongoose.Types.ObjectId(userId),status: { $ne: 'cancelled' } } },
       { $unwind: '$products' },
       {
         $lookup: {
@@ -911,6 +920,7 @@ const showOrder = async(req,res)=>{
           as: 'productDetails'
         }
       },
+      {$unwind:'$productDetails'},
       {
         $lookup: {
           from: 'addresses',
@@ -918,49 +928,71 @@ const showOrder = async(req,res)=>{
           foreignField: '_id',
           as: 'AddressOn'
         }
-      },
+      },{$unwind:'$AddressOn'},
+      {$lookup:{
+        from:'payments',
+        localField:'payment',
+        foreignField:'_id',
+        as:'paymentMethod'
+      }},
+      {$unwind:'$paymentMethod'},
+      
+      {$group:{
+        _id:'$_id',
+        payment:{'$first':'$paymentMethod'},
+        totalAmount:{'$first':'$totalAmount'},
+        DateOrder:{'$first':'$DateOrder'},
+        products:{'$push':'$productDetails'},
+        address:{'$first':'$AddressOn'}
+      }},
       {
         $project: {
-          'AddressOn': 1,
-          'productDetails': 1,
-          'payment': 1,
-          'totalAmount': 1,
-          'DateOrder': 1
+          _id: 1,
+          payment: 1,
+          totalAmount: 1,
+          DateOrder: { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$DateOrder" } },
+          products: 1,
+          address: 1
         }
-      }
+      },
+      { $sort: { DateOrder: -1 } },
+      {$skip:skip},
+      {$limit:5}
     ]);
     console.log(orderDetails, 'orderForm');
     
     const cart = await Cart.find({ userId: userId });
     let count = 0;
-
     if (orderDetails.length > 0) {
       const orderDetailedList = orderDetails.map(order => {
-        const productList = order.productDetails.map(product => ({
+        const productList = order.products.map(product => ({
           productName: product.name,
           price: product.price,
-          image: product.image[0],
+          image: product.image.length > 0 ? product.image[0] : '' 
         }));
 
-        const addressList = order.AddressOn.length > 0 ? order.AddressOn[0] : {};
+        const address = order.address || {};
+        const payment = order.payment || {};
 
         return {
           orderId: order._id,
-          payment: order.payment,
+          payment: payment.paymentMethod,
           totalAmount: order.totalAmount,
           orderDate: order.DateOrder,
           products: productList,
           address: {
-            fullname: addressList.fullname || '',
-            pincode: addressList.pincode || '',
-            mobile: addressList.mobile || '',
-            street: addressList.street || '',
-            city: addressList.city || ''
+            fullname: address.fullname || '',
+            pincode: address.pincode || '',
+            mobile: address.mobile || '',
+            street: address.street || '',
+            city: address.city || ''
           }
         };
       });
 
-      res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: orderDetailedList });
+      console.log(orderDetailedList);
+      const totalPages = Math.ceil(orderDetails.length / 5);
+      res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: orderDetailedList,totalPages: totalPages});
     } else {
       res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: '' });
     }
@@ -973,7 +1005,8 @@ const showOrder = async(req,res)=>{
 const checkoutLoad = async (req,res) =>{
   try{
       const isLoggedIn = await User.findById(req.session.user);
-      console.log(isLoggedIn,'user details')
+      console.log(isLoggedIn,'user details');
+      const paymentMethods = getEnumValues(Payment.schema,'paymentMethod')
       const id = isLoggedIn._id
     const userCart = await Cart.findOne({userId:id});
     count = countCart(userCart)
@@ -1025,7 +1058,7 @@ const checkoutLoad = async (req,res) =>{
     const address = await Address.find({user:new mongoose.Types.ObjectId(id)});
     console.log(address,'useraddrss')
 
-      res.render('checkout',{isLoggedIn:isLoggedIn,count:count,total:total,product:productList,address:address});
+      res.render('checkout',{isLoggedIn:isLoggedIn,count:count,total:total,product:productList,address:address,paymentMethods:paymentMethods});
   }catch(error){
       console.error(error.message);
   }
@@ -1036,7 +1069,6 @@ const placeOrder = async(req,res)=>{
     const { addressId, paymentMethod, totalAmount,productName } = req.body;
     console.log(addressId, paymentMethod, totalAmount,productName, 'address and payment method');
 
-    
     if (!mongoose.Types.ObjectId.isValid(addressId)) {
       throw new Error('Invalid address ID format');
     }
@@ -1046,29 +1078,37 @@ const placeOrder = async(req,res)=>{
       throw new Error('Invalid user ID format');
     }
 
-    console.log(userid, "userData");
-
     const userCart = await Cart.findOne({ userId: userid });
     if (!userCart || !userCart.products) {
       throw new Error('User cart or products are undefined');
     }
 
-    const productIds = userCart.products.map(product => product.productId); // Extracting product IDs from the cart
+    const productIds = userCart.products.map(product => product.productId);
 
-        console.log(productIds, 'productIds');
-
-    console.log(userid, addressId, productName, paymentMethod, totalAmount);
+    const payment = new Payment({
+      orderId:null,
+      paymentMethod:paymentMethod,
+      amount:totalAmount,
+      status:'pending'
+    });
+    await payment.save();
     
     const order = new Order({
       userId:userid,
       address:addressId,
       products:productIds,
-      payment:paymentMethod,
-      totalAmount:totalAmount
+      payment:payment._id,
+      totalAmount:totalAmount,
+      status:'Ordered'
     });
     await order.save();
-    if(order)await Cart.deleteOne({userId:userid});
-
+    payment.orderId = order._id;
+    
+    await payment.save();
+    if(order){
+      await Cart.deleteOne({userId:userid});
+      
+    }
     if(paymentMethod === 'COD'){
       
       res.json({ success: true, message: 'Order placed successfully' });
@@ -1092,16 +1132,173 @@ const searchProduct = async(req,res)=>{
 };
 const cancelOrder = async (req,res)=>{
   try{
-    const {reason} = req.body;
+    const {reason,orderId} = req.body;
+    console.log(reason,orderId,'reason')
     const userid = req.session.user;
-    await Order.findOneAndUpdate({userId:userid},{$set:{'orderStatus.reason':reason,success:false}});
+    const order = await Order.findById(orderId);
+    console.log(order,'orderlist in cancelling')
+    const updatedOrder = await Order.findOneAndUpdate(
+      { _id: orderId, userId: userid },
+      { $set: { 'orderStatus': reason,'status': 'cancelled' } },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
     res.json({ success: true });
 
   }catch(error){
     console.error(error.message);
     res.json({success:false})
   }
-}
+};
+
+const showOrderDetails = async (req,res)=>{
+  try{
+    const orderId = req.query.id;
+    console.log(orderId,'id from params');
+    const user = req.session.user;
+    const isLoggedIn = await User.findById(user);
+    if(!isLoggedIn){
+      return res.status(404).send('User not logged in');
+    };
+    const order = await getOderDetails(orderId);
+    console.log(order,'order')
+    res.render('orderDetails',{isLoggedIn:isLoggedIn,count:0,orderList:order})
+  }catch(error){
+    console.log(error.message)
+  }
+};
+const orderCancelledList = async (req, res) => {
+  try {
+    const isLoggedIn = await User.findById(req.session.user);
+    if (!isLoggedIn) {
+      return res.status(401).send('User not logged in');
+    }
+
+    const userId = isLoggedIn._id;
+    console.log(userId, 'user');
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    const orderDetails = await Order.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userId), status: 'cancelled' } },
+      { $unwind: '$products' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'products',
+          foreignField: '_id',
+          as: 'productDetails'
+        }
+      },
+      { $unwind: '$productDetails' },
+      {
+        $lookup: {
+          from: 'addresses',
+          localField: 'address',
+          foreignField: '_id',
+          as: 'AddressOn'
+        }
+      },
+      { $unwind: '$AddressOn' },
+      {
+        $lookup: {
+          from: 'payments',
+          localField: 'payment',
+          foreignField: '_id',
+          as: 'paymentMethod'
+        }
+      },
+      { $unwind: '$paymentMethod' },
+      {
+        $group: {
+          _id: '$_id',
+          payment: { $first: '$paymentMethod' },
+          totalAmount: { $first: '$totalAmount' },
+          DateOrder: { $first: '$DateOrder' },
+          products: { $push: '$productDetails' },
+          address: { $first: '$AddressOn' }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          payment: 1,
+          totalAmount: 1,
+          DateOrder: { $dateToString: { format: '%Y-%m-%d %H:%M:%S', date: '$DateOrder' } },
+          products: 1,
+          address: 1
+        }
+      },
+      { $sort: { DateOrder: -1 } },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    const totalCancelledOrders = await Order.countDocuments({ userId: userId, status: 'cancelled' });
+    const totalPages = Math.ceil(totalCancelledOrders / limit);
+
+    const orderDetailedList = orderDetails.map(order => {
+      const productList = order.products.map(product => ({
+        productName: product.name,
+        price: product.price,
+        image: product.image.length > 0 ? product.image[0] : ''
+      }));
+
+      const address = order.address || {};
+      const payment = order.payment || {};
+
+      return {
+        orderId: order._id,
+        payment: payment.paymentMethod,
+        totalAmount: order.totalAmount,
+        orderDate: order.DateOrder,
+        products: productList,
+        address: {
+          fullname: address.fullname || '',
+          pincode: address.pincode || '',
+          mobile: address.mobile || '',
+          street: address.street || '',
+          city: address.city || ''
+        }
+      };
+    });
+
+    res.render('order-cancel', { isLoggedIn: isLoggedIn, count: orderDetails.length, orderForm: orderDetailedList, totalPages: totalPages });
+
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).send('Internal Server Error');
+  }
+};
+const orderProductDelete = async (req,res)=>{
+  try{
+    const userId = req.session.user;
+    const {orderId,productId}= req.body;
+    const order = await Order.findById(orderId);
+    const reason ='product No need';
+    if(order.products.length===1){
+      await Order.findOneAndUpdate(
+        { _id: orderId},
+        { $set: { 'orderStatus': reason,'status': 'cancelled' } },
+        { new: true }
+      );
+      return res.json({ message: 'Order deleted successfully' });
+    }else{
+      order.products = order.products.filter(product => product._id.toString() !== productId);
+      await order.save();
+      return res.json({ message: 'Product deleted from order successfully', order });
+    }
+  }catch(error){
+    console.log(error.message);
+    console.error(error.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
 module.exports = {
   registration,
   addUser,
@@ -1142,5 +1339,8 @@ module.exports = {
   updateQuantity,
   showOrder,placeOrder,
   searchProduct,
-  cancelOrder
+  cancelOrder,
+  showOrderDetails,
+  orderCancelledList,
+  orderProductDelete,
 };

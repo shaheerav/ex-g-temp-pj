@@ -171,8 +171,9 @@
 							<div class="form-group m-5">
 							  <label for="payment-method">Choose payment method:</label>
 							  <select name="payment" id="payment" class="form-control">
-								<option value="COD">COD</option>
-								<option value="razorpay">RAZORPAY</option>
+								<% paymentMethods.forEach(method=>{%>
+								<option value="<%=method %>"><%=method %></option>
+								<% }) %>
 							  </select>
 							</div>
 						  

@@ -1,0 +1,226 @@
+<%- include ('../layouts/user/header.ejs')  %>
+  <div class="card m-5 p-3" style="margin-bottom: 100px;">
+    <div class="card-header ">
+        <h6>Ordered on <%= new Date(orderList.DateOrder).toLocaleString() %></h6>
+        <h6 class="corner-box p-3">Order ID: <%= orderList._id %></h6>
+    </div>
+    <div class="card-body ">
+        <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item p-3 "> 
+                <h6>Shipping Address</h6>
+                <p><%= orderList.address.fullname %></p>
+                <p><%= orderList.address.mobile %></p>
+                <p><%= orderList.address.pincode %></p>
+                <p><%= orderList.address.street %></p>
+                <p><%= orderList.address.city %></p>
+                <p><%= orderList.address.state %></p>
+            </li>
+            <input id="orderId" value="<%= orderList._id %>" type="hidden">
+            <li class="nav-item p-3">
+                <h6>Payment Method</h6>
+                <h5 class="font-weight-bold"><%= orderList.payment.paymentMethod %></h5>
+            </li>
+        </ul>
+        <div class="corner-box p-5">
+            <h5 class="p-3" >Order Summary</h5>
+            <table class="table site-block-order-table mb-5">
+                <tbody>
+                    <tr>
+                        <td name="productPrice">Item(s) subtotal </td>
+                        <td><i class="bi bi-currency-rupee"></i><%= orderList.totalAmount %></td>
+                    </tr>
+                    <tr>
+                        <td name="productPrice">Shipping Charge </td>
+                        <td><i class="bi bi-currency-rupee"></i><%= orderList.shippingCharge %></td>
+                    </tr>
+                    <tr>
+                        <td name="productPrice">Tax </td>
+                        <td><i class="bi bi-currency-rupee"></i><%= orderList.tax %></td>
+                    </tr>
+                    <tr>
+                        <td class="text-black font-weight-bold"><strong>Grand total</strong></td>
+                        <td class="text-black"><i class="bi bi-currency-rupee"></i><%= orderList.totalAmount  %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="p-3">
+            <h1 class="font-weight-bold text-center text-success"><%= orderList.status  %></h1>
+        </div>
+    </div>
+
+    <div class="card-body row">
+        
+        <% if (orderList.products && orderList.products.length > 0) { %>
+            <h5>Products:</h5>
+            <ul>
+                <% orderList.products.forEach(product => { %>
+                    <li>
+                        <h6><%= product.name %></h6>
+                        <p><strong>Brand:</strong> <%= product.brand %></p>
+                        <p><strong>Description:</strong> <%= product.description %></p>
+                        <p><strong>Price:</strong> <%= product.price %></p>
+                        <img src="/uploads/<%= product.image[0] %>" alt="productimage" style="width: 70px; height: 80px;">
+                        <input id="productId" value="<%= product._id %>" type="hidden">
+                        <button class="btn p-3 m-3" onclick="deleteProductFromOrder('<%= product._id %>', '<%= orderList._id %>')">Cancel Order</button>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>No products found.</p>
+        <% } %>
+    </div>
+    
+  </div>
+
+ <!-- Start Footer Section -->
+ <footer class="footer-section">
+    <div class="container relative">
+        <div class="sofa-img">
+            <img src="images/logo1.png" alt="Image" class="img-fluid">
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="subscription-form">
+                    <h3 class="d-flex align-items-center">
+                        <span class="me-1"><img src="images/envelope-outline.svg" alt="Image" class="img-fluid"></span>
+                        <span>Subscribe to Newsletter</span>
+                    </h3>
+
+                    <form action="#" class="row g-3">
+                        <div class="col-auto">
+                            <input type="text" class="form-control" placeholder="Enter your name">
+                        </div>
+                        <div class="col-auto">
+                            <input type="email" class="form-control" placeholder="Enter your email">
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary">
+                                <span class="fa fa-paper-plane"></span>
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-5 mb-5">
+            <div class="col-lg-4">
+                <div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">Trend Setter<span>.</span></a></div>
+                <p class="mb-4">Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique. Pellentesque habitant</p>
+
+                <ul class="list-unstyled custom-social">
+                    <li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
+                    <li><a href="#"><span class="fa fa-brands fa-twitter"></span></a></li>
+                    <li><a href="#"><span class="fa fa-brands fa-instagram"></span></a></li>
+                    <li><a href="#"><span class="fa fa-brands fa-linkedin"></span></a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="row links-wrap">
+                    <div class="col-6 col-sm-6 col-md-3">
+                        <ul class="list-unstyled">
+                            <li><a href="#">About us</a></li>
+                            <li><a href="#">Services</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Contact us</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-6 col-sm-6 col-md-3">
+                        <ul class="list-unstyled">
+                            <li><a href="#">Support</a></li>
+                            <li><a href="#">Knowledge base</a></li>
+                            <li><a href="#">Live chat</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-6 col-sm-6 col-md-3">
+                        <ul class="list-unstyled">
+                            <li><a href="#">Jobs</a></li>
+                            <li><a href="#">Our team</a></li>
+                            <li><a href="#">Leadership</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-6 col-sm-6 col-md-3">
+                        <ul class="list-unstyled">
+                            <li><a href="#">Nordic Chair</a></li>
+                            <li><a href="#">Kruzo Aero</a></li>
+                            <li><a href="#">Ergonomic Chair</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-top copyright">
+            <div class="row pt-4">
+                <div class="col-lg-6">
+                    <p class="mb-2 text-center text-lg-start">
+                        Copyright &copy;<script>document.write(new Date().getFullYear());</script>. All Rights Reserved. &mdash; Designed with love by 
+                        <a href="https://untree.co">Untree.co</a> Distributed By 
+                        <a href="https://themewagon.com">ThemeWagon</a>
+                    </p>
+                </div>
+                <div class="col-lg-6 text-center text-lg-end">
+                    <ul class="list-unstyled d-inline-flex ms-auto">
+                        <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer Section -->	
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function showDetails(productId) {
+        // Redirect to the product details page with the product ID
+        window.location.href = '/productDetails?id=' + productId;
+    }
+
+    function changeMainImage(newImageSrc) {
+        document.getElementById('myimage').src = '/uploads/' + newImageSrc;
+    }
+
+    function deleteProductFromOrder(productId, orderId) {
+        $.ajax({
+            url: '/order-product/delete',
+            method: 'POST',
+            data: {
+                orderId: orderId,
+                productId: productId
+            },
+            success: (response) => {
+                console.log('Response:', response);
+      if (response.message === 'Order deleted successfully') {
+
+        window.location.href = '/orders';
+      } else {
+        alert('Product deleted from order successfully');
+        window.location.reload(); 
+      }
+    },
+    error: (error) => {
+      console.error('Error deleting product:', error);
+    }
+  });
+}
+</script>
+
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/tiny-slider.js"></script>
+<script src="js/custom.js"></script>
+<script src="javascripts/zoomImage.js"></script>
+</body>
+</html>
