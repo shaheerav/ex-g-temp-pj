@@ -44,12 +44,11 @@ const newProduct = async (req,res)=>{
         console.log(error.message);
     }
 }
-const addProduct = async (req,res)=>{
-    try{
-        
+const addProduct = async (req, res) => {
+    try {
         const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
         const inputSize = req.body.size;
-        
+
         const category = await Category.find();
 
         if (!validSizes.includes(inputSize)) {
@@ -63,59 +62,49 @@ const addProduct = async (req,res)=>{
         const outputPath = path.join(__dirname, "../public/croppedImages");
         if (!fs.existsSync(outputPath)) {
             fs.mkdirSync(outputPath, { recursive: true });
-          }
-
-          const arrayOfImages = [];
-          if(req.files && req.files['image']){
+        }
+        const arrayOfImages = [];
+        if (req.files && req.files['image']) {
             for (let i = 0; i < req.files['image'].length; i++) {
                 let imageName = req.files['image'][i].filename;
                 // Perform image cropping here using sharp
                 await sharp(req.files['image'][i].path)
-                  .resize(200, 250) // Adjust the width and height as needed
-                  .toFile(path.join(outputPath, imageName));
+                    .resize(200, 250) // Adjust the width and height as needed
+                    .toFile(path.join(outputPath, imageName));
                 arrayOfImages.push(imageName);
-                }
-          }
+            }
+        }
 
-          let imagecrPath = '';
-        if (req.files && req.files['imagecr'] && req.files['imagecr']) {
-            const imagecrFile = req.files['imagecr'];
-            const imagecrName = imagecrFile.filename;
-            imagecrPath = path.join(outputPath, imagecrName);}
-
-
-        let product = new Product ({
-            name:req.body.name,
-            brand:req.body.brand,
-            description:req.body.description,
+        let product = new Product({
+            name: req.body.name,
+            brand: req.body.brand,
+            description: req.body.description,
             category: req.body.category,
-            size:inputSize,
-            price:parseFloat(req.body.price),
-            stock:parseInt(req.body.stock),
-            image:arrayOfImages,
-            imagecr:imagecrPath,
+            size: inputSize,
+            price: parseFloat(req.body.price),
+            stock: parseInt(req.body.stock),
+            image: arrayOfImages,
+            imagecr: req.body.imagecr,
         });
-        console.log('Request Body:', req.body);
-        console.log('product',product);
-        
-        product = await product.save();
-        if(!product){
 
-            return res.render('addProduct',{
-                message:'not able to add product',
-                categories,
+        product = await product.save();
+        console.log(product,'products');
+        if (!product) {
+            return res.render('addProduct', {
+                message: 'Not able to add product',
+                category,
                 validSizes,
             });
         }
         res.redirect('/product');
 
-    }catch(error){
+    } catch (error) {
         console.error('Error adding product:', error);
         const user = await User.findById(req.session.User_id);
         res.status(500).send({ success: false, msg: 'Internal Server Error' });
         if (error.code === 11000 && error.keyPattern && error.keyPattern.name) {
             // Duplicate key error
-            res.render('category-add', { admin: user, message: ' please check your added entries' });
+            res.render('category-add', { admin: user, message: 'Please check your added entries' });
         } else {
             // Other error
             console.log(error.message);
@@ -123,6 +112,7 @@ const addProduct = async (req,res)=>{
         }
     }
 };
+
 
 const editProduct = async(req,res)=>{
     try{

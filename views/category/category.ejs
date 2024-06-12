@@ -1,73 +1,54 @@
-<%- include('../layouts/admin/header.ejs')  %>
+<%- include('../layouts/admin/header.ejs') %>
 <div class="col-12">
   <h2>Category List</h2>
-  <button type="button" class="btn btn-primary" style="margin: 8px;"><a href="/category/category-add" class="text-light">Add New Category</a></button>
-    <div class="bg-light rounded h-100 p-4">
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Name</th>
-              <th scope="col">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if(category.length > 0){ for(let i = 0 ; i< category.length;i++){ %>
-            <tr <% if(category[i].is_blocked) { %>
-              style='background-color:yellow'<%} %>>
-              <td><%= i+1 %></td>
-              <td><%= category[i].name %></td>
-              <td><%= category[i].description %></td>
-              <td>
-                <div class="btn-group" role="group" aria-label="Basic example">
-                  <button type="button" class="btn btn-primary">
-                    <a
-                      href="/category/edit-category?id=<%= category[i]._id %>"
-                      class="text-light"
-                      >EDIT</a
-                    >
-                  </button>
-                  <!--<button type="button" class="btn btn-primary">
-                    <a
-                      href="/category/delete-category?id=<%= category[i]._id %>"
-                      class="text-light"
-                      >Delete</a
-                    >
-                  </button>-->
-                  <button type="button" class="btn btn-primary">
-                    <a
-                      href="/category/softdeleteCategory?id=<%= category[i]._id %>"
-                      class="text-light"
-                      >UNLINK</a
-                    >
-                  </button>
-                  <button type="button" class="btn btn-primary">
-                    <a
-                      href="/category/removeSoftDelete?id=<%= category[i]._id %>"
-                      class="text-light"
-                      >LINK</a
-                    >
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <% } }else{ %>
-            <tr>
-              <td colspan="4 ">No Category</td>
-            </tr>
-            <% } %>
-          </tbody>
-        </table>
-        <ul class="pagination">
-          <% for (let i = 1; i <= totalPages; i++) { %>
-          <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-            <a class="page-link" href="/admin/category=<%= i %>"><%= i %></a>
-          </li>
+  <button type="button" class="btn btn-primary" style="margin: 8px;">
+    <a href="/category/category-add" class="text-light">Add New Category</a>
+  </button>
+  <div class="bg-light rounded h-100 p-4">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if(category.length > 0) { 
+            for(let i = 0 ; i < category.length; i++) { %>
+          <tr <% if(category[i].is_blocked) { %> style='background-color:yellow' <% } %>>
+            <td><%= i+1 %></td>
+            <td><%= category[i].name %></td>
+            <td><%= category[i].description %></td>
+            <td>
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <a href="/category/edit-category?id=<%= category[i]._id %>" class="btn btn-primary text-light">EDIT</a>
+                <% if(!category[i].softDelete) { %>
+                  <a href="/category/softdeleteCategory?id=<%= category[i]._id %>" class="btn btn-primary text-light">UNLINK</a>
+                <% } else { %>
+                  <a href="/category/removeSoftDelete?id=<%= category[i]._id %>" class="btn btn-primary text-light">LINK</a>
+                <% } %>
+              </div>
+            </td>
+          </tr>
+          <% } 
+          } else { %>
+          <tr>
+            <td colspan="4">No Category</td>
+          </tr>
           <% } %>
-        </ul>
-      </div>
+        </tbody>
+      </table>
+      <ul class="pagination">
+        <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+          <a class="page-link" href="/admin/category=<%= i %>"><%= i %></a>
+        </li>
+        <% } %>
+      </ul>
     </div>
   </div>
-  <!-- Table End -->
-<%- include('../layouts/admin/footer.ejs')  %>
+</div>
+<%- include('../layouts/admin/footer.ejs') %>

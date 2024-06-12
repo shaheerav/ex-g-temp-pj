@@ -1,68 +1,44 @@
-<%- include('../layouts/user/header.ejs')  %>
+<%- include('../layouts/user/header.ejs') %>
 <div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-      <div class="col-sm-12 col-xl-6">
-        <div class="bg-light rounded h-100 p-4">
-          <h6 class="mb-4">Edit User</h6>
-          <form action="" method="post">
-            <div class="mb-3">
-              <input type="hidden" value="<%= user._id %>" name="id">
-              <label for="exampleInputEmail1" class="form-label"
-                >Name</label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-                name="name"
-                value="<%= user.name %>"
-              />
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label"
-                >Username</label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-                name="username"
-                value="<%= user.username %>"
-              />
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label"
-                >Name</label
-              >
-              <input
-                type="email"
-                class="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-                name="email"
-                value="<%= user.email %>"
-              />
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label"
-                >Phone</label
-              >
-              <input
-                type="number"
-                class="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-                name="mobile"
-                value="<%= user.mobile %>"
-              />
-            </div>
-  
-            <button type="submit" class="btn btn-primary">save</button>
-          </form>
-        </div>
+  <div class="row g-4">
+    <div class="col-sm-12 col-xl-6">
+      <div class="bg-light rounded h-100 p-4">
+        <h6 class="mb-4">Edit User</h6>
+        <div id="error"></div>
+        <form action="/editProfile" method="post" id="profile">
+          <div class="mb-3">
+            <input type="hidden" value="<%= user._id %>" name="id">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="<%= user.name %>">
+            <% if (errors && errors.name) { %>
+              <span class="text-danger"><%= errors.name.msg %></span>
+            <% } %>
+          </div>
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" value="<%= user.username %>">
+            <% if (errors && errors.username) { %>
+              <span class="text-danger"><%= errors.username.msg %></span>
+            <% } %>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>">
+            <% if (errors && errors.email) { %>
+              <span class="text-danger"><%= errors.email.msg %></span>
+            <% } %>
+          </div>
+          <div class="mb-3">
+            <label for="mobile" class="form-label">Phone</label>
+            <input type="number" class="form-control" id="mobile" name="mobile" value="<%= user.mobile %>">
+            <% if (errors && errors.mobile) { %>
+              <span class="text-danger"><%= errors.mobile.msg %></span>
+            <% } %>
+          </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
       </div>
     </div>
   </div>
-<%- include('../layouts/user/footer.ejs')  %>
+</div>
+<%- include('../layouts/user/footer.ejs') %>

@@ -37,15 +37,15 @@ productRouts.get("/", controllProduct.showProduct);
 productRouts.get("/addProduct", controllProduct.newProduct);
 productRouts.post(
   "/addProduct",
-  uploadOptions.fields([{name:'image',maxCount:10},{name:'imagecr',maxCount:1}]),
-  async(req,res)=>{
-    try{
-      await controllProduct.addProduct(req,res);
-    }catch(error){
-      console.error('Error adding product: ',error);
-      res.status(500).send('Internal Server Error');
+  uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name: 'imagecr', maxCount: 1 }]),
+    async (req, res) => {
+        try {
+            await controllProduct.addProduct(req, res);
+        } catch (error) {
+            console.error('Error adding product: ', error);
+            res.status(500).send('Internal Server Error');
+        }
     }
-  }
 );
 productRouts.get("/edit-product", controllProduct.editProduct);
 productRouts.post("/edit-product",

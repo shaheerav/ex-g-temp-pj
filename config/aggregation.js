@@ -8,7 +8,7 @@ const getOderDetails = async (orderId)=>{
             {$unwind:'$products'},
             {$lookup:{
                 from:'products',
-                localField:'products',
+                localField:'products.productId',
                 foreignField:'_id',
                 as:'productList',
             }},
@@ -32,7 +32,9 @@ const getOderDetails = async (orderId)=>{
                 payment:{'$first':'$paymentMethod'},
                 totalAmount:{'$first':'$totalAmount'},
                 DateOrder:{'$first':'$DateOrder'},
-                products:{'$push':'$productList'},
+                products:{'$push':{
+                    product:'$productList',
+                    quantity:'$products.quantity'}},
                 address:{'$first':'$userAddress'},
                 tax:{'$first':'$tax'},
                 shippingCharge:{'$first':'$shippingCharge'},
@@ -61,6 +63,7 @@ const getOderDetails = async (orderId)=>{
         throw new error (`Error fetching order details: ${error.message}`)
     }
 };
+
 module.exports = {
-    getOderDetails
+    getOderDetails,
 }

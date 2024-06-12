@@ -12,10 +12,17 @@ const orderSchema = new mongoose.Schema({
         require:true,
     },
     products :[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Product',
-        require:true,
-    }],
+        productId:
+            {
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'Product',
+                require:true,
+            },
+        quantity:{
+            type:Number,
+            require:true,
+        }
+}],
     DateOrder:{
         type:Date,
         default:Date.now

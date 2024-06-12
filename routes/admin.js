@@ -25,7 +25,7 @@ adminRouts.post('/',controllAdmin.adminVerify);
 
 adminRouts.get('/home',authAdmin.isLogin,controllAdmin.adminhome);
 adminRouts.get('/forget',authAdmin.isLogout,controllAdmin.forget);
-adminRouts.post('forget',controllAdmin.forgetverify);
+adminRouts.post('/forget',controllAdmin.forgetverify);
 adminRouts.get ('/forget-password',controllAdmin.forgetPasswordLoad);
 adminRouts.post('/forget-password',controllAdmin.resetPassword)
 adminRouts.get('/adlogout',authAdmin.isLogin,controllAdmin.logout);
@@ -36,7 +36,8 @@ adminRouts.get('/delete-user',controllAdmin.deleteUser);
 adminRouts.get('/block-user', authAdmin.isLogin,controllAdmin.blockUser);
 adminRouts.get('/unblock-user',authAdmin.isLogin,controllAdmin.unblockUser);
 adminRouts.get('/orderList',authAdmin.isLogin,controllAdmin.orderList);
-adminRouts.post('/updateOrderStatus',controllAdmin.updateOrderStatus)
-
+adminRouts.get('/updatePaymentStatus',controllAdmin.updatePaymentStatus);
+adminRouts.post('/updateStatus',controllAdmin.updateStatus);
+adminRouts.get('/orderDetails',controllAdmin.orderDetails)
 
 module.exports = adminRouts;

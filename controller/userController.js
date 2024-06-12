@@ -547,7 +547,7 @@ const userDetails = async (req,res)=>{
     console.log(id,'userDetailes');
     const userData = await User.findById(id);
     if(userData){
-      res.render('userDetails',{isLoggedIn:isLoggedIn,count:count});
+      res.render('userDetails',{isLoggedIn:isLoggedIn,count:count,error:[]});
     }else{
       res.status(400).send('some error happend');
     }    
@@ -561,7 +561,7 @@ const editProfileLoad = async (req,res) =>{
     const id = req.query.id;
     const userData = await User.findById({_id:id});
     if(userData){
-      res.render('editProfile',{isLoggedIn:isLoggedIn,user:userData,count:count});
+      res.render('editProfile',{isLoggedIn:isLoggedIn,user:userData,count:count,errors:''});
     }else{
       res.redirect('/userDetails')
     }
@@ -569,27 +569,26 @@ const editProfileLoad = async (req,res) =>{
     console.error(error.message)
   }
 };
-const updateProfile = async (req,res)=>{
-  try{
-    const id = req.body.id;
-    const userDataUpdated = 
-      {
-        name:req.body.name,
-        username:req.body.username,
-        email:req.body.email,
-        mobile:req.body.mobile
-      }
-      const updatedUser = await User.findByIdAndUpdate(id, userDataUpdated, { new: true });
-    if (!updatedUser) {
-      return res.status(404).json({ error: 'User not found' });
+const updateProfile = async (req, res) => {
+  try {
+    const errors = validationResult(req)
+    const { id, name, username, email, mobile } = req.body;
+    const isLoggedIn = req.session.user;
+    if(!errors.isEmpty()){
+      res.render('editProfile',{errors:errors.mapped(),isLoggedIn:isLoggedIn,user:{_id:id,name,username,email,mobile},count:count})
     }
-    req.session.user = await User.findById(id);
+    const userDataUpdated = { name, username, email, mobile };
+    const updatedUser = await User.findByIdAndUpdate(id, userDataUpdated, { new: true });
+    
+   
+      req.session.user = updatedUser;
     res.redirect(`/userDetails?id=${id}`);
+
   } catch (error) {
     console.error(error.message);
-    res.status(500).send('Internal Server Error');
   }
 };
+
 
 const addresspageLoad = async (req,res)=>{
   try{
@@ -915,7 +914,7 @@ const showOrder = async(req,res)=>{
       {
         $lookup: {
           from: 'products',
-          localField: 'products',
+          localField: 'products.productId',
           foreignField: '_id',
           as: 'productDetails'
         }
@@ -1083,7 +1082,10 @@ const placeOrder = async(req,res)=>{
       throw new Error('User cart or products are undefined');
     }
 
-    const productIds = userCart.products.map(product => product.productId);
+    const productIds = userCart.products.map(product => ({
+      productId: product.productId,
+      quantity: product.quantity
+  }));
 
     const payment = new Payment({
       orderId:null,
@@ -1157,7 +1159,6 @@ const cancelOrder = async (req,res)=>{
 const showOrderDetails = async (req,res)=>{
   try{
     const orderId = req.query.id;
-    console.log(orderId,'id from params');
     const user = req.session.user;
     const isLoggedIn = await User.findById(user);
     if(!isLoggedIn){
@@ -1299,6 +1300,67 @@ const orderProductDelete = async (req,res)=>{
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+const allProduct = async (req,res)=>{
+  try{
+    const isLoggedIn = req.session.user;
+    let count=0;
+    const product = await Product.find();
+    res.render('allProducts',{isLoggedIn:isLoggedIn,count:count,products:product})
+
+
+  }catch(error){
+    console.log(error.message);
+  }
+};
+const searchProudcts = async (req,res)=>{
+  try{
+    const { search, sort } = req.query;
+    const isLoggedIn = req.session.user;
+    let count = 0
+    console.log(search,'search thing');
+    let query = {};
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+
+    let sortOption = {};
+    switch (sort) {
+      case 'popularity':
+        sortOption = { popularity: -1 };
+        break;
+      case 'price_low_high':
+        sortOption = { price: 1 };
+        break;
+      case 'price_high_low':
+        sortOption = { price: -1 };
+        break;
+      case 'average_ratings':
+        sortOption = { averageRating: -1 };
+        break;
+      case 'featured':
+        sortOption = { isFeatured: -1 };
+        break;
+      case 'new_arrivals':
+        sortOption = { createdAt: -1 };
+        break;
+      case 'a_to_z':
+        sortOption = { name: 1 };
+        break;
+      case 'z_to_a':
+        sortOption = { name: -1 };
+        break;
+      default:
+        sortOption = {};
+    }
+
+    let products = await Product.find(query).sort(sortOption);
+    console.log(products, 'search results');
+
+    res.render('searchedProduct', { product: products, isLoggedIn: isLoggedIn, count: count });
+  }catch(error){
+    console.error(error.message);
+  }
+}
 module.exports = {
   registration,
   addUser,
@@ -1343,4 +1405,6 @@ module.exports = {
   showOrderDetails,
   orderCancelledList,
   orderProductDelete,
+  allProduct,
+  searchProudcts
 };

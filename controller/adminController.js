@@ -1,8 +1,12 @@
 const User = require('../models/userModel');
-const Order = require('../models/order')
+const Order = require('../models/order');
+const Payment = require('../models/payment');
 const bcrypt = require("bcrypt");
+const Product = require('../models/products');
 const randomString = require('randomstring');
 const nodemailer = require('nodemailer');
+const { format } = require('morgan');
+const {getOderDetails} = require('../config/aggregation')
 
 const adminPage = async (req,res)=>{
     try{
@@ -230,7 +234,53 @@ const resetPasswordMail = async (name, email, token) => {
   const orderList = async (req,res)=>{
     try{
         const adminData = await User.findById({_id:req.session.User_id});
-        const orders = await Order.find();
+        const orders = await Order.aggregate([
+            {$unwind:'$products'},
+            {$lookup:{
+                from:'products',
+                localField:'products.productId',
+                foreignField:'_id',
+                as:'productDetails'
+            }},
+            {$unwind:'$productDetails'},
+            {$lookup:{
+                from:'users',
+                localField:'userId',
+                foreignField:'_id',
+                as:'userInfo'
+            }},
+            {$unwind:'$userInfo'},
+            {$lookup:{
+                from:'payments',
+                localField:'payment',
+                foreignField:'_id',
+                as:'paymentInfo'
+            }},
+            {$unwind:'$paymentInfo'},
+            {$group:{
+                _id:'$_id',
+                products:{'$push':{
+                    productId: '$products.productId',
+                    productName: '$productDetails.name',
+                    productImage: '$productDetails.image',
+                    quantity: '$products.quantity'}},
+                payment:{'$first':'$paymentInfo'},
+                userId:{'$first':'$userInfo'},
+                totalAmount:{'$first':'$totalAmount'},
+                DateOrder :{'$first':'$DateOrder'},
+                status:{'$first':'$status'}
+            }},
+            {$project:{
+                _id:1,
+                products:1,
+                payment:1,
+                userId:1,
+                totalAmount:1,
+                DateOrder:{$dateToString:{format:"%Y-%m-%d %H:%M:%S",date:"$DateOrder"}},
+                status:1
+            }}
+        ]);
+         console.log(orders,'orderlist')
         res.render('orderList',{admin:adminData,order:orders});
     }catch(error){
         console.error(error.message)
@@ -238,18 +288,60 @@ const resetPasswordMail = async (name, email, token) => {
 
   };
 
-  const updateOrderStatus =async (req,res)=>{
-    const { orderId, status } = req.body;
-  
+  const updatePaymentStatus =async (req,res)=>{
+    
   try {
-    await Order.findByIdAndUpdate(orderId, { status: status });
+    const orderId = req.query.id;
+    console.log(orderId,'orderId')
+    const order = await Order.findById(orderId);
+    if (!order) {
+        return res.status(404).json({ success: false, message: 'Order not found' });
+    }
 
-    res.json({ success: true });
+   const payment = await Payment.findOne({orderId:orderId});
+   if(payment.status==='pending'){
+    payment.status ='paid'
+    payment.save();
+   }else{
+    payment.status = 'pending';
+    payment.save();
+   }
+    res.redirect('/admin/orderList',)
   } catch (error) {
     console.error('Error updating order status:', error);
-    res.json({ success: false });
   }
 };
+const updateStatus = async(req,res)=>{
+    try{
+        const {status,orderId}= req.body;
+        
+        const order = await Order.findByIdAndUpdate(orderId,{$set:{status:status}},{new:true});
+
+        if(status==='Delivered'){    
+            for (const item of order.products) {
+                await Product.findByIdAndUpdate(item.productId, {
+                    $inc: { stock: -item.quantity }
+                });
+            }
+        }
+        res.json({success:true})
+    }catch(error){
+        console.log(error.message)
+    }
+};
+const orderDetails = async(req,res)=>{
+    try{
+        const orderId = req.query.id;
+        const adminData = await User.findById({_id:req.session.User_id});
+        const order =  await getOderDetails(orderId);
+        console.log(order,'orderItems')
+        res.render('orderDetails',{orderList:order,admin:adminData})
+        
+    }catch(error){
+        console.log(error.message);
+        res.status(500).send('Internal Server Error');
+    }
+}
 module.exports={
     adminPage,
     adminVerify,
@@ -265,5 +357,7 @@ module.exports={
     forgetverify,
     forgetPasswordLoad,
     resetPassword,orderList,
-    updateOrderStatus
+    updatePaymentStatus,
+    updateStatus,
+    orderDetails
 }

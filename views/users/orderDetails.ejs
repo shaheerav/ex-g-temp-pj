@@ -54,13 +54,14 @@
         <% if (orderList.products && orderList.products.length > 0) { %>
             <h5>Products:</h5>
             <ul>
-                <% orderList.products.forEach(product => { %>
+                <% orderList.products.forEach((product, index) => { %>
                     <li>
-                        <h6><%= product.name %></h6>
-                        <p><strong>Brand:</strong> <%= product.brand %></p>
-                        <p><strong>Description:</strong> <%= product.description %></p>
-                        <p><strong>Price:</strong> <%= product.price %></p>
-                        <img src="/uploads/<%= product.image[0] %>" alt="productimage" style="width: 70px; height: 80px;">
+                        <h6><%= product.product.name %></h6>
+                        <p><strong>Brand:</strong> <%= product.product.brand %></p>
+                        <p><strong>Description:</strong> <%= product.product.description %></p>
+                        <p><strong>Price:</strong> <%= product.product.price %></p>
+                        <img src="/uploads/<%= product.product.image[0] %>" style="width: 80px; height: 100px;">
+                        <p><strong>Quantity:</strong><%= product.quantity %></p>
                         <input id="productId" value="<%= product._id %>" type="hidden">
                         <button class="btn p-3 m-3" onclick="deleteProductFromOrder('<%= product._id %>', '<%= orderList._id %>')">Cancel Order</button>
                     </li>

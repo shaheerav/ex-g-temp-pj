@@ -25,30 +25,29 @@ const newCategory = async (req,res)=>{
     }
 }
 const addCategory = async (req,res)=>{
-    
-        
-        try {
-            let category = new Category({
-                name: req.body.name,
-                description: req.body.description,
-            });
-    
-            category = await category.save();
-    
-            res.redirect('/category');
-        } catch (error) {
+    try {
+        const normalizedName = req.body.name.toLowerCase();
+
+        const existingCategory = await Category.findOne({ name: normalizedName }).collation({ locale: 'en', strength: 2 });
+
+        if (existingCategory) {
             const user = await User.findById(req.session.User_id);
-    
-            if (error.code === 11000 && error.keyPattern && error.keyPattern.name) {
-                // Duplicate key error
-                res.render('category-add', { admin: user, message: 'Category with this name already exists.' });
-            } else {
-                // Other error
-                console.log(error.message);
-                res.render('category-add', { admin: user, message: 'An error occurred while adding the category.' });
-            }
+            return res.render('category-add', { admin: user, message: 'Category with this name already exists.' });
         }
-}; 
+
+        let category = new Category({
+            name: normalizedName,
+            description: req.body.description,
+        });
+
+        category = await category.save();
+        res.redirect('/category');
+    } catch (error) {
+        const user = await User.findById(req.session.User_id);
+        console.log(error.message);
+        res.render('category-add', { admin: user, message: 'An error occurred while adding the category.' });
+    }
+};
 
 const editCategory = async(req,res)=>{
     try{

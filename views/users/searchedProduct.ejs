@@ -1,0 +1,274 @@
+<%- include('../layouts/user/header.ejs') %>
+<!-- Start Hero Section -->
+<div class="hero">
+  <div class="container">
+    <div class="row justify-content-between">
+      <div class="col-lg-5">
+        <div class="intro-excerpt">
+          <h1>Shop For Quality <span clsas="d-block">Shop for Style</span></h1>
+          <p class="mb-4">
+            Online shopping made easy. Shop with us and get the best
+            value.Everything you need at your finger tips.
+          </p>
+          <p>
+            <a href="" class="btn btn-secondary me-2">Shop Now</a
+            ><a href="#" class="btn btn-white-outline">Explore</a>
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="hero-img-wrap">
+          <img
+            src="images/familypic.png"
+            class="img-fluid"
+            style="height: 500px"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Hero Section -->
+ <div class="col-lg-4 m-3">
+  <form id="searchForm" action="/searchProduct" method="get">
+    <div class="container">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-md-5 mb-2">
+          <input type="search" name="search" class="form-control" placeholder="Search Product...">
+        </div>
+        <div class="col-md-3 mb-2">
+          <select name="sort" class="form-control">
+            <option value="">Sort By</option>
+            <option value="popularity">Popularity</option>
+            <option value="price_low_high">Price: Low to High</option>
+            <option value="price_high_low">Price: High to Low</option>
+            <option value="average_ratings">Average Ratings</option>
+            <option value="featured">Featured</option>
+            <option value="new_arrivals">New Arrivals</option>
+            <option value="a_to_z">A - Z</option>
+            <option value="z_to_a">Z - A</option>
+          </select>
+        </div>
+        <div class="col-md-2 mb-2">
+          <button class="btn btn-primary w-200" type="submit">Search</button>
+        </div>
+      </div>
+    </div>
+  </form>
+  
+</div>
+<!-- Start Product Section men -->
+<div class="untree_co-section product-section before-footer-section">
+  <div class="container">
+    <div class="row">
+      <% product.forEach(function(item, index) { %>
+      <div class="col-12 col-md-4 col-lg-3 mb-5">
+        <a class="product-item" onclick="showDetails('<%= item.id %>')">
+          <img
+            src="/uploads/<%= item.image[0] %>"
+            class="img-fluid product-thumbnail"
+            style="height: 300px; width: 250px"
+          />
+          <h3 class="product-title"><%=item.name %></h3>
+          <strong class="product-price"
+            ><i class="bi bi-currency-rupee"></i><%= item.price %></strong
+          >
+
+          <span class="icon-cross">
+            <img src="images/cross.svg" class="img-fluid" />
+          </span>
+        </a>
+      </div>
+      <% }); %>
+      <!-- End Column 1 -->
+    </div>
+  </div>
+</div>
+
+<!-- End Product Section -->
+
+
+<!-- Start Why Choose Us Section -->
+<div class="why-choose-section">
+  <div class="container">
+    <div class="row justify-content-between">
+      <div class="col-lg-6">
+        <h2 class="section-title">Why Choose Us</h2>
+        <p>
+          Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit.
+          Aliquam vulputate velit imperdiet dolor tempor tristique.
+        </p>
+
+        <div class="row my-5">
+          <div class="col-6 col-md-6">
+            <div class="feature">
+              <div class="icon">
+                <img src="images/truck.svg" alt="Image" class="imf-fluid" />
+              </div>
+              <h3>Fast &amp; Free Shipping</h3>
+              <p>
+                Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet
+                velit. Aliquam vulputate.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-6">
+            <div class="feature">
+              <div class="icon">
+                <img src="images/bag.svg" alt="Image" class="imf-fluid" />
+              </div>
+              <h3>Easy to Shop</h3>
+              <p>
+                Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet
+                velit. Aliquam vulputate.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-6">
+            <div class="feature">
+              <div class="icon">
+                <img src="images/support.svg" alt="Image" class="imf-fluid" />
+              </div>
+              <h3>24/7 Support</h3>
+              <p>
+                Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet
+                velit. Aliquam vulputate.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-6">
+            <div class="feature">
+              <div class="icon">
+                <img src="images/return.svg" alt="Image" class="imf-fluid" />
+              </div>
+              <h3>Hassle Free Returns</h3>
+              <p>
+                Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet
+                velit. Aliquam vulputate.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="img-wrap">
+          <img
+            src="images/baner-right-image-04.jpg"
+            alt="Image"
+            class="img-fluid"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Why Choose Us Section -->
+
+<!-- Start We Help Section -->
+<div class="we-help-section">
+  <div class="container">
+    <div class="row justify-content-between">
+      <div class="col-lg-7 mb-5 mb-lg-0">
+        <div class="imgs-grid">
+          <div class="grid grid-1">
+            <img src="images/baner-right-image-01.jpg" alt="Untree.co" />
+          </div>
+          <div class="grid grid-2">
+            <img src="images/baner-right-image-02.jpg" alt="Untree.co" />
+          </div>
+          <div class="grid grid-3">
+            <img src="images/baner-right-image-03.jpg" alt="Untree.co" />
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 ps-lg-5">
+        <h2 class="section-title mb-4">
+          We Help You Make Modern Interior Design
+        </h2>
+        <p>
+          Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio quis
+          nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate
+          velit imperdiet dolor tempor tristique. Pellentesque habitant morbi
+          tristique senectus et netus et malesuada
+        </p>
+
+        <ul class="list-unstyled custom-list my-4">
+          <li>Donec vitae odio quis nisl dapibus malesuada</li>
+          <li>Donec vitae odio quis nisl dapibus malesuada</li>
+          <li>Donec vitae odio quis nisl dapibus malesuada</li>
+          <li>Donec vitae odio quis nisl dapibus malesuada</li>
+        </ul>
+        <p><a herf="#" class="btn">Explore</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End We Help Section -->
+
+<!-- Start Blog Section -->
+<div class="blog-section">
+  <div class="container">
+    <div class="row mb-5">
+      <div class="col-md-6">
+        <h2 class="section-title">Recent Blog</h2>
+      </div>
+      <div class="col-md-6 text-start text-md-end">
+        <a href="#" class="more">View All Posts</a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-4 mb-4 mb-md-0">
+        <div class="post-entry">
+          <a href="#" class="post-thumbnail"
+            ><img src="images/slider-1.jpg" alt="Image" class="img-fluid"
+          /></a>
+          <div class="post-content-entry">
+            <h3><a href="#">Online shopping experience</a></h3>
+            <div class="meta">
+              <span>by <a href="#">Kristin Watson</a></span>
+              <span>on <a href="#">Dec 19, 2021</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 mb-4 mb-md-0">
+        <div class="post-entry">
+          <a href="#" class="post-thumbnail"
+            ><img src="images/slider-2.jpg" alt="Image" class="img-fluid"
+          /></a>
+          <div class="post-content-entry">
+            <h3><a href="#">Cash Less Payment Methods</a></h3>
+            <div class="meta">
+              <span>by <a href="#">Robert Fox</a></span>
+              <span>on <a href="#">Dec 15, 2021</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 mb-4 mb-md-0">
+        <div class="post-entry">
+          <a href="#" class="post-thumbnail"
+            ><img src="images/slider-3.jpg" alt="Image" class="img-fluid"
+          /></a>
+          <div class="post-content-entry">
+            <h3><a href="#">Online Scames </a></h3>
+            <div class="meta">
+              <span>by <a href="#">Kristin Watson</a></span>
+              <span>on <a href="#">Dec 12, 2021</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Blog Section -->
+
+<%- include('../layouts/user/footer.ejs') %>

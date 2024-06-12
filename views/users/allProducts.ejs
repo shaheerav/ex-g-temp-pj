@@ -1,0 +1,92 @@
+<%- include('../layouts/user/header.ejs') %>
+<style>
+    .product-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-item {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-thumbnail {
+    width: 100%;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.product-details {
+    padding: 1rem;
+}
+
+.product-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-price {
+    font-weight: bold;
+}
+
+</style>
+
+<form id="searchForm" class="m-3">
+    <input type="text" id="searchInput" placeholder="Search products..." style="height: 40px; width: 200px; border-radius: 30px;">
+    <button type="submit">Search</button>
+</form>
+<div id="searchResults"></div>
+<div class="col-12 col-md-12 col-lg-9 m-5">
+    <div class="row" id="productList">
+        <% products.forEach(function(item) { %>
+        <div class="col-12 col-md-4 mb-4">
+            <div class="product-card">
+                <a class="product-item" href="javascript:void(0)" onclick="showDetails('<%= item._id %>')">
+                    <img src="/uploads/<%= item.image[0] %>" alt="<%= item.name %>" style="width: 250px; /* Set width */
+                    height: 200px; /* Set height */
+                    object-fit: cover; /* Maintain aspect ratio */
+                    border-radius: 8px; ">
+                    <div class="product-details">
+                        <h3 class="product-title"><%= item.name %></h3>
+                        <strong class="product-price"><i class="bi bi-currency-rupee"></i><%= item.price %></strong>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <% }); %>
+    </div>
+</div>
+<%- include('../layouts/user/footer.ejs') %>
+<script>
+    // Get the input field
+    var searchInput = document.getElementById('searchInput');
+
+    // Add an event listener to listen for changes in the input field
+    searchInput.addEventListener('input', function() {
+        // Get the search query
+        var query = searchInput.value.trim().toLowerCase();
+
+        // Get all product items
+        var products = document.querySelectorAll('.product-item');
+
+        // Loop through each product item
+        products.forEach(function(product) {
+            // Get the product title
+            var title = product.querySelector('.product-title').textContent.toLowerCase();
+
+            // Show or hide the product based on whether the title contains the search query
+            if (title.includes(query)) {
+                product.style.display = 'block'; // Show product
+            } else {
+                product.style.display = 'none'; // Hide product
+            }
+        });
+    });
+</script>

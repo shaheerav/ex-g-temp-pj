@@ -31,10 +31,10 @@ userRouts.set('views','./views/users')
 const bodyParser = require("body-parser");
 userRouts.use(bodyParser.json());
 userRouts.use(bodyParser.urlencoded({extended:true}));
+const {profileValidate } = require('../middleware/validate-profile');
 
 const controller = require('../controller/userController');
 const auth = require('../middleware/userAuth');
-const validate = require('../middleware/validation');
 const { token } = require("morgan");
 
 userRouts.get('/',controller.homepage)
@@ -136,7 +136,7 @@ userRouts.get('/kids',controller.kidsCategory);
 userRouts.get('/footwear',controller.footwearCategory);
 userRouts.get('/userDetails',auth.isLogin,controller.userDetails);
 userRouts.get('/editProfile',auth.isLogin,controller.editProfileLoad);
-userRouts.post('/editProfile',validate.validateUpdateProfile,controller.updateProfile);
+userRouts.post('/editProfile',profileValidate,controller.updateProfile);
 userRouts.get('/showAddress',controller.addresspageLoad);
 userRouts.get('/addAddress',controller.addAddressLoad);
 userRouts.post('/addAddress',controller.addAddress);
@@ -155,4 +155,6 @@ userRouts.post('/cancelOrder',controller.cancelOrder);
 userRouts.get('/orderDetails',controller.showOrderDetails);
 userRouts.get('/cancelledList',controller.orderCancelledList);
 userRouts.post('/order-product/delete',controller.orderProductDelete);
+userRouts.get('/allProduct',controller.allProduct);
+userRouts.get('/searchProduct',controller.searchProudcts);
 module.exports = userRouts;

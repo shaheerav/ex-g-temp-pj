@@ -1,0 +1,75 @@
+<%- include('../layouts/admin/header.ejs') %>
+<div class="card m-5 p-3" style="margin-bottom: 100px;">
+    <div class="card-header ">
+        <h6>Ordered on <%= new Date(orderList.DateOrder).toLocaleString() %></h6>
+        <h6 class="corner-box p-3">Order ID: <%= orderList._id %></h6>
+    </div>
+    <div class="card-body ">
+        <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item p-3 "> 
+                <h6>Shipping Address</h6>
+                <p><%= orderList.address.fullname %></p>
+                <p><%= orderList.address.mobile %></p>
+                <p><%= orderList.address.pincode %></p>
+                <p><%= orderList.address.street %></p>
+                <p><%= orderList.address.city %></p>
+                <p><%= orderList.address.state %></p>
+            </li>
+            <input id="orderId" value="<%= orderList._id %>" type="hidden">
+            <li class="nav-item p-3">
+                <h6>Payment Method</h6>
+                <h5 class="font-weight-bold"><%= orderList.payment.paymentMethod %></h5>
+            </li>
+        </ul>
+        <div class="corner-box p-5">
+            <h5 class="p-3" >Order Summary</h5>
+            <table class="table site-block-order-table mb-5">
+                <tbody>
+                    <tr>
+                        <td name="productPrice">Item(s) subtotal </td>
+                        <td><i class="bi bi-currency-rupee"></i><%= orderList.totalAmount %></td>
+                    </tr>
+                    <tr>
+                        <td name="productPrice">Shipping Charge </td>
+                        <td><i class="bi bi-currency-rupee"></i><%= orderList.shippingCharge %></td>
+                    </tr>
+                    <tr>
+                        <td name="productPrice">Tax </td>
+                        <td><i class="bi bi-currency-rupee"></i><%= orderList.tax %></td>
+                    </tr>
+                    <tr>
+                        <td class="text-black font-weight-bold"><strong>Grand total</strong></td>
+                        <td class="text-black"><i class="bi bi-currency-rupee"></i><%= orderList.totalAmount  %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="p-3">
+            <h1 class="font-weight-bold text-center text-success"><%= orderList.status  %></h1>
+        </div>
+    </div>
+
+    <div class="card-body row">
+        
+        <% if (orderList.products && orderList.products.length > 0) { %>
+            <h5>Products:</h5>
+            <ul>
+                <% orderList.products.forEach((product, index) => { %>
+                    <li>
+                        <h6><%= product.product.name %></h6>
+                        <p><strong>Brand:</strong> <%= product.product.brand %></p>
+                        <p><strong>Description:</strong> <%= product.product.description %></p>
+                        <p><strong>Price:</strong> <%= product.product.price %></p>
+                        <img src="/uploads/<%= product.product.image[0] %>" style="width: 80px; height: 100px;">
+                        <p><strong>Quantity:</strong><%= product.quantity %></p>
+                        <input id="productId" value="<%= product._id %>" type="hidden">
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>No products found.</p>
+        <% } %>
+    </div>
+    
+  </div>
+<%- include('../layouts/admin/footer.ejs') %>
