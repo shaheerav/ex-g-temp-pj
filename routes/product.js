@@ -35,38 +35,13 @@ const uploadOptions = multer({ storage: storage });
 const controllProduct = require("../controller/productController");
 productRouts.get("/", controllProduct.showProduct);
 productRouts.get("/addProduct", controllProduct.newProduct);
-productRouts.post(
-  "/addProduct",
-  uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name: 'imagecr', maxCount: 1 }]),
-    async (req, res) => {
-        try {
-            await controllProduct.addProduct(req, res);
-        } catch (error) {
-            console.error('Error adding product: ', error);
-            res.status(500).send('Internal Server Error');
-        }
-    }
-);
+productRouts.post("/addProduct",uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name:'imagecr', maxCount: 1 }]), controllProduct.addProduct);
 productRouts.get("/edit-product", controllProduct.editProduct);
-productRouts.post("/edit-product",
- uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name: 'imagecr', maxCount: 1 }]),
- async (req,res)=>{
-  try{
-    await controllProduct.updateProduct(req,res);
-  }catch(error){
-    console.error('Error editing Product ',error);
-    res.status(500).send('Internal server Error');
-  }
-}
-);
+productRouts.post("/edit-product",uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name: 'imagecr', maxCount: 1 }]),controllProduct.updateProduct);
 productRouts.get('/showImages',controllProduct.showImages);
 productRouts.post('/showImages/:productId/:index', controllProduct.deleteImage);
-
 productRouts.get("/delete-product", controllProduct.deleteProduct);
-
 productRouts.put('/rating',controllProduct.rating);
-
 productRouts.get("/softdeleteProduct", controllProduct.softDeleteProduct);
 productRouts.get("/removesoftDeleteP", controllProduct.removeSoftDeletePro);
-
 module.exports = productRouts;

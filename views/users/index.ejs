@@ -57,186 +57,51 @@
   </form>
 </div>
 <!-- Start Product Section men -->
-<div class="product-section">
-  <div class="container">
-    <div class="row">
-      <!-- Start Column 1 -->
-      <div class="col-md-12 col-lg-3 mb-5 mb-lg-0">
-        <h2 class="mb-4 section-title">
-          ALLWAYS DRESS WELL, KEEP IT SIMPLE BUT SIGNIFICANT.
-        </h2>
-        <p class="mb-4">
-          Shirts, T-shirts, Suits, Blazers & Coats, Jeans, Trousers etc.
-        </p>
-        <p><a href="/men" class="btn">Shop</a></p>
-      </div>
-      <!-- End Column 1 -->
-
-      <!-- Start Column 2 -->
-      <div class="col-12 col-md-12 col-lg-9">
-        <div class="row">
-          <% men.forEach(function(item, index) { %>
-          <div class="col-12 col-md-4 mb-4">
-            <a class="product-item" onclick="showDetails('<%= item.id %>')">
-              <img
-                src="/uploads/<%= item.image[0] %>"
-                class="img-fluid product-thumbnail"
-                style="height: 300px; width: 250px"
-              />
-              <h3 class="product-title"><%=item.name %></h3>
-              <strong class="product-price"
-                ><i class="bi bi-currency-rupee"></i><%= item.price %></strong
-              >
-
-              <span class="icon-cross">
-                <img src="images/cross.svg" class="img-fluid" />
-              </span>
-            </a>
-          </div>
-          <% }); %>
+<% Object.keys(productsByCategory).forEach(function(categoryName) { %>
+  <div class="product-section">
+    <div class="container">
+      <div class="row">
+        <!-- Start Column 1 -->
+        <div class="col-md-12 col-lg-3 mb-5 mb-lg-0">
+          <h2 class="mb-4 section-title">
+            <%= categoryName.charAt(0).toUpperCase() + categoryName.slice(1) %>
+          </h2>
+          <p class="mb-4">
+            <%= productsByCategory[categoryName].description %>
+          </p>
+          <p><a href="/<%= categoryName %>" class="btn">Shop</a></p>
         </div>
-      </div>
-      <!-- End Column 2 -->
-    </div>
-  </div>
-</div>
+        <!-- End Column 1 -->
 
-<!-- End Product Section -->
-
-<!-- Start Product Section women -->
-<div class="product-section">
-  <div class="container">
-    <div class="row">
-      <!-- Start Column 1 -->
-      <div class="col-md-12 col-lg-3 mb-5 mb-lg-0">
-        <h2 class="mb-4 section-title">
-          Wearing a beautiful dress is like wearing a smile- it makes everything
-          better.
-        </h2>
-        <p class="mb-4">Kurthas & Suits, sarees, Western wear, Jeans etc.</p>
-        <p><a href="/men" class="btn">Shop</a></p>
-      </div>
-      <!-- End Column 1 -->
-
-      <!-- Start Column 2 -->
-      <div class="col-12 col-md-12 col-lg-9">
-        <div class="row">
-          <% women.forEach(function(item, index) { %>
-          <div class="col-12 col-md-4 mb-4">
-            <a class="product-item" onclick="showDetails('<%= item.id %>')">
-              <img
-                src="/uploads/<%= item.image[0] %>"
-                class="img-fluid product-thumbnail"
-                style="height: 300px; width: 250px"
-              />
-              <h3 class="product-title"><%=item.name %></h3>
-              <strong class="product-price"
-                ><i class="bi bi-currency-rupee"></i><%= item.price %></strong
-              >
-
-              <span class="icon-cross">
-                <img src="images/cross.svg" class="img-fluid" />
-              </span>
-            </a>
+        <!-- Start Column 2 -->
+        <div class="col-12 col-md-12 col-lg-9">
+          <div class="row">
+            <% productsByCategory[categoryName].products.forEach(function(item) { %>
+              <div class="col-12 col-md-4 mb-4">
+                <a class="product-item" onclick="showDetails('<%= item._id %>')">
+                  <img
+                    src="/uploads/<%= item.image[0] %>"
+                    class="img-fluid product-thumbnail"
+                    style="height: 300px; width: 250px"
+                  />
+                  <h3 class="product-title"><%= item.name %></h3>
+                  <strong class="product-price">
+                    <i class="bi bi-currency-rupee"></i><%= item.price %>
+                  </strong>
+                  <span class="icon-cross">
+                    <img src="images/cross.svg" class="img-fluid" />
+                  </span>
+                </a>
+              </div>
+            <% }); %>
           </div>
-          <% }); %>
         </div>
-      </div>
-      <!-- End Column 2 -->
-    </div>
-  </div>
-</div>
-<!-- End Product Section -->
-
-<!-- Start Product Section kids -->
-<div class="product-section">
-  <div class="container">
-    <div class="row">
-      <!-- Start Column 1 -->
-      <div class="col-md-12 col-lg-3 mb-5 mb-lg-0">
-        <h2 class="mb-4 section-title">Enjoy the little things in life.</h2>
-        <p class="mb-4">
-          T-shirts, Shirts, Tops, Clothing sets, Party wear,Shorts etc.
-        </p>
-        <p><a href="/men" class="btn">Shop</a></p>
-      </div>
-      <!-- End Column 1 -->
-
-      <!-- Start Column 2 -->
-      <div class="col-12 col-md-4 col-lg-9">
-        <div class="row">
-          <% kids.forEach(function(item, index) { %>
-          <div class="col-12 col-md-4 mb-4">
-            <a class="product-item" onclick="showDetails('<%= item.id %>')">
-              <img
-                src="/uploads/<%= item.image[0] %>"
-                class="img-fluid product-thumbnail"
-                style="height: 300px; width: 250px"
-              />
-              <h3 class="product-title"><%=item.name %></h3>
-              <strong class="product-price"
-                ><i class="bi bi-currency-rupee"></i><%= item.price %></strong
-              >
-
-              <span class="icon-cross">
-                <img src="images/cross.svg" class="img-fluid" />
-              </span>
-            </a>
-          </div>
-          <% }); %>
-        </div>
+        <!-- End Column 2 -->
       </div>
     </div>
   </div>
-</div>
-<!-- End Product Section -->
-
-<!-- Start Product Section foodwear-->
-<div class="product-section">
-  <div class="container">
-    <div class="row">
-      <!-- Start Column 1 -->
-      <div class="col-md-12 col-lg-3 mb-5 mb-lg-0">
-        <h2 class="mb-4 section-title">
-          To Wear Dreams on one's feet is to begin to give a reality to one's
-          dreams.
-        </h2>
-        <p class="mb-4">
-          Casual shoes,Sports shoes, sneakers, Flip flops, Flats, Heals,Boots
-          etc.
-        </p>
-        <p><a href="/men" class="btn">Shop</a></p>
-      </div>
-      <!-- End Column 1 -->
-
-      <!-- Start Column 2 -->
-      <div class="col-12 col-md-4 col-lg-9">
-        <div class="row">
-          <% footwear.forEach(function(item, index) { %>
-          <div class="col-12 col-md-4 mb-4">
-            <a class="product-item" onclick="showDetails('<%= item.id %>')">
-              <img
-                src="/uploads/<%= item.image[0] %>"
-                class="img-fluid product-thumbnail"
-                style="height: 300px; width: 250px"
-              />
-              <h3 class="product-title"><%=item.name %></h3>
-              <strong class="product-price"
-                ><i class="bi bi-currency-rupee"></i><%= item.price %></strong
-              >
-
-              <span class="icon-cross">
-                <img src="images/cross.svg" class="img-fluid" />
-              </span>
-            </a>
-          </div>
-          <% }); %>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- End Product Section -->
+<% }); %>
+<!-- End Product Sections -->
 
 <!-- Start Why Choose Us Section -->
 <div class="why-choose-section">

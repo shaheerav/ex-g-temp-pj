@@ -21,33 +21,45 @@ const products = require("../models/products");
 const cart = require("../models/cart");
  
 const address = require("../models/address");
+const APP_ID = process.env.APP_ID;
+const APP_SECRET = process.env.APP_SECRET;
+const REDIRECT_URI = process.env.REDIRECT_URI;
+
 
 let count =0;
 const homepage = async (req, res) => {
   try {
-    const catman = await Category.find({name:'men'});
-    const catwomen = await Category.find({name:'women'});
-    const catkids = await Category.find({name:'kids'});
-    const catfootwear = await Category.find({name:'footwear'});
-    const men = await Product.find({category:catman}).limit(3);
-    const women = await Product.find({category:catwomen}).limit(3);
-    const kids = await Product.find({category:catkids}).limit(3);
-    const footwear = await Product.find({category:catfootwear}).limit(3);
+    const categories = await Category.find({});
+
+    const productPromises = categories.map(category =>
+      Product.find({ category: category._id }).limit(3).exec()
+    );
+
+    const products = await Promise.all(productPromises);
+
+    const productsByCategory = {};
+    categories.forEach((category, index) => {
+      productsByCategory[category.name] = {
+        description: category.description,
+        products: products[index]
+      };
+    });
+
     const isLoggedIn = req.session.user || req.user;
-    if(isLoggedIn){
+    let count = 0;
+
+    if (isLoggedIn) {
       const id = isLoggedIn._id;
-    const cart = await Cart.findOne({userId:id});
-    
-    if(cart){
-      count = countCart(cart);
-    }else{
-      count = 0;
+      const cart = await Cart.findOne({ userId: id });
+
+      if (cart) {
+        count = countCart(cart);
+      }
+
+      console.log(isLoggedIn, "is login");
     }
 
-    console.log(isLoggedIn,"is login")
-    }
-    
-    res.render("index", { men:men,women:women,kids:kids,footwear:footwear, isLoggedIn: isLoggedIn,count:count});
+    res.render("index", { productsByCategory, isLoggedIn, count });
   } catch (error) {
     console.log(error.message);
   }
@@ -1360,6 +1372,26 @@ const searchProudcts = async (req,res)=>{
   }catch(error){
     console.error(error.message);
   }
+};
+const error = async (req,res)=>{
+  res.send("error")
+};
+const authFacebook = (req, res) => {
+  const url = `https://www.facebook.com/v13.0/dialog/oauth?client_id=${APP_ID}&redirect_uri=${REDIRECT_URI}&scope=email`;
+  res.redirect(url);
+};
+const facebookCallback =  async (req, res) => {
+  const { code } = req.query;
+  try {
+    const { data } = await axios.get(`https://graph.facebook.com/v13.0/oauth/access_token?client_id=${APP_ID}&client_secret=${APP_SECRET}&code=${code}&redirect_uri=${REDIRECT_URI}`);
+
+    const { access_token } = data;
+    const { data: profile } = await axios.get(`https://graph.facebook.com/v13.0/me?fields=name,email&access_token=${access_token}`);
+    res.redirect('/');
+  } catch (error) {
+    console.error('Error:', error.response.data.error);
+    res.redirect('/login');
+  }
 }
 module.exports = {
   registration,
@@ -1406,5 +1438,8 @@ module.exports = {
   orderCancelledList,
   orderProductDelete,
   allProduct,
-  searchProudcts
+  searchProudcts,
+  error,
+  authFacebook,
+  facebookCallback
 };

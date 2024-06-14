@@ -162,7 +162,7 @@
             <h1 class="mb-4">Add Product</h1>
 
             <!-- Form for adding a product -->
-            <form id="productForm" action="" method="POST" enctype="multipart/form-data">
+            <form id="product-form" action="" method="POST" enctype="multipart/form-data">
                 <% if( message){ %>
                     <div class="alert alert-danger" role="alert">
                         <%= message %>
@@ -200,7 +200,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">Size</label>
-                    <select name="size" required>
+                    <select name="size" class="form-control"  required>
                         <option value="XS">XS</option>
                         <option value="S">S</option>
                         <option value="M">M</option>
@@ -224,21 +224,19 @@
                     <div class="error" id="stock-error"></div>
                 </div>
 
-
-
                 <div class="mb-3">
                     <label for="images" class="form-label">Additional Images:</label>
                     <input type="file" class="form-control" id="inputImage" name="image"  accept=".jpg, .jpeg, .png" multiple>
                     <div id="previewContainer" class="preview-container"></div>
+                    <div class="error" id="images-error"></div>
                 </div>
 
 
                 <main class="page">
                     <label class="form-check-label" for="isFeatured">Main Image </label>
-                    <!-- input file -->
                     <div class="box">
                         <input type="file" id="file-input" name="imagecr" required >
-                        
+                        <input type="hidden" id="cropped-image" name="croppedImage">
                         <div class="error" id="image-error"></div>
                     </div>
                     <!-- leftbox -->
@@ -248,7 +246,7 @@
                     <!--rightbox-->
                     <div class="box-2 img-result hide">
                         <!-- result of crop -->
-                        <img class="cropped" src="" alt="">
+                        <img class="cropped" src="" alt="" >
                     </div>
                     <!-- input file -->
                     <div class="box">
@@ -313,6 +311,18 @@
 <script src="/javascripts/product.js"></script>
 
     <script>
+        document.getElementById('inputImage').addEventListener('change', function (event) {
+        const files = event.target.files;
+
+        // Check each selected file
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) {
+                document.getElementById('inputImage').value = '';
+                document.getElementById('images-error').textContent = 'Please select only image files.';
+                return;
+            }
+        });
+    });
         //*********************** PREVIEW IMAGE **************************//
     const input = document.getElementById('inputImage');
     const previewContainer = document.getElementById('previewContainer');
@@ -351,6 +361,9 @@
             }
         }
     }
+    
+
+    //************************************image cropped*************************************************
         // Variables
         let result = document.querySelector('.result');
         let save = document.querySelector('.save');

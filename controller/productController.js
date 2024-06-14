@@ -48,7 +48,7 @@ const addProduct = async (req, res) => {
     try {
         const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
         const inputSize = req.body.size;
-
+        const user = await User.findById(req.session.User_id);
         const category = await Category.find();
 
         if (!validSizes.includes(inputSize)) {
@@ -74,7 +74,8 @@ const addProduct = async (req, res) => {
                 arrayOfImages.push(imageName);
             }
         }
-
+        const croppedImageData = req.body.croppedImage;
+        console.log(croppedImageData,'imagecr')
         let product = new Product({
             name: req.body.name,
             brand: req.body.brand,
@@ -84,7 +85,7 @@ const addProduct = async (req, res) => {
             price: parseFloat(req.body.price),
             stock: parseInt(req.body.stock),
             image: arrayOfImages,
-            imagecr: req.body.imagecr,
+            imagecr: croppedImageData,
         });
 
         product = await product.save();
@@ -94,6 +95,7 @@ const addProduct = async (req, res) => {
                 message: 'Not able to add product',
                 category,
                 validSizes,
+                admin: user
             });
         }
         res.redirect('/product');
@@ -216,7 +218,7 @@ const deleteProduct = async(req,res)=>{
 const softDeleteProduct = async(req,res)=>{
     try{
         const id = req.query.id;
-        await Product.updateOne({_id:id},{$et:{softDelete:true}});
+        await Product.updateOne({_id:id},{$set:{softDelete:true}});
         res.redirect('/product');
 
     }catch(error){
@@ -226,7 +228,7 @@ const softDeleteProduct = async(req,res)=>{
 const removeSoftDeletePro = async(req,res)=>{
     try{
         const id = req.query.id;
-        await Product.updateOne({_id:id},{$et:{softDelete:false}});
+        await Product.updateOne({_id:id},{$set:{softDelete:false}});
         res.redirect('/product');
 
     }catch(error){

@@ -52,10 +52,11 @@
                       <a href="/product/delete-product?id=<%= product[i]._id %>" class="text-light">Delete</a>
                     </button>
                     <button type="button" class="btn btn-primary">
-                      <a href="/product/softdeleteproduct?id=<%= product[i]._id %>" class="text-light">Soft Delete</a>
-                    </button>
-                    <button type="button" class="btn btn-primary">
-                      <a href="/product/removeSoftDeleteP?id=<%= product[i]._id %>" class="text-light">Remove</a>
+                      <% if(!product[i].softDelete) {%>
+                      <a href="/product/softdeleteproduct?id=<%= product[i]._id %>" class="text-light">Unlink</a>
+                      <% }else{ %>
+                      <a href="/product/removeSoftDeleteP?id=<%= product[i]._id %>" class="text-light">Link</a>
+                      <% } %>
                     </button>
                   </div>
                 </td>

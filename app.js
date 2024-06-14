@@ -1,7 +1,5 @@
 var createError = require('http-errors');
 var express = require('express');
-const mongoose = require('mongoose');
-mongoose.connect("mongodb://localhost:27017/Trend_setter");
 const path = require('path');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -13,10 +11,12 @@ const adminRouter = require('./routes/admin');
 const productRouter = require('./routes/product');
 const categoryRouter = require('./routes/category');
 
-
 const expressValidator = require('express-validator');
+
+const connectDB = require('./config/connectDB');
 var app = express();
 
+connectDB();
 app.use(session({
   secret: 'shrrree', // replace with a strong secret
   resave: false,

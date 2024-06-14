@@ -229,6 +229,7 @@
                     <label for="images" class="form-label">Additional Images:</label>
                     <input type="file" class="form-control" id="inputImage" name="image"  accept=".jpg, .jpeg, .png" multiple>
                     <div id="previewContainer" class="preview-container"></div>
+                    <div class="error" id="images-error"></div>
                 </div>
 
 
@@ -310,6 +311,20 @@
 <script src="/javascripts/product.js"></script>
 
     <script>
+        document.getElementById('inputImage').addEventListener('change', function (event) {
+        const files = event.target.files;
+
+        // Check each selected file
+        Array.from(files).forEach(file => {
+            // Check if the file is an image
+            if (!file.type.startsWith('image/')) {
+                // Clear the file input and display an error message
+                document.getElementById('inputImage').value = '';
+                document.getElementById('images-error').textContent = 'Please select only image files.';
+                return;
+            }
+        });
+    });
         //*********************** PREVIEW IMAGE **************************//
     const input = document.getElementById('inputImage');
     const previewContainer = document.getElementById('previewContainer');
