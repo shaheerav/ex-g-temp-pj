@@ -50,9 +50,15 @@
                                 <h2 class="h6 text-black"><i class="bi bi-currency-rupee"></i><%= product.price %></h2>
                             </td>
                             <td>
+                                <% if(product.stock >0) {%>
                                 <button class="cart-item-count mr-3 decrease-quantity" onclick="changeQuantity('<%= product._id %>', '<%= product.productId %>', -1)">-</button>
                                 <span id="quantityNumber_<%= product.productId %>"><%= product.quantity %></span>
                                 <button class="cart-item-count mr-3 increase-quantity" onclick="changeQuantity('<%= product._id %>', '<%= product.productId %>', 1)">+</button>
+                                <div class="error text-danger" id="quantity-error"></div>
+                                <% }else{ %>
+                                    <h6>Out of stock</h6>
+                                    <%= product.quantity %>
+                                    <% } %>
                             </td>
                             <td class="product-total"><i class="bi bi-currency-rupee"></i><%= product.price * product.quantity %></td>
                             <td>
@@ -243,6 +249,7 @@
         console.log(`Cart ID: ${cartId}, Product ID: ${productId}, Count: ${count}`);
         let quantityElement = document.getElementById(`quantityNumber_${productId}`);
         let currentQuantity = parseInt(quantityElement.innerHTML);
+        let quantityError = document.getElementById('')
         hideErrorMessage();
         if (currentQuantity + count <= 0) {
             deleteProduct(productId);
@@ -270,7 +277,9 @@
                 },
                 error: (error) => {
                     console.error('AJAX Error:', error);
-                    showErrorMessage('An error occurred while updating the quantity');
+                    if(error){
+                        document.getElementById('quantity-error').textContent = 'stock over';
+                    }
                 }
             });
         }

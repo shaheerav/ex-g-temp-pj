@@ -73,9 +73,15 @@ const addProduct = async (req, res) => {
                     .toFile(path.join(outputPath, imageName));
                 arrayOfImages.push(imageName);
             }
-        }
-        const croppedImageData = req.body.croppedImage;
-        console.log(croppedImageData,'imagecr')
+        };
+        let croppedImagePath = null;
+        const croppedImageName = ''
+            if (req.body.croppedImage) {
+            const base64Data = req.body.croppedImage.replace(/^data:image\/png;base64,/, "");
+            croppedImageName = `cropped-${Date.now()}.png`;
+            croppedImagePath = path.join(outputPath, croppedImageName);
+            fs.writeFileSync(croppedImagePath, base64Data, 'base64');
+            }
         let product = new Product({
             name: req.body.name,
             brand: req.body.brand,
@@ -85,7 +91,7 @@ const addProduct = async (req, res) => {
             price: parseFloat(req.body.price),
             stock: parseInt(req.body.stock),
             image: arrayOfImages,
-            imagecr: croppedImageData,
+            imagecr: croppedImagePath ? path.basename(croppedImagePath) : null,
         });
 
         product = await product.save();
@@ -105,11 +111,9 @@ const addProduct = async (req, res) => {
         const user = await User.findById(req.session.User_id);
         res.status(500).send({ success: false, msg: 'Internal Server Error' });
         if (error.code === 11000 && error.keyPattern && error.keyPattern.name) {
-            // Duplicate key error
             res.render('category-add', { admin: user, message: 'Please check your added entries' });
         } else {
-            // Other error
-            console.log(error.message);
+            console.error(error.message);
             res.render('category-add', { admin: user, message: 'An error occurred while adding the product.' });
         }
     }
@@ -191,7 +195,7 @@ const updateProduct = async (req,res)=>{
             price:req.body.price,
             stock:req.body.stock,
             image:updatedImages,
-            imagecr:imagecrPath
+            //imagecr:imagecrPath
         },
     },
     {new:true}

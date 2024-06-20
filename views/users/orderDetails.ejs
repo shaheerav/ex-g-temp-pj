@@ -63,7 +63,9 @@
                         <img src="/uploads/<%= product.product.image[0] %>" style="width: 80px; height: 100px;">
                         <p><strong>Quantity:</strong><%= product.quantity %></p>
                         <input id="productId" value="<%= product._id %>" type="hidden">
+                        <% if(!orderList.status ==='Delivered'){ %>
                         <button class="btn p-3 m-3" onclick="deleteProductFromOrder('<%= product._id %>', '<%= orderList._id %>')">Cancel Order</button>
+                        <% } %>
                     </li>
                 <% }); %>
             </ul>

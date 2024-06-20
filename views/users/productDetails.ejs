@@ -207,9 +207,14 @@
             <label for="size-select">Select Size:</label>
             <h2><%= product.size %></h2>
             <div>
-              <label for="quantity">Quantity:</label>
+              
+              <% if(!isProductInCart){ %>
+                <label for="quantity">Quantity:</label>
               <input type="number" id="quantity" name="quantity" min="1" value="1" style="width: 50px; height: 40px; padding-left: 10px; font-size: 16px; margin-right: 1px;" required>
               <button class="buy-btn btn" type="submit">Add to cart</button>
+              <% }else{ %>
+                <h5>Product already in the Cart</h5>
+              <% } %>
             </div>
           <% } %>
         </form>

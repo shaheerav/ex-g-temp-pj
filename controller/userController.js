@@ -61,7 +61,7 @@ const homepage = async (req, res) => {
 
     res.render("index", { productsByCategory, isLoggedIn, count });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 function countCart(product){
@@ -160,7 +160,7 @@ const loadOtpPage = async (req, res) => {
       count:count
     });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 
@@ -243,7 +243,7 @@ const loginPage = async (req, res) => {
     }
     
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const loginValidate = async (req, res) => {
@@ -255,7 +255,7 @@ const loginValidate = async (req, res) => {
     });
 
     if (!userData) {
-      return res.render('login',{message:'Username/email incorrect',isLoggedIn:false,count:count})
+      return res.render('login',{message:'Username incorrect',isLoggedIn:false,count:count})
     }
       const passwordMatch = await bcrypt.compare(password, userData.password);
 
@@ -278,7 +278,7 @@ const loadHome = async (req, res) => {
     const userData = await User.findById({ _id: req.session.user_id });
     res.render("/", { user: userData,count:count });
   } catch (error) {
-    console.log(error.massage);
+    console.error(error.massage);
   }
 };
 const userLogout = async (req, res) => {
@@ -289,7 +289,7 @@ const userLogout = async (req, res) => {
       res.redirect('/login');
   });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const verifyMail = async (req, res) => {
@@ -301,7 +301,7 @@ const verifyMail = async (req, res) => {
     );
     res.render("email-verified");
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const securePassword = async (password) => {
@@ -309,7 +309,7 @@ const securePassword = async (password) => {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const sendOTPEmail = async (email, otp) => {
@@ -341,7 +341,7 @@ const sendOTPEmail = async (email, otp) => {
       }
     });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const registration = async (req, res) => {
@@ -349,7 +349,7 @@ const registration = async (req, res) => {
     const isLoggedIn = req.session.user;
     res.render("signup",{isLoggedIn:isLoggedIn,count:count});
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 //google verification
@@ -363,7 +363,7 @@ const successGoogleLogin = async (req, res) => {
     }
     res.redirect("/", { user: req.user.email,count:count });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const productDetails = async (req, res) => {
@@ -376,23 +376,26 @@ const productDetails = async (req, res) => {
       star:4,
       totalrating:100
     };
+    const userid = isLoggedIn._id; 
     const size = product.size;
-    console.log(size)
-console.log(product.stock,'product stock')
-      res.render("productDetails", { product: product, isLoggedIn: isLoggedIn,ratingData:ratingData,size:size,count:count,isOutOfStock: product.stock === 0 });
-    
-    
+    const cart = await Cart.findOne({ userId: userid });
+    let isProductInCart = false;
+    if (cart && Array.isArray(cart.products)) {
+      isProductInCart = cart.products.some(cartProduct => cartProduct.productId.toString() === id);
+    }
+      res.render("productDetails", { product: product, isLoggedIn: isLoggedIn,ratingData:ratingData,size:size,count:count,isOutOfStock: product.stock === 0,isProductInCart:isProductInCart });
+  
   } catch (error) {
     res.status(500).send(error.message);
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const forgetLoad = async (req, res) => {
   try {
     const isLoggedIn = req.session.user;
-    res.render("forget",{isLoggedIn:isLoggedIn});
+    res.render("forget",{isLoggedIn:isLoggedIn,count:0});
   } catch (error) {
-    console.log("error loading forget ");
+    console.error("error loading forget ");
     res.status(500, { success: false, message: "Internal Server Error" });
   }
 };
@@ -404,7 +407,7 @@ const forgetVerify = async (req, res) => {
     console.log("user", userData);
     if (userData) {
       if (userData.is_verify === false) {
-        res.render("forget", { message: "Please verify your emails",isLoggedIn:isLoggedIn });
+        res.render("forget", { message: "Please verify your emails",isLoggedIn:isLoggedIn,count:0 });
       } else {
         const randomString = randonString.generate();
         const updatedData = await User.updateOne(
@@ -413,7 +416,7 @@ const forgetVerify = async (req, res) => {
         );
         resetPasswordMail(userData.name, userData.email, randomString);
         res.render("forget", {
-          message: "Please check your mail to Reset password", isLoggedIn:isLoggedIn
+          message: "Please check your mail to Reset password", isLoggedIn:isLoggedIn,count:0
         });
       }
     } else {
@@ -459,7 +462,7 @@ const resetPasswordMail = async (name, email, token) => {
       }
     });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const forgetPasswordLoad = async (req,res)=>{
@@ -470,14 +473,14 @@ const forgetPasswordLoad = async (req,res)=>{
     const tokenData = await User.findOne({token:token});
     console.log('user :',tokenData._id);
     if(tokenData){
-      res.render('forget-password',{user_id:tokenData._id,isLoggedIn:isLoggedIn,count:count})
+      res.render('forget-password',{user_id:tokenData._id,isLoggedIn:isLoggedIn,count:0})
     }else{
       console.log('error on your token');
       res.status(500,{success:false,message:'some error happens'});
 
     }
   }catch(error){
-    console.log('error on forgetpassword');
+    console.error('error on forgetpassword');
     res.status(500,{ success: false, message: "Internal server error" })
   }
 };
@@ -491,7 +494,7 @@ const resetPassword = async(req,res)=>{
     res.redirect('login')
 
   }catch(error){
-    console.log(error.message)
+    console.error(error.message)
   }
 };
 const termsofuse = async (req,res)=>{
@@ -499,14 +502,14 @@ const termsofuse = async (req,res)=>{
     res.render('termsofuse');
 
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const privacypolicy = async (req,res)=>{
   try{
     res.render('privacypolicy');
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const menCategory = async (req,res)=>{
@@ -517,7 +520,7 @@ const menCategory = async (req,res)=>{
     
     res.render('men',{product:productList,isLoggedIn:isLoggedIn,count:count})
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const womenCategory = async (req,res)=>{
@@ -528,7 +531,7 @@ const womenCategory = async (req,res)=>{
     
     res.render('women',{product:productList,isLoggedIn:isLoggedIn,count:count})
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const kidsCategory = async (req,res)=>{
@@ -538,7 +541,7 @@ const kidsCategory = async (req,res)=>{
     const productList = await Product.find({category:categoryKids});
     res.render('kids',{product:productList,isLoggedIn:isLoggedIn,count:count})
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const footwearCategory = async (req,res)=>{
@@ -548,7 +551,7 @@ const footwearCategory = async (req,res)=>{
     const productList = await Product.find({category:categoryFootwear});
     res.render('footwear',{product:productList,isLoggedIn:isLoggedIn,count:count})
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 
@@ -564,7 +567,7 @@ const userDetails = async (req,res)=>{
       res.status(400).send('some error happend');
     }    
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const editProfileLoad = async (req,res) =>{
@@ -611,7 +614,7 @@ const addresspageLoad = async (req,res)=>{
     
     res.render('showAddress',{isLoggedIn:isLoggedIn,count:count,user:address||[]});
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const addAddressLoad = async(req,res)=>{
@@ -619,7 +622,7 @@ const addAddressLoad = async(req,res)=>{
     const isLoggedIn = req.session.user
     res.render('addAddress',{isLoggedIn:isLoggedIn,count:count});
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const addAddress =async (req,res)=> {
@@ -642,7 +645,7 @@ const addAddress =async (req,res)=> {
     address = await address.save()
     res.redirect(`/showAddress?${isLoggedIn._id}`);
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const editAddress = async (req,res)=>{
@@ -653,7 +656,7 @@ const editAddress = async (req,res)=>{
     console.log('address',address);
     res.render('editAddress',{isLoggedIn:isLoggedIn,user:address,count:count});
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const updateAddress = async (req,res)=>{
@@ -675,7 +678,7 @@ const updateAddress = async (req,res)=>{
     req.session.user = await User.findById(isLoggedIn._id);
     res.redirect('/showAddress')
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const deleteAddress = async(req,res)=>{
@@ -685,7 +688,7 @@ const deleteAddress = async(req,res)=>{
     res.redirect('/showAddress')
 
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 
@@ -826,7 +829,7 @@ const addproducttoCart = async (req, res) => {
     console.log('product save to cart')
     res.redirect(`/productDetails?id=${productId}`)
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 
@@ -954,7 +957,8 @@ const showOrder = async(req,res)=>{
         totalAmount:{'$first':'$totalAmount'},
         DateOrder:{'$first':'$DateOrder'},
         products:{'$push':'$productDetails'},
-        address:{'$first':'$AddressOn'}
+        address:{'$first':'$AddressOn'},
+        status:{'$first':'$status'}
       }},
       {
         $project: {
@@ -963,7 +967,8 @@ const showOrder = async(req,res)=>{
           totalAmount: 1,
           DateOrder: { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$DateOrder" } },
           products: 1,
-          address: 1
+          address: 1,
+          status:1
         }
       },
       { $sort: { DateOrder: -1 } },
@@ -987,6 +992,7 @@ const showOrder = async(req,res)=>{
 
         return {
           orderId: order._id,
+          status:order.status,
           payment: payment.paymentMethod,
           totalAmount: order.totalAmount,
           orderDate: order.DateOrder,
@@ -1000,12 +1006,10 @@ const showOrder = async(req,res)=>{
           }
         };
       });
-
-      console.log(orderDetailedList);
       const totalPages = Math.ceil(orderDetails.length / 5);
       res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: orderDetailedList,totalPages: totalPages});
     } else {
-      res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: '' });
+      res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: '',totalpages:0 });
     }
 
   } catch (error) {
@@ -1141,7 +1145,7 @@ const searchProduct = async(req,res)=>{
     const product = await Product.find().populate('category')
     res.render('searchProduct',{isLoggedIn:isLoggedIn,count:0,product})
   }catch(error){
-    console.log(error.message)
+    console.error(error.message)
   }
 };
 const cancelOrder = async (req,res)=>{
@@ -1180,7 +1184,7 @@ const showOrderDetails = async (req,res)=>{
     console.log(order,'order')
     res.render('orderDetails',{isLoggedIn:isLoggedIn,count:0,orderList:order})
   }catch(error){
-    console.log(error.message)
+    console.error(error.message)
   }
 };
 const orderCancelledList = async (req, res) => {
@@ -1321,20 +1325,23 @@ const allProduct = async (req,res)=>{
 
 
   }catch(error){
-    console.log(error.message);
+    console.error(error.message);
   }
 };
 const searchProudcts = async (req,res)=>{
   try{
-    const { search, sort } = req.query;
+    const { search, sort, category} = req.query;
     const isLoggedIn = req.session.user;
     let count = 0
-    console.log(search,'search thing');
     let query = {};
     if (search) {
       query.name = { $regex: search, $options: 'i' };
     }
-
+    if(category){
+      const categories = await Category.find({ name: { $in: category.split(',') } });
+      const categoryIds = categories.map(cat => cat._id);
+      query.category = { $in: categoryIds };
+    }
     let sortOption = {};
     switch (sort) {
       case 'popularity':
@@ -1366,8 +1373,6 @@ const searchProudcts = async (req,res)=>{
     }
 
     let products = await Product.find(query).sort(sortOption);
-    console.log(products, 'search results');
-
     res.render('searchedProduct', { product: products, isLoggedIn: isLoggedIn, count: count });
   }catch(error){
     console.error(error.message);

@@ -35,7 +35,7 @@ const uploadOptions = multer({ storage: storage });
 const controllProduct = require("../controller/productController");
 productRouts.get("/", controllProduct.showProduct);
 productRouts.get("/addProduct", controllProduct.newProduct);
-productRouts.post("/addProduct",uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name:'imagecr', maxCount: 1 }]), controllProduct.addProduct);
+productRouts.post("/addProduct",uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name: 'imagecr', maxCount: 1 }]), controllProduct.addProduct);
 productRouts.get("/edit-product", controllProduct.editProduct);
 productRouts.post("/edit-product",uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name: 'imagecr', maxCount: 1 }]),controllProduct.updateProduct);
 productRouts.get('/showImages',controllProduct.showImages);

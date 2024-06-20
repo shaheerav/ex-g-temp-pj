@@ -34,24 +34,29 @@
                   <% }) %>
                 </td>
                 <td><%= order[i]._id %></td>
-                <td><%=order[i].userId.name  %></td>
+                <td><%= order[i].userId.name %></td>
                 <td><%= order[i].totalAmount %></td>
                 <td><%= order[i].payment.paymentMethod %></td>
                 <td class="status">
                   <% if(order[i].payment.status === 'pending') { %>
-                    <button class="btn btn-danger" ><a href="/admin/updatePaymentStatus?id=<%= order[i]._id %>" class="text-light">Pending</a></button>
+                    <button class="btn btn-danger"><a href="/admin/updatePaymentStatus?id=<%= order[i]._id %>" class="text-light">Pending</a></button>
                   <% } else { %>
-                    <button class="text-success btn btn-success text-light"><a href="/admin/updatePaymentStatus?id=<%= order[i]._id %>" class="text-light"><span>Paid</span></a></button>
+                    <button class="btn btn-success text-light"><a href="/admin/updatePaymentStatus?id=<%= order[i]._id %>" class="text-light">Paid</a></button>
                   <% } %>
                 </td>
-                <td><%= order[i].status %>
-                  <select id="changeStatus-<%= order[i]._id %>" onchange="updateStatus('<%= order[i]._id %>')">
-                    <option value="changeStatus">Change Status</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Out-For-Delivery">Out For Delivery</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancel</option>
-                  </select>
+                <td>
+                  <% if(order[i].status !== 'Cancelled' && order[i].status !== 'Delivered') { %>
+                    <%= order[i].status %>
+                    <select id="changeStatus-<%= order[i]._id %>" onchange="updateStatus('<%= order[i]._id %>')">
+                      <option value="changeStatus">Change Status</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Out-For-Delivery">Out For Delivery</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancel</option>
+                    </select>
+                  <% } else { %>
+                    <%= order[i].status %>
+                  <% } %>
                 </td>
                 <td><%= order[i].DateOrder %></td>
                 <td>
@@ -69,71 +74,30 @@
     </div>
   </div>
 </div>
-<!-- Table End -->
 
 <!-- Footer Start -->
 <div class="container-fluid pt-4 px-4">
   <div class="bg-light rounded-top p-4">
-      <div class="row">
-          <div class="col-12 col-sm-6 text-center text-sm-start">
-              &copy; <a href="#">Your Site Name</a>, All Right Reserved. 
-          </div>
-          <div class="col-12 col-sm-6 text-center text-sm-end">
-              <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-              Designed By <a href="https://htmlcodex.com">HTML Codex</a>
-          </br>
-          Distributed By <a class="border-bottom" href="https://themewagon.com" target="_blank">ThemeWagon</a>
-          </div>
+    <div class="row">
+      <div class="col-12 col-sm-6 text-center text-sm-start">
+        &copy; <a href="#">Your Site Name</a>, All Right Reserved.
       </div>
+      <div class="col-12 col-sm-6 text-center text-sm-end">
+        Designed By <a href="https://htmlcodex.com">HTML Codex</a><br>
+        Distributed By <a class="border-bottom" href="https://themewagon.com" target="_blank">ThemeWagon</a>
+      </div>
+    </div>
   </div>
 </div>
 <!-- Footer End -->
-</div>
-<!-- Content End -->
-
 
 <!-- Back to Top -->
 <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
-</div>
 
 <!-- JavaScript Libraries -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
 <script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-
-<script>
-function updateStatus(orderId) {
-  const newStatus = document.getElementById(`changeStatus-${orderId}`);
-  let status = newStatus.value;
-
-  fetch('/admin/updateStatus', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      status: status,
-      orderId: orderId
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      alert('Order status changed successfully.');
-      window.location.href = '/admin/orderList';
-    } else {
-      alert('Error updating order status: ' + data.message);
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('An error occurred while updating the status.');
-  });
-}
-
-</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/admin/lib/chart/chart.min.js"></script>
 <script src="/admin/lib/easing/easing.min.js"></script>
@@ -143,10 +107,41 @@ function updateStatus(orderId) {
 <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
 <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
 
+<!-- Custom Scripts -->
+<script>
+  function updateStatus(orderId) {
+    const newStatus = document.getElementById(`changeStatus-${orderId}`);
+    let status = newStatus.value;
+
+    fetch('/admin/updateStatus', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        status: status,
+        orderId: orderId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Order status changed successfully.');
+        window.location.href = '/admin/orderList';
+      } else {
+        alert('Error updating order status: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while updating the status.');
+    });
+  }
+</script>
+
 <!-- Template Javascript -->
 <script src="/admin/js/main.js"></script>
 <script src="/javascripts/product.js"></script>
 
 </body>
-
 </html>

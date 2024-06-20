@@ -185,7 +185,11 @@
             </li>
         <% }) %>
         <input value="<%= orderForm[i].orderId %>" id="orderIdInput" type="hidden"> 
-            <a href="#" class="btn btn-primary m-3" onclick="cancelOrder()">Cancel Your Order</a>
+        <% if(orderForm[i].status !== "Delivered"){ %>
+          <a href="#" class="btn btn-primary m-3" onclick="cancelOrder()">Cancel Your Order</a>
+        <% } else { %>
+          <h6>Product delivered</h6>
+        <% } %>
         </div>
     </div>
     <% } %>

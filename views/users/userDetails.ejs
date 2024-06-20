@@ -1,4 +1,32 @@
 <%- include ('../layouts/user/header.ejs') %>
+
+<div class="hero">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-lg-5">
+          <div class="intro-excerpt">
+            <h1>Hello, <%= isLoggedIn.name  %></h1>
+          </div>
+        </div>
+        <div class="col-lg-7"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card text-center">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="true" href="/userDetails">My profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="true" href="/showAddress?id=<%= isLoggedIn._id %>">Manage Address</a>
+          </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="true" href="/orders">My orders</a>
+        </li>
+      </ul>
+    </div>
+  </div>
 <div class="col-lg-12 row text-dark">
     <div class="col-lg-5 m-5">
         <div class="profile-pic">
@@ -17,10 +45,92 @@
         <h4><%= isLoggedIn.email  %></h4>
         <h4>Your Phone:</h4>
         <h4><%= isLoggedIn.mobile  %></h4>
-        <a href="/showAddress?id=<%= isLoggedIn._id %>"style="color:black;" class="text-start">Your Address</a>
-
     </div>
 
+</div>
+<div class="container">
+    <div class="header" style="display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;">
+        <img src="/images/profile.png" alt="Profile Picture" style="border-radius: 50%;
+        width: 80px;
+        height: 80px;">
+        <div>
+            <h1>Username</h1>
+            <button style="padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;">Edit Profile</button>
+        </div>
+    </div>
+    <div class="content" style="display: flex;
+            margin-top: 20px;">
+        <div class="sidebar"style="width: 30%;
+        padding-right: 20px;
+        border-right: 1px solid #ddd;">
+            <div class="section" style="margin-bottom: 20px;">
+                <h2 style="font-size: 1.2em;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;">Personal Info</h2>
+                <p>Name: John Doe</p>
+                <p>Email: john.doe@example.com</p>
+                <p>Phone: 123-456-7890</p>
+                <p>Address: 123 Main St, Anytown, USA</p>
+                <button>Change Password</button>
+            </div>
+            <div class="section">
+                <h2 style="font-size: 1.2em;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;">Payment Methods</h2>
+                <p>Card 1: **** **** **** 1234</p>
+                <p>Card 2: **** **** **** 5678</p>
+                <button>Add New</button>
+            </div>
+            <div class="section" style="margin-bottom: 20px;">
+                <h2 style="font-size: 1.2em;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;">Settings</h2>
+                <p>Notification Preferences</p>
+                <p>Account Settings</p>
+            </div>
+        </div>
+        <div class="main" style="width: 70%;
+            padding-left: 20px;">
+            <div class="section" style="margin-bottom: 20px;">
+                <h2 style="font-size: 1.2em;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;">Order History</h2>
+                <p>Order #1234 - Date: 01/01/2024 - Status: Shipped - Total: $100.00</p>
+                <p>Order #1235 - Date: 01/15/2024 - Status: Pending - Total: $50.00</p>
+                <p>Order #1236 - Date: 01/20/2024 - Status: Delivered - Total: $75.00</p>
+                <button>View All Orders</button>
+            </div>
+            <div class="section" style="margin-bottom: 20px;">
+                <h2 style="font-size: 1.2em;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;">Wishlist</h2>
+                <p>Item 1 <button>Remove</button></p>
+                <p>Item 2 <button>Remove</button></p>
+                <button>View All Wishlist</button>
+            </div>
+            <div class="section">
+                <h2 style="font-size: 1.2em;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;">Customer Support</h2>
+                <p>Contact: support@example.com</p>
+                <p>FAQs</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <%- include ('../layouts/user/footer.ejs') %>
