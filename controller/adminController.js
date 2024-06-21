@@ -232,6 +232,9 @@ const resetPasswordMail = async (name, email, token) => {
     }
   };
   const orderList = async (req,res)=>{
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
     try{
         const adminData = await User.findById({_id:req.session.User_id});
         const orders = await Order.aggregate([
@@ -278,10 +281,13 @@ const resetPasswordMail = async (name, email, token) => {
                 totalAmount:1,
                 DateOrder:{$dateToString:{format:"%Y-%m-%d %H:%M:%S",date:"$DateOrder"}},
                 status:1
-            }}
+            }},{ $sort: { DateOrder: -1 } }, 
+            { $skip: skip },
+            { $limit: limit }
         ]);
          console.log(orders,'orderlist')
-        res.render('orderList',{admin:adminData,order:orders});
+        res.render('orderList',{admin:adminData,order:orders,currentPage: page,
+            totalPages: Math.ceil(orders.length / limit)});
     }catch(error){
         console.error(error.message)
     }

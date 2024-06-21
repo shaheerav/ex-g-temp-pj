@@ -57,10 +57,6 @@ const productSchema = new mongoose.Schema({
         type:Array,
         require:true
     },
-    imagecr:{
-        type:String,
-        required:false
-    },
     softDelete:{
         type:Boolean,
         default:false

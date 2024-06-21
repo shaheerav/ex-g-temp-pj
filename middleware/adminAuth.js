@@ -2,6 +2,7 @@ const isLogin = async (req,res,next)=>{
     try{
         console.log('Inside isLogin middleware');
         if(req.session.User_id){
+            
             next();
         }
         else{

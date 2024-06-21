@@ -61,6 +61,8 @@ userRouts.get('/addAddress',controller.addAddressLoad);
 userRouts.post('/addAddress',controller.addAddress);
 userRouts.get('/editAddress',controller.editAddress);
 userRouts.post('/editAddress',controller.updateAddress);
+userRouts.get('/changePassword',controller.changePassword);
+userRouts.post('/changePassword',controller.changingPassword);
 userRouts.get('/deleteAddress',controller.deleteAddress);
 userRouts.get('/cart',auth.isLogin,controller.addToCart);
 userRouts.post('/add-to-cart/:id',controller.addproducttoCart);

@@ -16,16 +16,15 @@ const File_type_map = {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, './public/uploads'); // Adjust the upload directory as needed
+      cb(null, './public/uploads'); 
   },
   filename: function (req, file, cb) {
-      cb(null, Date.now() + path.extname(file.originalname)); // Append extension
+      cb(null, Date.now() + path.extname(file.originalname)); 
   }
 });
 
 const upload = multer({ storage: storage }).array('images[]');
 
-// Middleware to handle file uploads and validation
 const handleFileUploads = (req, res, next) => {
   upload(req, res, function (err) {
       if (err) {

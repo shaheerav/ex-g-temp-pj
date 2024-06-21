@@ -924,7 +924,7 @@ const showOrder = async(req,res)=>{
     const skip = (page - 1) * 5;
 
     const orderDetails = await Order.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(userId),status: { $ne: 'cancelled' } } },
+      { $match: { userId: new mongoose.Types.ObjectId(userId),status: { $ne: 'Cancelled' } } },
       { $unwind: '$products' },
       {
         $lookup: {
@@ -1007,7 +1007,9 @@ const showOrder = async(req,res)=>{
         };
       });
       const totalPages = Math.ceil(orderDetails.length / 5);
-      res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: orderDetailedList,totalPages: totalPages});
+      const filteredOrderForm = orderDetailedList.filter(order => order.status !== 'Cancelled');
+      console.log(filteredOrderForm,'filtered forms')
+      res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: filteredOrderForm,totalPages: totalPages});
     } else {
       res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: '',totalpages:0 });
     }
@@ -1157,7 +1159,7 @@ const cancelOrder = async (req,res)=>{
     console.log(order,'orderlist in cancelling')
     const updatedOrder = await Order.findOneAndUpdate(
       { _id: orderId, userId: userid },
-      { $set: { 'orderStatus': reason,'status': 'cancelled' } },
+      { $set: { 'orderStatus': reason,'status': 'Cancelled' } },
       { new: true }
     );
 
@@ -1198,21 +1200,21 @@ const orderCancelledList = async (req, res) => {
     console.log(userId, 'user');
 
     const page = parseInt(req.query.page) || 1;
-    const limit = 5;
-    const skip = (page - 1) * limit;
+
+    const skip = (page - 1) * 5;
 
     const orderDetails = await Order.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(userId), status: 'cancelled' } },
+      { $match: { userId: new mongoose.Types.ObjectId(userId),status: { $eq: 'Cancelled' } } },
       { $unwind: '$products' },
       {
         $lookup: {
           from: 'products',
-          localField: 'products',
+          localField: 'products.productId',
           foreignField: '_id',
           as: 'productDetails'
         }
       },
-      { $unwind: '$productDetails' },
+      {$unwind:'$productDetails'},
       {
         $lookup: {
           from: 'addresses',
@@ -1220,75 +1222,79 @@ const orderCancelledList = async (req, res) => {
           foreignField: '_id',
           as: 'AddressOn'
         }
-      },
-      { $unwind: '$AddressOn' },
-      {
-        $lookup: {
-          from: 'payments',
-          localField: 'payment',
-          foreignField: '_id',
-          as: 'paymentMethod'
-        }
-      },
-      { $unwind: '$paymentMethod' },
-      {
-        $group: {
-          _id: '$_id',
-          payment: { $first: '$paymentMethod' },
-          totalAmount: { $first: '$totalAmount' },
-          DateOrder: { $first: '$DateOrder' },
-          products: { $push: '$productDetails' },
-          address: { $first: '$AddressOn' }
-        }
-      },
+      },{$unwind:'$AddressOn'},
+      {$lookup:{
+        from:'payments',
+        localField:'payment',
+        foreignField:'_id',
+        as:'paymentMethod'
+      }},
+      {$unwind:'$paymentMethod'},
+      
+      {$group:{
+        _id:'$_id',
+        payment:{'$first':'$paymentMethod'},
+        totalAmount:{'$first':'$totalAmount'},
+        DateOrder:{'$first':'$DateOrder'},
+        products:{'$push':'$productDetails'},
+        address:{'$first':'$AddressOn'},
+        status:{'$first':'$status'}
+      }},
       {
         $project: {
           _id: 1,
           payment: 1,
           totalAmount: 1,
-          DateOrder: { $dateToString: { format: '%Y-%m-%d %H:%M:%S', date: '$DateOrder' } },
+          DateOrder: { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$DateOrder" } },
           products: 1,
-          address: 1
+          address: 1,
+          status:1
         }
       },
       { $sort: { DateOrder: -1 } },
-      { $skip: skip },
-      { $limit: limit }
+      {$skip:skip},
+      {$limit:5}
     ]);
+    console.log(orderDetails, 'orderForm');
+    
+    const cart = await Cart.find({ userId: userId });
+    let count = 0;
+    if (orderDetails.length > 0) {
+      const orderDetailedList = orderDetails.map(order => {
+        const productList = order.products.map(product => ({
+          productName: product.name,
+          price: product.price,
+          image: product.image.length > 0 ? product.image[0] : '' 
+        }));
 
-    const totalCancelledOrders = await Order.countDocuments({ userId: userId, status: 'cancelled' });
-    const totalPages = Math.ceil(totalCancelledOrders / limit);
+        const address = order.address || {};
+        const payment = order.payment || {};
 
-    const orderDetailedList = orderDetails.map(order => {
-      const productList = order.products.map(product => ({
-        productName: product.name,
-        price: product.price,
-        image: product.image.length > 0 ? product.image[0] : ''
-      }));
-
-      const address = order.address || {};
-      const payment = order.payment || {};
-
-      return {
-        orderId: order._id,
-        payment: payment.paymentMethod,
-        totalAmount: order.totalAmount,
-        orderDate: order.DateOrder,
-        products: productList,
-        address: {
-          fullname: address.fullname || '',
-          pincode: address.pincode || '',
-          mobile: address.mobile || '',
-          street: address.street || '',
-          city: address.city || ''
-        }
-      };
-    });
-
-    res.render('order-cancel', { isLoggedIn: isLoggedIn, count: orderDetails.length, orderForm: orderDetailedList, totalPages: totalPages });
+        return {
+          orderId: order._id,
+          status:order.status,
+          payment: payment.paymentMethod,
+          totalAmount: order.totalAmount,
+          orderDate: order.DateOrder,
+          products: productList,
+          address: {
+            fullname: address.fullname || '',
+            pincode: address.pincode || '',
+            mobile: address.mobile || '',
+            street: address.street || '',
+            city: address.city || ''
+          }
+        };
+      });
+      const totalPages = Math.ceil(orderDetails.length / 5);
+      
+      res.render('order-cancel', { isLoggedIn: isLoggedIn, count: count, orderForm: orderDetailedList,totalPages: totalPages});
+    } else {
+      res.render('order-cancel', { isLoggedIn: isLoggedIn, count: count, orderForm: '',totalpages:0 });
+    }
 
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('Error:', error);
     res.status(500).send('Internal Server Error');
   }
 };
@@ -1397,7 +1403,44 @@ const facebookCallback =  async (req, res) => {
     console.error('Error:', error.response.data.error);
     res.redirect('/login');
   }
-}
+};
+const changePassword = async(req,res)=>{
+  try{
+    const isLoggedIn = await User.findById(req.session.user);
+    res.render('changePassword',{isLoggedIn,message:"",count:0})
+  }catch(error){
+    console.error(error.message);
+  }
+};
+const changingPassword = async (req,res)=>{
+  try{
+    const isLoggedIn = await User.findById(req.session.user);
+    const userId = isLoggedIn._id;
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        if (newPassword !== confirmPassword) {
+            return res.render('changePassword', { message: 'New passwords do not match', isLoggedIn, count: 0 });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.render('changePassword', { message: 'Current password is incorrect', isLoggedIn, count: 0 });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        user.password = hashedPassword;
+        await user.save();
+
+        res.render('changePassword', { message: 'Password changed successfully', isLoggedIn, count: 0 });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error');
+    }
+};
 module.exports = {
   registration,
   addUser,
@@ -1446,5 +1489,7 @@ module.exports = {
   searchProudcts,
   error,
   authFacebook,
-  facebookCallback
+  facebookCallback,
+  changePassword,
+  changingPassword
 };

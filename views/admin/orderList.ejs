@@ -8,7 +8,6 @@
           <tr>
             <th id="allSelector" scope="col">All<input class="form-check-input" type="checkbox" value="" id="selectAll"></th>
             <th scope="col">Sl</th>
-            <th scope="col">Product</th>
             <th scope="col">Order ID</th>
             <th scope="col">User</th>
             <th scope="col">Price</th>
@@ -25,14 +24,6 @@
               <tr>
                 <td><input class="form-check-input order-checkbox" type="checkbox" value="<%= order[i]._id %>" id="flexCheckDefault"></td>
                 <td><%= i + 1 %></td>
-                <td>
-                  <% order[i].products.forEach(product => { %>
-                    <div>
-                      <img src="/uploads/<%= product.productImage[0] %>" alt="<%= product.productName %>" width="50">
-                      <span>(Quantity: <%= product.quantity %>)</span>
-                    </div>
-                  <% }) %>
-                </td>
                 <td><%= order[i]._id %></td>
                 <td><%= order[i].userId.name %></td>
                 <td><%= order[i].totalAmount %></td>
@@ -73,6 +64,33 @@
       </table>
     </div>
   </div>
+</div>
+<div class="container mt-4">
+  <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+          <% if(currentPage > 1) { %>
+              <li class="page-item">
+                  <a class="page-link" href="?page=1" tabindex="-1" aria-disabled="true">First</a>
+              </li>
+              <li class="page-item">
+                  <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+              </li>
+          <% } %>
+          <% for(let i = 1; i <= totalPages; i++) { %>
+              <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                  <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+              </li>
+          <% } %>
+          <% if(currentPage < totalPages) { %>
+              <li class="page-item">
+                  <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+              </li>
+              <li class="page-item">
+                  <a class="page-link" href="?page=<%= totalPages %>">Last</a>
+              </li>
+          <% } %>
+      </ul>
+  </nav>
 </div>
 
 <!-- Footer Start -->
