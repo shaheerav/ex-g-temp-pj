@@ -5,19 +5,7 @@ const User = require('../models/userModel');
 const fs = require('fs');
 const sharp = require('sharp');
 const path = require('path');
-const { default: mongoose } = require('mongoose');
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, './public/uploads')
-    },
-    filename: function (req, file, cb) {
-      const fileName = file.originalname.split(' ').join('-');
-      cb(null, fileName + '-' + Date.now);
-    }
-  })
-  
-  const uploadOptions = multer({ storage: storage })
+const { default: mongoose, set } = require('mongoose');
 
 const showProduct = async (req,res)=>{
     const page = parseInt(req.query.page) || 1;
@@ -43,79 +31,74 @@ const newProduct = async (req,res)=>{
     }catch(error){
         console.log(error.message);
     }
-}
-const addProduct = async (req, res) => {
+};
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Adjust the upload directory as needed
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname)); // Append extension
+    }
+});
+
+const upload = multer({ storage: storage }).array('images[]');
+
+// Middleware to handle file uploads and validation
+const handleFileUploads = (req, res, next) => {
+    upload(req, res, function (err) {
+        if (err) {
+            console.error('Error uploading files:', err);
+            return res.status(500).json({ error: 'Failed to upload files' });
+        }
+        next();
+    });
+};
+const addProduct =  async (req, res) => {
     try {
         const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-        const inputSize = req.body.size;
+        const { name, brand, description, category, size, price, stock } = req.body;
         const user = await User.findById(req.session.User_id);
-        const category = await Category.find();
+        const categories = await Category.find();
 
-        if (!validSizes.includes(inputSize)) {
+        if (!validSizes.includes(size)) {
             return res.render('addProduct', {
-                message: `Invalid size: ${inputSize}`,
-                category: category,
-                validSizes: validSizes,
+                message: `Invalid size: ${size}`,
+                category: categories,
+                validSizes,
             });
         }
 
-        const outputPath = path.join(__dirname, "../public/croppedImages");
-        if (!fs.existsSync(outputPath)) {
-            fs.mkdirSync(outputPath, { recursive: true });
-        }
-        const arrayOfImages = [];
-        if (req.files && req.files['image']) {
-            for (let i = 0; i < req.files['image'].length; i++) {
-                let imageName = req.files['image'][i].filename;
-                // Perform image cropping here using sharp
-                await sharp(req.files['image'][i].path)
-                    .resize(200, 250) // Adjust the width and height as needed
-                    .toFile(path.join(outputPath, imageName));
-                arrayOfImages.push(imageName);
-            }
-        };
-        let croppedImagePath = null;
-        const croppedImageName = ''
-            if (req.body.croppedImage) {
-            const base64Data = req.body.croppedImage.replace(/^data:image\/png;base64,/, "");
-            croppedImageName = `cropped-${Date.now()}.png`;
-            croppedImagePath = path.join(outputPath, croppedImageName);
-            fs.writeFileSync(croppedImagePath, base64Data, 'base64');
-            }
+        const imagePaths = req.files.map(file => file.filename);
+        console.log('Uploaded image paths:', imagePaths); 
+        let images = new Set (imagePaths);
+        let finalImage = Array.from(images)
         let product = new Product({
-            name: req.body.name,
-            brand: req.body.brand,
-            description: req.body.description,
-            category: req.body.category,
-            size: inputSize,
-            price: parseFloat(req.body.price),
-            stock: parseInt(req.body.stock),
-            image: arrayOfImages,
-            imagecr: croppedImagePath ? path.basename(croppedImagePath) : null,
+            name,
+            brand,
+            description,
+            category,
+            size,
+            price: parseFloat(price),
+            stock: parseInt(stock),
+            image: finalImage, 
         });
 
         product = await product.save();
-        console.log(product,'products');
+        console.log('Product saved:', product);
+
         if (!product) {
             return res.render('addProduct', {
                 message: 'Not able to add product',
-                category,
+                category: categories,
                 validSizes,
                 admin: user
             });
         }
-        res.redirect('/product');
 
+        res.status(200).json({ success: true, message: 'Product added successfully' });
     } catch (error) {
         console.error('Error adding product:', error);
-        const user = await User.findById(req.session.User_id);
-        res.status(500).send({ success: false, msg: 'Internal Server Error' });
-        if (error.code === 11000 && error.keyPattern && error.keyPattern.name) {
-            res.render('category-add', { admin: user, message: 'Please check your added entries' });
-        } else {
-            console.error(error.message);
-            res.render('category-add', { admin: user, message: 'An error occurred while adding the product.' });
-        }
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 };
 
@@ -129,7 +112,7 @@ const editProduct = async(req,res)=>{
         const category = await Category.find();
         console.log('product in edit page :', product)
         if(product){
-            res.render('edit-product',{product:product,admin:user,category,validSizes:validSizes});
+            res.render('edit-product',{product:product,admin:user,category,validSizes:validSizes,message:""});
         }else{
             res.redirect('/product');
         }
@@ -141,72 +124,45 @@ const editProduct = async(req,res)=>{
 };
 const updateProduct = async (req,res)=>{
     try{
+
+        const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+        const {id, name, brand, description, category, size, price, stock } = req.body;
         const user = await User.findById(req.session.User_id);
-        const category = await Category.find();
-
-        const outputPath = path.join(__dirname, "../public/croppedImages");
-        if (!fs.existsSync(outputPath)) {
-            fs.mkdirSync(outputPath, { recursive: true });
-          }
-
-
-            const arrayOfImages = [];
-          if(req.files && req.files['image']){
-            for (let i = 0; i < req.files['image'].length; i++) {
-                let imageName = req.files['image'][i].filename;
-                // Perform image cropping here using sharp
-                await sharp(req.files['image'][i].path)
-                  .resize(200, 250) // Adjust the width and height as needed
-                  .toFile(path.join(outputPath, imageName));
-                arrayOfImages.push(imageName);
-                }
-          }
-            
-          
-          let imagecrPath = '';
-        if (req.files && req.files['imagecr'] && req.files['imagecr'][0]) {
-            const imagecrFile = req.files['imagecr'][0];
-            const imagecrName = imagecrFile.filename;
-            imagecrPath = path.join(outputPath, imagecrName);
-            await sharp(imagecrFile.path)
-                .resize(200, 250) // Adjust the width and height as needed
-                .toFile(imagecrPath);
-        }
-
-        const productId = req.body.id;
-          if(!productId){
-            return res.status(400).send('Product ID is required');
-          }
-
-          const categoryObjectId = new mongoose.Types.ObjectId(req.body.category);
-          const existingProduct = await Product.findById(productId);
-          if(!existingProduct){
+        const categories = await Category.find();
+        const product = await Product.findById(id);
+        if (!product) {
             return res.status(404).send('Product not found');
-          }
-          const updatedImages = existingProduct.image ? existingProduct.image.concat(arrayOfImages) : arrayOfImages;
-        
-        const updateProduct = await Product.findByIdAndUpdate(productId,{
-            $set:{
-            name:req.body.name,
-            brand:req.body.brand,
-            description:req.body.description,
-            category:categoryObjectId,
-            size:req.body.size,
-            price:req.body.price,
-            stock:req.body.stock,
-            image:updatedImages,
-            //imagecr:imagecrPath
-        },
-    },
-    {new:true}
-);
+        }
+        let finalImage = product.image;
+
+        if (req.files && req.files.length > 0) {
+            const imagePaths = req.files.map(file => file.filename);
+            console.log('Uploaded image paths:', imagePaths); 
+            let images = new Set(imagePaths);
+            finalImage = Array.from(images); // Override with new images if uploaded
+        }
+         
+        const updatedProduct = await Product.findByIdAndUpdate(id, {
+            $set: {
+                name,
+                brand,
+                description,
+                category,
+                size,
+                price,
+                stock,
+                image: finalImage,
+            }
+        }, { new: true });
+
+        console.log(updatedProduct, "updating done");
 if(!updateProduct){
     return res.status(404).send('Product not found');
 }
-        res.redirect('/product');
+res.redirect('/product')
 
     }catch(error){
-        console.log(error.message);
+        console.error(error.message);
     }
 };
 const deleteProduct = async(req,res)=>{

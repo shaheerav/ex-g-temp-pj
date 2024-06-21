@@ -1,7 +1,7 @@
 const express = require("express");
 const productRouts = express();
 const multer = require("multer");
-
+const path = require('path');
 productRouts.set("view engine", "ejs");
 productRouts.set("views", "./views/product");
 
@@ -16,28 +16,32 @@ const File_type_map = {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const isValid = File_type_map[file.mimetype];
-    let uploadError = new Error("invalid image type");
-    if (isValid) {
-      uploadError = null;
-    }
-    cb(uploadError, "./public/uploads");
+      cb(null, './public/uploads'); // Adjust the upload directory as needed
   },
   filename: function (req, file, cb) {
-    const fileName = file.originalname.split(" ").join("-");
-    const extension = File_type_map[file.mimetype];
-    cb(null, `${fileName}-${Date.now()}.${extension}`);
-  },
+      cb(null, Date.now() + path.extname(file.originalname)); // Append extension
+  }
 });
 
-const uploadOptions = multer({ storage: storage });
+const upload = multer({ storage: storage }).array('images[]');
+
+// Middleware to handle file uploads and validation
+const handleFileUploads = (req, res, next) => {
+  upload(req, res, function (err) {
+      if (err) {
+          console.error('Error uploading files:', err);
+          return res.status(500).json({ error: 'Failed to upload files' });
+      }
+      next();
+  });
+};
 
 const controllProduct = require("../controller/productController");
 productRouts.get("/", controllProduct.showProduct);
 productRouts.get("/addProduct", controllProduct.newProduct);
-productRouts.post("/addProduct",uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name: 'imagecr', maxCount: 1 }]), controllProduct.addProduct);
+productRouts.post("/addProduct",handleFileUploads, controllProduct.addProduct);
 productRouts.get("/edit-product", controllProduct.editProduct);
-productRouts.post("/edit-product",uploadOptions.fields([{ name: 'image', maxCount: 10 }, { name: 'imagecr', maxCount: 1 }]),controllProduct.updateProduct);
+productRouts.post("/edit-product",handleFileUploads,controllProduct.updateProduct);
 productRouts.get('/showImages',controllProduct.showImages);
 productRouts.post('/showImages/:productId/:index', controllProduct.deleteImage);
 productRouts.get("/delete-product", controllProduct.deleteProduct);
