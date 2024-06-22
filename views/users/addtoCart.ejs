@@ -219,6 +219,7 @@
     </div>
 </footer>
 <!-- End Footer Section -->
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -292,7 +293,13 @@
             },
             success: (response) => {
                 if (response.success) {
-                    window.location.reload(); // Reload the page after successful deletion
+                    swal("Remove!", "Your item has been successfully removed.", "success", {
+									button: "ok",
+									}).then((value)=>{
+										if(value){
+											window.location.reload();
+										}
+									})
                 } else {
                     showErrorMessage(response.message);
                 }
