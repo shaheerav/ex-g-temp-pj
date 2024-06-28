@@ -48,7 +48,9 @@ const userData =  new mongoose.Schema({
     token:{
         type:String,
         default:''
-    }
+    },
     
+},{
+    timestamps:true
 })
 module.exports= mongoose.model("User",userData);

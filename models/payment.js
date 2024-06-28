@@ -8,7 +8,7 @@ const paymentSchema = new mongoose.Schema({
     },
     paymentMethod:{
         type:String,
-        enum:['Cash-On-Delivery(COD)','Cart-Payment','Bank-transger','PayPal','Razorpay'],
+        enum:['COD','Cart-Payment','Bank-transger','PayPal','Razorpay'],
         require:true
     },
     amount:{
@@ -20,6 +20,6 @@ const paymentSchema = new mongoose.Schema({
         enum:['pending','paid'],
         require:true
     },
-});
+},{timestamps:true});
 
 module.exports = mongoose.model('Payment',paymentSchema);

@@ -32,6 +32,11 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script>
+
     <link rel="stylesheet" href="stylesheets/style.css" />
   </head>
 
@@ -93,6 +98,10 @@
         left: 50%;
         transform: translateX(-50%);
       }
+      .dropdown-item{
+        color: white;
+        font-size: large;
+      }
     </style>
     <!-- Start Header/Navigation -->
     <nav
@@ -119,10 +128,6 @@
             <li class="nav-item active">
               <a class="nav-link" href="/">Home</a>
             </li>
-            <li><a class="nav-link" href="/men">Men</a></li>
-            <li><a class="nav-link" href="/women">Women</a></li>
-            <li><a class="nav-link" href="/kids">Kids</a></li>
-            <li><a class="nav-link" href="/footwear">Footwear</a></li>
             <li><a class="nav-link" href="/allProduct">Products</a></li>
           </ul>
 
@@ -132,16 +137,16 @@
                 href="#"
                 class="nav-link dropdown-toggle"
                 data-bs-toggle="dropdown"
-                style="color: white"
+                style="color: white;font-size: large;"
                 ><img src="images/user.svg" />
                 <% if (isLoggedIn) { %>
                 <!-- Content to show when the user is logged in -->
                 <samp><%= isLoggedIn.name %></samp>
                 <!-- Other content for logged-in users -->
-                <% } else { %> signIn <% } %></a
+                <% } else { %> Sign In <% } %></a
               >
-              <div class="dropdown-menu bg-transparent border-0">
-                <a href="/userDetails" class="dropdown-item">Your Account</a>
+              <div class="dropdown-menu bg-transparent border-0 " >
+                <a href="/userDetails" class="dropdown-item ">Your Account</a>
                 <a href="/orders" class="dropdown-item">Your Order</a>
                 <a href="element.html" class="dropdown-item">Wish List</a>
                 <a href="/users" class="dropdown-item">Register</a>

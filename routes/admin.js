@@ -24,10 +24,6 @@ adminRouts.get('/',authAdmin.isLogout,controllAdmin.adminPage);
 adminRouts.post('/',controllAdmin.adminVerify);
 
 adminRouts.get('/home',authAdmin.isLogin,controllAdmin.adminhome);
-adminRouts.get('/forget',authAdmin.isLogout,controllAdmin.forget);
-adminRouts.post('/forget',controllAdmin.forgetverify);
-adminRouts.get ('/forget-password',controllAdmin.forgetPasswordLoad);
-adminRouts.post('/forget-password',controllAdmin.resetPassword)
 adminRouts.get('/adlogout',authAdmin.isLogin,controllAdmin.logout);
 adminRouts.get('/userdata',authAdmin.isLogin,controllAdmin.userManagement);
 adminRouts.get('/edit-user',authAdmin.isLogin,controllAdmin.edituser);

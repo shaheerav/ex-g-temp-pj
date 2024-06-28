@@ -44,15 +44,10 @@ userRouts.post('/forget',controller.forgetVerify);
 userRouts.get('/forget-password',auth.isLogout,controller.forgetPasswordLoad);
 userRouts.post('/forget-password',controller.resetPassword);
 userRouts.get('/success',controller.successGoogleLogin)
-userRouts.get('/verify',controller.verifyMail);
 userRouts.get('/login',auth.isLogout,controller.loginPage);
 userRouts.post('/login',controller.loginValidate);
 userRouts.get('/logout',controller.userLogout);
 userRouts.get('/productDetails',auth.isLogin,controller.productDetails);
-userRouts.get('/men',controller.menCategory);
-userRouts.get('/women',controller.womenCategory);
-userRouts.get('/kids',controller.kidsCategory);
-userRouts.get('/footwear',controller.footwearCategory);
 userRouts.get('/userDetails',auth.isLogin,controller.userDetails);
 userRouts.get('/editProfile',auth.isLogin,controller.editProfileLoad);
 userRouts.post('/editProfile',profileValidate,controller.updateProfile);
@@ -71,11 +66,13 @@ userRouts.post('/checkout',controller.placeOrder)
 userRouts.post('/cart/delete',controller.removeProduct);
 userRouts.post('/cart/updateQuantity',controller.updateQuantity);
 userRouts.get('/orders',auth.isLogin,controller.showOrder);
-userRouts.get('/search',controller.searchProduct);
 userRouts.post('/cancelOrder',controller.cancelOrder);
 userRouts.get('/orderDetails',controller.showOrderDetails);
 userRouts.get('/cancelledList',controller.orderCancelledList);
 userRouts.post('/order-product/delete',controller.orderProductDelete);
 userRouts.get('/allProduct',controller.allProduct);
 userRouts.get('/searchProduct',controller.searchProudcts);
+userRouts.get('/reviwe:id',controller.reviweProduct);
+userRouts.get('/return:id',controller.returnProduct);
+userRouts.post('/cancel-product/:id',controller.productReturnOrder)
 module.exports = userRouts;

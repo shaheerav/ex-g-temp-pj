@@ -1,46 +1,6 @@
-<!-- /*
-* Bootstrap 5
-* Template Name: Furni
-* Template Author: Untree.co
-* Template URI: https://untree.co/
-* License: https://creativecommons.org/licenses/by/3.0/
-*/ -->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <meta name="author" content="Untree.co" />
-    <link rel="shortcut icon" href="favicon.png" />
-
-    <meta name="description" content="" />
-    <meta name="keywords" content="bootstrap, bootstrap4" />
-
-    <!-- Bootstrap CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link href="css/tiny-slider.css" rel="stylesheet" />
-    <link href="css/style.css" rel="stylesheet" />
-    <title>Trend Setter</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-    />
-    <link rel="stylesheet" href="stylesheets/style.css" />
-  </head>
-
-  <body>
-    <style>
+<%-include('../layouts/user/header.ejs')  %>
+    <!-- End Header/Navigation -->
+     <style>
       /*zooming*/
       * {
         box-sizing: border-box;
@@ -96,297 +56,175 @@
         top: -12px; /* Adjust this value as needed */
         left: 50%;
         transform: translateX(-50%);
-      }
-    </style>
-    <!-- Start Header/Navigation -->
-    <nav
-      class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
-      arial-label="Furni navigation bar"
-    >
+    }
+    .size-chart {
+        width: 50%;
+        border-collapse: collapse;
+    }
+    .size-chart th, .size-chart td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    .size-chart th {
+        background-color: #f2f2f2;
+    }
+    .size-available {
+        color: green;
+    }
+    .size-not-available {
+        text-decoration: line-through;
+        color: red;
+    }
+    .color-box {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 1px solid #000;
+        margin-top: 5px;
+    }
+    .size-radio {
+        display: none;
+    }
+    .size-label {
+        cursor: pointer;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        margin: 5px;
+    }
+    .size-radio:checked + .size-label {
+        border: 2px solid green;
+        background-color: #e0ffe0;
+    }
+     </style>
+     <div class="hero">
       <div class="container">
-        <a class="navbar-brand" href="index.html">Trend Setter<span>.</span></a>
-
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarsFurni"
-          aria-controls="navbarsFurni"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarsFurni">
-          <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-            <li class="nav-item active">
-              <a class="nav-link" href="/">Home</a>
-            </li>
-            <li><a class="nav-link" href="/men">Men</a></li>
-            <li><a class="nav-link" href="/women">Women</a></li>
-            <li><a class="nav-link" href="/kids">Kids</a></li>
-            <li><a class="nav-link" href="/footwear">Footwear</a></li>
-          </ul>
-
-          <div class="nav-item dropdown ms-auto mb-2 mb-md-0">
-            <li>
-              <a
-                href="#"
-                class="nav-link dropdown-toggle"
-                data-bs-toggle="dropdown"
-                style="color: white"
-                ><img src="images/user.svg" />
-                <% if (isLoggedIn) { %>
-                <!-- Content to show when the user is logged in -->
-                <samp><%= isLoggedIn.name %></samp>
-                <!-- Other content for logged-in users -->
-                <% } else { %> signIn <% } %></a
-              >
-              <div class="dropdown-menu bg-transparent border-0">
-                <a href="button.html" class="dropdown-item">Your Account</a>
-                <a href="typography.html" class="dropdown-item">Your Order</a>
-                <a href="element.html" class="dropdown-item">Wish List</a>
-                <a href="/users" class="dropdown-item">Register</a>
-                <% if (isLoggedIn){ %>
-                <a href="/logout" class="dropdown-item">Logout</a>
-                <%} else { %>
-                <a href="/login" class="dropdown-item">Login</a>
-                <% } %>
+          <div class="row justify-content-between">
+              <div class="col-lg-5">
+                  <div class="intro-excerpt">
+                      <h1>Product Details</h1>
+                  </div>
               </div>
-            </li>
+              <div class="col-lg-7"></div>
           </div>
-          <li>
-            <a class="nav-link" href="/cart">
-              <img src="images/cart.svg">
-              <span class="badge badge-light" id="cart-count"><%= count %></span>
-            </a>
-          </li>
+      </div>
+  </div>
+  <%- include('../partials/breadcrumbs.ejs') %>
+  <section class="container sproduct my-3 pt-3">
+    <div class="row mt-3">
+      <div class="col-lg-5">
+        <div class="col">
+          <div class="img-container">
+            <img src="/uploads/<%= product.image[0] %>" style="height: 500px; width: 400px" id="myimage" />
+            <div id="myresult" class="img-zoom-result"></div>
+          </div>
+          <div class="row">
+            <div class="col mt-3">
+              <% product.image.forEach(function(imageSrc, index) { %>
+                <img src="/uploads/<%= imageSrc %>" alt="Product Image" style="width: 100px; height: 100px" class="thumbnail" onclick="changeMainImageAndZoom('<%= imageSrc %>')" data-index="<%= index %>" />
+              <% }); %>
+            </div>
+          </div>
         </div>
       </div>
-    </nav>
-    <!-- End Header/Navigation -->
-    <section class="container sproduct my-3 pt-3">
-      <div class="row mt-3">
-        <div class="col-lg-5">
-          <div class="col">
-            <div class="img-container">
-              <img
-                src="/uploads/<%= product.image[0]  %>"
-                style="height: 500px; width: 400px"
-                id="myimage"
-              />
-              <div id="myresult" class="img-zoom-result"></div>
-            </div>
-            <div class="row">
-              <div class="col mt-3">
-                <% product.image.forEach(function(imageSrc,index) { %>
-                <img
-                  src="/uploads/<%= imageSrc %>"
-                  alt="Product Image"
-                  style="width: 100px; height: 100px"
-                  class="thumbnail"
-                  onclick="changeMainImageAndZoom('<%= imageSrc %>')"
-                  data-index = "<%= index %>"
-                />
-                <% }); %>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-7">
-          
-          <form action="/add-to-cart/<%= product._id %>" method="post">
+      <div class="col-lg-7">
+        <form action="/add-to-cart/<%= product._id %>" method="post" id="addToCartForm">
           <input type="hidden" name="productId" value="<%= product._id %>">
-          <h6>home/<%= product.category.name %></h6>
           <h3 class="py-4" name="name"><%= product.name %></h3>
           <h2><i class="bi bi-currency-rupee" name="price"></i><%= product.price %></h2>
           <% if (isOutOfStock) { %>
             <h4 class="text-danger">Out of Stock</h4>
           <% } else { %>
             <label for="size-select">Select Size:</label>
-            <h2><%= product.size %></h2>
+            <div class="m-3">
+              <table class="size-chart">
+                <thead>
+                  <tr>
+                    <th>Size</th>
+                    <th>Color</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% 
+                    const allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+                    const availableSizes = product.size.map(s => s.size);
+                    allSizes.forEach(size => {
+                      const sizeClass = availableSizes.includes(size) ? 'size-available' : 'size-not-available';
+                      const disabled = !availableSizes.includes(size) || existingSizesInCart.includes(size) ? 'disabled' : '';
+                      const selected = existingSizesInCart.includes(size) ? 'selected' : '';
+  
+                      // Mark the already selected size as red and disabled
+                      const bgColor = existingSizesInCart.includes(size) ? 'red' : '';
+  
+                  %>
+                  <tr>
+                    <td class="<%= sizeClass %>" >
+                      <% if (!existingSizesInCart.includes(size)) { %>
+                        <label>
+                          <input type="radio" name="size" value="<%= size %>" <%= disabled %> required>
+                          <span class="<%= selected %>" style="background-color: <%= bgColor %>;"><%= size %></span>
+                        </label>
+                      <% } else { %>
+                        <span class="<%= selected %>" style="background-color: <%= bgColor %>;"><%= size %></span>
+                      <% } %>
+                    </td>
+                    <% if (size === 'XS') { %>
+                      <td rowspan="6">
+                        <div class="color-box" style="background-color: <%= product.color %>;"></div>
+                        <%= product.color %>
+                      </td>
+                    <% } %>
+                  </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
             <div>
-              
-              <% if(!isProductInCart){ %>
                 <label for="quantity">Quantity:</label>
-              <input type="number" id="quantity" name="quantity" min="1" value="1" style="width: 50px; height: 40px; padding-left: 10px; font-size: 16px; margin-right: 1px;" required>
-              <button class="buy-btn btn" type="submit">Add to cart</button>
-              <% }else{ %>
-                <h5>Product already in the Cart</h5>
-              <% } %>
+                <input type="number" id="quantity" name="quantity" min="1" value="1" style="width: 50px; height: 40px; padding-left: 10px; font-size: 16px; margin-right: 1px;" required>
+                <button class="buy-btn btn" type="submit">Add to cart</button>
+              
             </div>
           <% } %>
         </form>
-          
-          <h4 class="mt-5 mb-5">Product Details</h4>
-          <span> <%= product.description %> </span>
-          <div class="stars" id="stars">
-            <span class="star" data-value="1">★</span>
-            <span class="star" data-value="2">★</span>
-            <span class="star" data-value="3">★</span>
-            <span class="star" data-value="4">★</span>
-            <span class="star" data-value="5">★</span>
-          </div>
-          <div class="review">
-            <p>Share your review</p>
-            <textarea id="review"
-            placeholder="Write your review here"></textarea>
-            <button id="submit">Submit</button>
-            <div class="reviews" id="reviews">
-
-            </div>
-          </div>
+        <h4 class="mt-5 mb-5">Product Details</h4>
+        <span><%= product.description %></span>
+        <div class="stars" id="stars">
+          <span class="star" data-value="1">★</span>
+          <span class="star" data-value="2">★</span>
+          <span class="star" data-value="3">★</span>
+          <span class="star" data-value="4">★</span>
+          <span class="star" data-value="5">★</span>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
+  
 
-    <!-- Start Footer Section -->
-    <footer class="footer-section my-3">
-      <div class="container relative">
-        <div class="sofa-img">
-          <img src="images/logo1.png" alt="Image" class="img-fluid" />
-        </div>
-
-        <div class="row">
-          <div class="col-lg-8">
-            <div class="subscription-form">
-              <h3 class="d-flex align-items-center">
-                <span class="me-1"
-                  ><img
-                    src="images/envelope-outline.svg"
-                    alt="Image"
-                    class="img-fluid" /></span
-                ><span>Subscribe to Newsletter</span>
-              </h3>
-
-              <form action="#" class="row g-3">
-                <div class="col-auto">
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Enter your name"
-                  />
-                </div>
-                <div class="col-auto">
-                  <input
-                    type="email"
-                    class="form-control"
-                    placeholder="Enter your email"
-                  />
-                </div>
-                <div class="col-auto">
-                  <button class="btn btn-primary">
-                    <span class="fa fa-paper-plane"></span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <div class="row g-5 mb-5">
-          <div class="col-lg-4">
-            <div class="mb-4 footer-logo-wrap">
-              <a href="#" class="footer-logo">Trend Setter<span>.</span></a>
-            </div>
-            <p class="mb-4">
-              Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio
-              quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam
-              vulputate velit imperdiet dolor tempor tristique. Pellentesque
-              habitant
-            </p>
-
-            <ul class="list-unstyled custom-social">
-              <li>
-                <a href="#"><span class="fa fa-brands fa-facebook-f"></span></a>
-              </li>
-              <li>
-                <a href="#"><span class="fa fa-brands fa-twitter"></span></a>
-              </li>
-              <li>
-                <a href="#"><span class="fa fa-brands fa-instagram"></span></a>
-              </li>
-              <li>
-                <a href="#"><span class="fa fa-brands fa-linkedin"></span></a>
-              </li>
-            </ul>
-          </div>
-
-          <div class="col-lg-8">
-            <div class="row links-wrap">
-              <div class="col-6 col-sm-6 col-md-3">
-                <ul class="list-unstyled">
-                  <li><a href="#">About us</a></li>
-                  <li><a href="#">Services</a></li>
-                  <li><a href="#">Blog</a></li>
-                  <li><a href="#">Contact us</a></li>
-                </ul>
-              </div>
-
-              <div class="col-6 col-sm-6 col-md-3">
-                <ul class="list-unstyled">
-                  <li><a href="#">Support</a></li>
-                  <li><a href="#">Knowledge base</a></li>
-                  <li><a href="#">Live chat</a></li>
-                </ul>
-              </div>
-
-              <div class="col-6 col-sm-6 col-md-3">
-                <ul class="list-unstyled">
-                  <li><a href="#">Jobs</a></li>
-                  <li><a href="#">Our team</a></li>
-                  <li><a href="#">Leadership</a></li>
-                  <li><a href="#">Privacy Policy</a></li>
-                </ul>
-              </div>
-
-              <div class="col-6 col-sm-6 col-md-3">
-                <ul class="list-unstyled">
-                  <li><a href="#">Nordic Chair</a></li>
-                  <li><a href="#">Kruzo Aero</a></li>
-                  <li><a href="#">Ergonomic Chair</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="border-top copyright">
-          <div class="row pt-4">
-            <div class="col-lg-6">
-              <p class="mb-2 text-center text-lg-start">
-                Copyright &copy;
-                <script>
-                  document.write(new Date().getFullYear());
-                </script>
-                . All Rights Reserved. &mdash; Designed with love by
-                <a href="https://untree.co">Untree.co</a> Distributed By
-                <a hreff="https://themewagon.com">ThemeWagon</a>
-                <!-- License information: https://untree.co/license/ -->
-              </p>
-            </div>
-
-            <div class="col-lg-6 text-center text-lg-end">
-              <ul class="list-unstyled d-inline-flex ms-auto">
-                <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
-    <!-- End Footer Section -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/tiny-slider.js"></script>
-    <script src="js/custom.js"></script>
-      <script>
-
-      </script>
-      
     <script>
+      //validating form 
+      function validateForm() {
+    var selectedSize = document.querySelector('input[name="size"]:checked');
+    if (!selectedSize) {
+      document.getElementById('sizeSelectionError').style.display = 'block';
+      return false;
+    }
+    return true;
+  }
+  // Enable/disable button based on size selection
+  document.addEventListener('DOMContentLoaded', function() {
+    var addToCartBtn = document.getElementById('addToCartBtn');
+    var sizeRadios = document.querySelectorAll('input[name="size"]');
+    
+    sizeRadios.forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        if (this.checked) {
+          addToCartBtn.removeAttribute('disabled');
+          document.getElementById('sizeSelectionError').style.display = 'none';
+        }
+      });
+    });
+  });
       //***********************image zoom**************************
       function imageZoom(imgID, resultID) {
         var img, lens, result, cx, cy;
@@ -564,25 +402,4 @@ function getStarColorClass(value) {
 }
 
     </script>
-
-    <script>
-      /* <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        fill="currentColor"
-        class ="bi bi-currency-rupee"
-        viewBox="0 0 16 16"
-      >
-        <path d="M4 3.06h2.726c1.22 0 2.12.575 2.325 1.724H4v1.051h5.051C8.855 7.001 8 7.558 6.788 7.558H4v1.317L8.437 14h2.11L6.095 8.884h.855c2.316-.018 3.465-1.476 3.688-3.049H12V4.784h-1.345c-.08-.778-.357-1.335-.793-1.732H12V2H4z" />
-      </svg>*/
-    </script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/tiny-slider.js"></script>
-    <script src="js/custom.js"></script>
-    <script>
-      //--------------changing the images---------------
-    </script>
-    <script src="javascripts/zoomImage.js"></script>
-  </body>
-</html>
+    <%-include('../layouts/user/footer.ejs')  %>

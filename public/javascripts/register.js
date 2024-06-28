@@ -11,7 +11,7 @@ $(function(){
                 },
                 password:{
                     required:true,
-                    minlength:8,
+                    minlength:4,
                 },
                 conformPassword:{
                     required:true,

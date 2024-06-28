@@ -1,0 +1,65 @@
+<%- include ('../layouts/user/header.ejs') %>
+<div class="card-body row m-5">
+    
+    <% if (order.products && order.products.length > 0) { %>
+        <h5>Products:</h5>
+        <ul>
+            <% order.products.forEach((product, index) => { %>
+                <li>
+                    <form class="cancel-product-form">
+                        <h6><%= product.product.name %></h6>
+                        <p><strong>Brand:</strong> <%= product.product.brand %></p>
+                        <p><strong>Description:</strong> <%= product.product.description %></p>
+                        <p><strong>Price:</strong> <%= product.product.price %></p>
+                        <img src="/uploads/<%= product.product.image[0] %>" style="width: 80px; height: 100px;">
+                        <p><strong>Quantity:</strong><%= product.quantity %></p>
+                        <input id="productId" name="productId" value="<%= product.productId %>" type="hidden">
+                        <input id="orderId" name="orderId" value="<%= order._id %>" type="hidden">
+                        <input id="quantity" name="quantity" value="<%= product.quantity %>" type="hidden">
+                        
+                        <button class="btn btn-primary" type="submit">Cancel Product</button>
+                    </form>
+                </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>No products found.</p>
+    <% } %>
+</div>
+<%- include('../layouts/user/footer.ejs') %>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.cancel-product-form').on('submit', function(event) {
+            event.preventDefault();
+            const $form = $(this);
+            const productId = $form.find('input[name="productId"]').val();
+            const orderId = $form.find('input[name="orderId"]').val();
+            const quantity = $form.find('input[name="quantity"]').val();
+
+            $.ajax({
+                url: '/cancel-product/' + productId,
+                method: 'POST',
+                data: {
+                    productId: productId,
+                    orderId: orderId,
+                    quantity: quantity
+                },
+                success: function(response) {
+                    console.log('Response:', response);
+                    if (response.success) {
+                        alert(response.message);
+                        window.location.href = '/orders';
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(error) {
+                    console.error('Error deleting product:', error);
+                    alert('An error occurred while processing your request. Please try again.');
+                }
+            });
+        });
+    });
+</script>

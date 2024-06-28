@@ -1,23 +1,12 @@
 const mongoose =require('mongoose');
-const reviewSchema = new mongoose.Schema({
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-    text: {
-      type: String,
-      required: true,
-    },
-    rating: {
+const sizeSchema = new mongoose.Schema({
+    size: { type: String, required: true },
+    stock: {
       type: Number,
       required: true,
-      min: 1,
-      max: 5,
-    },
-    date: {
-      type: Date,
-      default: Date.now,
-    },
+      min: [0, 'Stock must be a non-negative number'],
+      max: 200
+    }
   });
 const productSchema = new mongoose.Schema({
     name:{
@@ -37,21 +26,16 @@ const productSchema = new mongoose.Schema({
         ref:'Category',
         require:true
     },
-    size: {
-        type: String,
-        default: 'M',
+    size: [sizeSchema],
+    color:{
+        type:String,
+        require:true
     },
     
     price:{
         type:Number,
         required:true,
         min:[0,'Price must be a positive number']
-    },
-    stock:{
-        type:Number,
-        require:true,
-        min:[0,'Stock must be non-negative number'],
-        max:200
     },
     image:{
         type:Array,
@@ -61,14 +45,12 @@ const productSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
-    rating:[{
-        star:Number,
-        postedby:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
-    }],
-    totalrating:{
-        type:String,
-        default:0,
-    },
-    reviews: [reviewSchema],
+    reviews:{
+        type:mongoose.Types.ObjectId,
+        ref:'Review',
+        require:true
+    }
+},{
+    timestamps:true
 });
 module.exports = mongoose.model('Product',productSchema);

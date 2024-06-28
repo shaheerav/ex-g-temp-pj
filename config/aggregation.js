@@ -34,6 +34,7 @@ const getOderDetails = async (orderId)=>{
                 DateOrder:{'$first':'$DateOrder'},
                 products:{'$push':{
                     product:'$productList',
+                    productId:'$products.productId',
                     quantity:'$products.quantity'}},
                 address:{'$first':'$userAddress'},
                 tax:{'$first':'$tax'},

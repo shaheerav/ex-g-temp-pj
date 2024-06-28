@@ -12,7 +12,6 @@ const showProduct = async (req,res)=>{
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
     try{
-        console.log('shows the product');
         const product = await Product.find().populate('category').skip(skip).limit(limit);
         const totalproduct = await Product.countDocuments();
         const totalPages = Math.ceil(totalproduct/limit);
@@ -56,18 +55,35 @@ const handleFileUploads = (req, res, next) => {
 const addProduct =  async (req, res) => {
     try {
         const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-        const { name, brand, description, category, size, price, stock } = req.body;
+        const { name, brand, description, category, price,color } = req.body;
         const user = await User.findById(req.session.User_id);
+        const sizes = req.body.size
         const categories = await Category.find();
-
-        if (!validSizes.includes(size)) {
+        //looking the values are array
+        if (!Array.isArray(sizes)) {
             return res.render('addProduct', {
-                message: `Invalid size: ${size}`,
+              message: 'Sizes must be an array',
+              category: categories,
+              validSizes,
+            });
+          }
+      
+          // Validate sizes
+          for (const sizeEntry of sizes) {
+            if (!validSizes.includes(sizeEntry.size)) {
+              return res.render('addProduct', {
+                message: `Invalid size: ${sizeEntry.size}`,
                 category: categories,
                 validSizes,
-            });
-        }
-
+              });
+            }
+          }
+      
+          const productSizes = sizes.map(sizeEntry => ({
+            size: sizeEntry.size,
+            stock: parseInt(sizeEntry.stock),
+          }));
+      
         const imagePaths = req.files.map(file => file.filename);
         console.log('Uploaded image paths:', imagePaths); 
         let images = new Set (imagePaths);
@@ -77,9 +93,9 @@ const addProduct =  async (req, res) => {
             brand,
             description,
             category,
-            size,
+            color,
+            size: productSizes,
             price: parseFloat(price),
-            stock: parseInt(stock),
             image: finalImage, 
         });
 

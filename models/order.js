@@ -21,7 +21,16 @@ const orderSchema = new mongoose.Schema({
         quantity:{
             type:Number,
             require:true,
-        }
+        },
+        size:{
+            type:String,
+            require:true
+        },
+        productStatus: {
+            type: String,
+            enum: ['Pending', 'Cancelled', 'Delivered'],
+            default: 'Pending'
+        },
 }],
     DateOrder:{
         type:Date,
@@ -49,7 +58,7 @@ const orderSchema = new mongoose.Schema({
     },
     status:{
         type:String,
-        enum:['Ordered','Shipped','Out-For-Delivery','Delivered','Cancelled'],
+        enum:['Ordered','Shipped','Out-For-Delivery','Delivered','Cancelled','Return'],
         require:true,
     },
     orderStatus:{
@@ -57,6 +66,6 @@ const orderSchema = new mongoose.Schema({
         default:'',
         require:true
     }
-});
+},{timestamps:true});
 
 module.exports = mongoose.model('Order',orderSchema);

@@ -16,6 +16,7 @@
 			</div>
 		<!-- End Hero Section -->
   <!-- Cancel Order Modal -->
+  <%- include('../partials/breadcrumbs.ejs')  %>
   <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -167,13 +168,11 @@
 		                    </tr>
 		                  </tbody>
 		                </table>
-						<form id="checkoutForm">
 							<div class="form-group m-5">
 							  <label for="payment-method">Choose payment method:</label>
 							  <select name="payment" id="payment" class="form-control">
-								<% paymentMethods.forEach(method=>{%>
-								<option value="<%=method %>"><%=method %></option>
-								<% }) %>
+								<option value="Razorpay">Razorpay</option>
+								<option value="COD">Cash-On-Delivery</option>
 							  </select>
 							</div>
 						  
@@ -181,8 +180,6 @@
 							  <button type="button" class="btn btn-black btn-lg py-3 btn-block" onclick="placeOrder()">Place Order</button>
 							  <button type="button" class="btn btn-black btn-lg py-3 btn-block" onclick="cancelOrder()">Cancel Order</button>
 							</div>
-							
-						  </form>
 					
 		              </div>
 		            </div>
@@ -288,46 +285,105 @@
 				}
 
 				function placeOrder() {
-				const paymentMethod = document.getElementById('payment').value;
+    const paymentMethod = document.getElementById('payment').value;
 
-				if (!selectedAddressId) {
-					alert('Please select an address.');
-					return;
-				}
+    if (!selectedAddressId) {
+        swal("Please select an address", {
+            dangerMode: true,
+            buttons: true,
+        });
+        return;
+    }
 
-				if (!paymentMethod) {
-					alert('Please select a payment method.');
-					return;
-				}
-				const totalAmount = <%= total %>;
-				const productName = Array.from(document.getElementsByName('productName')).map(input =>input.innerText.trim())
-				fetch('/checkout', {
-					method: 'POST',
-					headers: {
-					'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({
-					addressId: selectedAddressId,
-					paymentMethod: paymentMethod,
-					totalAmount: totalAmount,
-					productName :productName
-					})
-				})
-				.then(response => response.json())
-				.then(data => {
-					if (data.success) {
-							swal("Order Placed!", "Your order has been successfully placed.", "success", {
-									button: "Go to Orders",
-									}).then((value)=>{
-										if(value){
-											window.location.href = '/orders';
-										}
-									})
-					} else {
-					alert('Error placing order: ' + data.message);
-					}
-				});
-				}
+    if (!paymentMethod) {
+        swal("Please select a payment method", {
+            dangerMode: true,
+            buttons: true,
+        });
+        return;
+    }
+
+    const totalAmount = <%= total %>;
+    const productName = Array.from(document.getElementsByName('productName')).map(input => input.innerText.trim());
+
+    fetch('/checkout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            addressId: selectedAddressId,
+            paymentMethod: paymentMethod,
+            totalAmount: totalAmount,
+            productName: productName
+        })
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.success) {
+            if (paymentMethod === 'COD') {
+                swal("Order Placed!", "Your order has been successfully placed.", "success", {
+                    button: "Go to Orders",
+                }).then((value) => {
+                    if (value) {
+                        window.location.href = '/orders';
+                    }
+                });
+            } else if (paymentMethod === 'Razorpay') {
+                const options = {
+                    key: `${res.key_id}`,
+                    amount: `${res.amount}`,
+                    currency: "INR",
+                    name: `${res.product_name}`,
+                    order_id: `${res.order_id}`,
+                    handler: function(response) {
+                        swal("Order Placed!", "Your order has been successfully placed.", "success", {
+                            button: "Go to Orders",
+                        }).then((value) => {
+                            if (value) {
+                                window.location.href = '/orders';
+                            }
+                        });
+                    },
+                    prefill: {
+                        name: `${res.name}`,
+                        email: `${res.email}`,
+                        contact: `${res.contact}`
+                    },
+                    notes: {
+                        address: `${res.product_name}`
+                    },
+                    theme: {
+                        color: '#3399cc'
+                    }
+                };
+
+                const razorpayObject = new Razorpay(options);
+                razorpayObject.on('payment.failed', function(response) {
+                    swal("Payment Failed", response.error.description, "error", {
+                        button: "Try Again",
+                    });
+                });
+
+                razorpayObject.open();
+            }
+        } else {
+            swal("Error placing order", "An error occurred while processing your order. Please try again later.", "error", {
+                dangerMode: true,
+                button: true,
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error placing order:', error);
+        swal("Error placing order", "An error occurred while processing your order. Please try again later.", "error", {
+            dangerMode: true,
+            button: true,
+        });
+    });
+}
+
+				
 				document.getElementById('cancelReason').addEventListener('change', function() {
 						if (this.value === 'Other') {
 						document.getElementById('cancelReasonOther').style.display = 'block';
@@ -350,7 +406,10 @@
 						if (otherReason) {
 							cancelReason = otherReason;
 						} else {
-							alert('Please specify the reason for cancellation.');
+							swal("please specify your reason", {
+							dangerMode: true,
+							buttons: true,
+							}    );
 							return;
 						}
 						}
@@ -367,8 +426,13 @@
 						.then(response => response.json())
 						.then(data => {
 						if (data.success) {
-							alert('Order cancelled successfully.');
-							window.location.href = '/orders';
+							swal("Order cancelled!", "Your order cancelled successfully.", "success", {
+									button: "Go to Orders",
+									}).then((value)=>{
+										if(value){
+											window.location.href = '/orders';
+										}
+									})
 						} else {
 							alert('Error cancelling order: ' + data.message);
 						}

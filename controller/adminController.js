@@ -127,110 +127,7 @@ const logout = async (req,res)=>{
         console.log(error.message);
     }
 };
-const forget = async(req,res)=>{
-    try{
-        res.render('forget')
 
-    }catch(error){
-        console.error('Error forget password:', error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
-    }
-};
-const forgetverify = async (req,res)=>{
-    try{
-        const email = req.body.email;
-        const userData = await User.findOne({email:email});
-        if(userData){
-            if(userData.is_admin===0){
-                res.render('forget',{message:'Email is incorrect'});
-            }else{
-                const randomString = randomString.generate();
-                const updatedData = await User.updateOne(
-                    { email: email },
-                    { $set: { token: randomString } }
-                  );
-                    resetPasswordMail (userData.name,userData.email,randomString);
-                    res.render("forget", {
-                        message: "Please check your mail to Reset password",
-                      });
-            }
-        }else{
-            res.render('forget',{message:'Email is incorrect'});
-        }
-
-    }catch(error){
-        console.error('error reset password');
-        res.status(500).json({success:false,message:'Internal Server Error'});
-    }
-};
-const resetPasswordMail = async (name, email, token) => {
-    try {
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        host: "smtp.gmail.com",
-        port: "465",
-        auth: {
-          user: "vshaheera89@gmail.com",
-          pass: "kgjr dsij cfjn jotn",
-        },
-        secure: false, // Set this to false
-        tls: {
-          rejectUnauthorized: false, // Avoids Node.js self-signed certificate errors
-        },
-      });
-      const mailOption = {
-        from: "vshaheera89@gmail.com",
-        to: email,
-        subject: "For Reset Password",
-        html:
-          "<p>Hi " +
-          name +
-          'please click here to <a href="http://localhost:3000/forget-password?token=' +
-          token +
-          '"> Reset</a> your password</p>',
-      };
-      transporter.sendMail(mailOption, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log("Email has been sent:-", info.response);
-        }
-      });
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-  const forgetPasswordLoad = async (req,res)=>{
-    try{
-      const token = req.query.token;
-      console.log('token',token)
-      const tokenData = await User.findOne({token:token});
-      console.log('user :',tokenData._id);
-      if(tokenData){
-        res.render('forget-password',{user_id:tokenData._id})
-      }else{
-        console.log('error on your token');
-        res.status(500,{success:false,message:'some error happens'});
-  
-      }
-    }catch(error){
-      console.log('error on forgetpassword');
-      res.status(500,{ success: false, message: "Internal server error" })
-    }
-  };
-  const resetPassword = async(req,res)=>{
-    try{
-      const password = req.body.password;
-      const user_id = req.body.user_id;
-      console.log('user:',user_id);
-      const sPassword = await securePassword(password);
-      const updatedData = await User.findByIdAndUpdate({_id:user_id},{$set:{password:sPassword,token:''}});
-      res.redirect('login')
-  
-    }catch(error){
-      console.log(error.message)
-    }
-  };
   const orderList = async (req,res)=>{
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
@@ -359,10 +256,7 @@ module.exports={
     blockUser,
     unblockUser,
     logout,
-    forget,
-    forgetverify,
-    forgetPasswordLoad,
-    resetPassword,orderList,
+    orderList,
     updatePaymentStatus,
     updateStatus,
     orderDetails

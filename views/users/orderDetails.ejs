@@ -1,4 +1,5 @@
 <%- include ('../layouts/user/header.ejs')  %>
+<%- include('../partials/breadcrumbs.ejs') %>
   <div class="card m-5 p-3" style="margin-bottom: 100px;">
     <div class="card-header ">
         <h6>Ordered on <%= new Date(orderList.DateOrder).toLocaleString() %></h6>
@@ -62,10 +63,12 @@
                         <p><strong>Price:</strong> <%= product.product.price %></p>
                         <img src="/uploads/<%= product.product.image[0] %>" style="width: 80px; height: 100px;">
                         <p><strong>Quantity:</strong><%= product.quantity %></p>
-                        <input id="productId" value="<%= product._id %>" type="hidden">
-                        <% if(!orderList.status ==='Delivered'){ %>
-                        <button class="btn p-3 m-3" onclick="deleteProductFromOrder('<%= product._id %>', '<%= orderList._id %>')">Cancel Order</button>
-                        <% } %>
+                        <input id="productId" value="<%= product.productId %>" type="hidden">
+                        <% if(orderList.status !== 'Delivered'){ %>
+                            <button class="btn p-3 m-3" onclick="deleteProductFromOrder('<%= product.productId %>', '<%= orderList._id %>','<%= product.quantity%>')">Cancel Product</button>
+                            <% } else { %>
+                            <button class="btn p-3 m-3" onclick="returnProduct('<%= product._id %>', '<%= orderList._id %>')">Return Product</button>
+                            <% } %>
                     </li>
                 <% }); %>
             </ul>
@@ -196,22 +199,33 @@
         document.getElementById('myimage').src = '/uploads/' + newImageSrc;
     }
 
-    function deleteProductFromOrder(productId, orderId) {
+    function deleteProductFromOrder(productId, orderId,quantity) {
         $.ajax({
             url: '/order-product/delete',
             method: 'POST',
             data: {
+                productId: productId,
                 orderId: orderId,
-                productId: productId
+                quantity:quantity
             },
             success: (response) => {
                 console.log('Response:', response);
       if (response.message === 'Order deleted successfully') {
-
-        window.location.href = '/orders';
+        swal("Product deleted!", "order deleted successfully.", "success", {
+                    button: "Go to Orders",
+                }).then((value) => {
+                    if (value) {
+                        window.location.reload='/orders';
+                    }
+                });
       } else {
-        alert('Product deleted from order successfully');
-        window.location.reload(); 
+        swal("Product deleted!", "Product deleted from order successfully.", "success", {
+                    button: "ok",
+                }).then((value) => {
+                    if (value) {
+                        window.location.reload();
+                    }
+                });
       }
     },
     error: (error) => {

@@ -1,5 +1,13 @@
 <%- include('../layouts/user/header.ejs') %>
-
+<style>
+  .form-control{
+    color: white;
+    font-size: large;
+  }
+  .error{
+    color: red;
+  }
+</style>
 <!-- Start Hero Section -->
 <div class="hero">
   <div class="container">
@@ -30,7 +38,7 @@
                 style="background: transparent"
                 minlength="6"
               />
-              <div id="messageid"></div>
+              <div id="messageid" class="error"></div>
             </div>
             <div class="form-group">
               <label style="color: white">Username</label><br />
@@ -136,7 +144,7 @@
 <script>
 function validationForm(){
   let nameFirst = document.getElementById('name');
-  let letters = /^[A-Za-z]+$/;
+  let letters = /^[A-Za-z]+(\s[A-Za-z]+)*$/;
   let message = document.getElementById('messageid');
   if(nameFirst.value.trim()===''){
     message.innerText = '';

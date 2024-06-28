@@ -19,14 +19,17 @@
           <form action="" method="post">
             <div class="form-group">
               <label style="color: white">Enter your OTP</label><br />
-              <input
-                type="text"
-                class="form-control"
-                name="otp"
-                style="background: transparent"
-              />
-              <div>Time left = <span id="timerDisplay"></span></div>
-              <p id="timer"></p>
+              <div id="otp-inputs">
+                <input type="text" class="otp-input" maxlength="1" />
+                <input type="text" class="otp-input" maxlength="1" />
+                <input type="text" class="otp-input" maxlength="1" />
+                <input type="text" class="otp-input" maxlength="1" />
+                <input type="text" class="otp-input" maxlength="1" />
+                <input type="text" class="otp-input" maxlength="1" />
+              </div>
+              <input type="hidden" name="otp" id="otp" />
+              <div id="timer" style="font-size: 2em;
+      color:white;">60</div>
               <input type="hidden" name="user_id" value="<%= user_id %>" />
             </div>
             <div class="col">
@@ -52,7 +55,7 @@
               <p>Don't have an account please <a href="/users">Register</a></p>
             </div>
             <% if (typeof message !== 'undefined') { %>
-            <p><%= message %> <a href="/login">login</a> now</p>
+            <p style="color: white; font-weight:bold;"><%= message %> <a href="/login">login</a> now</p>
             <% } %>
           </form>
         </div>
@@ -69,8 +72,8 @@
       
     setTimeout(function(){
       resendBtn.style.display ='block';
-      console.log("resend button work after three second")
-    },180000)
+      console.log("resend button work after one minut")
+    },60000)
     }else{
       console.error('resend button has some error')
     }
@@ -118,36 +121,42 @@
   setTimeout(async() => {
     const userId = document.querySelector('#user_id').value;
     await resendOtp(userId);
-  }, 5 * 60 * 1000);
+  }, 1 * 60 * 1000);
   
   //timer
-  let timerOn = true;
-  
-  function timer(remaining) {
-    var m = Math.floor(remaining / 60);
-    var s = remaining % 60;
-    
-    m = m < 10 ? '0' + m : m;
-    s = s < 10 ? '0' + s : s;
-    document.getElementById('timerDisplay').innerHTML = m + ':' + s;
-    remaining -= 1;
-    
-    if(remaining >= 0 && timerOn) {
-      setTimeout(function() {
-          timer(remaining);
-      }, 1000);
-      return;
+  let timeLeft = 60; // 1 minute (60 seconds)
+
+    // Function to update the timer
+    function updateTimer() {
+      const timerElement = document.getElementById('timer');
+      timerElement.textContent = timeLeft;
+      
+      if (timeLeft > 0) {
+        timeLeft--;
+        setTimeout(updateTimer, 1000); // Call updateTimer every 1 second
+      } else {
+        timerElement.textContent = 'Time is up!';
+      }
     }
-  
-    if(!timerOn) {
-      // Do validate stuff here
-      return;
-    }
-    
-    // Do timeout stuff here
-    alert('Timeout for otp');
-  }
-  
-  timer(180);
+
+    // Start the timer
+    updateTimer();
+    document.addEventListener("DOMContentLoaded", () => {
+    const inputs = document.querySelectorAll('.otp-input');
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', () => {
+        if (input.value.length > 0 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && input.value.length === 0 && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+  });
 </script>
 <%- include('../layouts/user/footerlogin.ejs') %>

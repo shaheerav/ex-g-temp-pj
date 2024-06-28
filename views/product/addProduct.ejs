@@ -127,8 +127,8 @@
         </nav>
         <!-- Navbar End -->
 <body>
-    <div class="row">
-        <div class="container col-md-8 bg-light">
+    <div class="row m-3">
+        <div class="container col-md-12 bg-light">
             <h1 class="mb-4">Add Product</h1>
 
             <!-- Form for adding a product -->
@@ -151,13 +151,32 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label">Color</label>
+                    <select name="color">
+                        <option value="Blue">Blue</option>
+                        <option value="Green">Green</option>
+                        <option value="Red">Red</option>
+                        <option value="Yellow">Yellow</option>
+                        <option value="Orange">Orange</option>
+                        <option value="Pink">Pink</option>
+                        <option value="Purple">Purple</option>
+                        <option value="Brown">Brown</option>
+                        <option value="Magenta">Magenta</option>
+                        <option value="Violet">Violet</option>
+                        <option value="White">White</option>
+                        <option value="Black">Black</option>
+                    </select>
+                    <div class="error" id="color-error"></div>
+                </div>
+
+                <div class="mb-3">
                     <label for="description" class="form-label">Description:</label>
                     <textarea class="form-control" id="description" name="description" required></textarea>
                     <div class="error" id="description-error"></div>
                 </div>
 
 
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label class="form-label" for="category">Category</label>
                     <select id="category" name="category" class="form-control" required>
                         <option value="">Select Category</option>
@@ -168,9 +187,10 @@
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Size</label>
-                    <select name="size" class="form-control"  required>
+                <div id="sizes-container" class="mb-3">
+                    <div class="size-entry mb-3">
+                    <label for="size">Size:</label>
+                    <select name="size[0][size]">
                         <option value="XS">XS</option>
                         <option value="S">S</option>
                         <option value="M">M</option>
@@ -178,20 +198,19 @@
                         <option value="XL">XL</option>
                         <option value="XXL">XXL</option>
                     </select>
+
+                    <label for="stock">Stock:</label>
+                    <input type="number" name="size[0][stock]" min="0" required>
+                    </div>
                 </div>
-                
+
+                <button type="button" onclick="addSize()">Add another size</button>
 
 
                 <div class="mb-3">
                     <label for="price" class="form-label">Price:</label>
                     <input type="number" class="form-control" id="price" name="price" value="0" required>
                     <div class="error" id="price-error"></div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="stock" class="form-label">Stock:</label>
-                    <input type="number" class="form-control" id="stock" name="stock" value="0" required>
-                    <div class="error" id="stock-error"></div>
                 </div>
                 <div class="image-upload-container">
         <input type="file" class="input-image" name="images[]" accept="image/*" multiple>
@@ -201,7 +220,7 @@
         </div>
     </div>
     <br>
-    <button type="submit" class="btn crop-button">ADD PRODUCT</button>
+    <button type="submit" class="btn crop-button" style="margin-left: -10px;">ADD PRODUCT</button>
 
             </form>
         </div>
@@ -229,6 +248,31 @@
 <script src="/admin/js/main.js"></script>
 <script src="/javascripts/product.js"></script>
     <script>
+        //********adding different size*************
+        let sizeIndex = 1;
+
+  function addSize() {
+    const container = document.getElementById('sizes-container');
+    const newSizeEntry = document.createElement('div');
+    newSizeEntry.classList.add('size-entry');
+    newSizeEntry.innerHTML = `
+      <label for="size">Size:</label>
+      <select name="size[${sizeIndex}][size]">
+        <option value="XS">XS</option>
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
+      </select>
+
+      <label for="stock">Stock:</label>
+      <input type="number" name="size[${sizeIndex}][stock]" min="0" required>
+    `;
+    container.appendChild(newSizeEntry);
+    sizeIndex++;
+  };
+  //**************cropped image*********
         document.addEventListener('DOMContentLoaded', function () {
     var input = document.querySelector('.input-image');
     var previewContainer = document.querySelector('.image-preview-container');
@@ -348,17 +392,7 @@ function validateForm() {
                     isValid = false;
                 }
 
-                const stock = document.getElementById('stock').value.trim();
-                if (stock === '' || isNaN(stock) || parseInt(stock) < 0) {
-                    document.getElementById('stock-error').textContent = 'Please enter valid product stock';
-                    isValid = false;
-                }
 
-                const images = document.getElementById('images').files;
-                if (images.length === 0) {
-                    document.getElementById('images-error').textContent = 'Please select product image';
-                    isValid = false;
-                }
 
                 return isValid;
             }

@@ -16,6 +16,7 @@
     </div>
 </div>
 <!-- End Hero Section -->
+<%- include('../partials/breadcrumbs.ejs')  %>
 <div id="errorMessage" style="display: none; color: red; margin: 10px;"></div>
 
 <div class="untree_co-section before-footer-section">
@@ -35,32 +36,39 @@
                     </thead>
                     <tbody>
                         <% productList.forEach(product => { %>
-                        <tr class="product-row" data-product-id="<%= product._id %>">
-                            <td class="product-thumbnail">
-                                <% if (product.image && product.image.length > 0) { %>
-                                <img src="uploads/<%= product.image[0] %>" alt="Image" class="img-fluid">
-                                <% } else { %>
-                                <p>No image available</p>
-                                <% } %>
-                            </td>
-                            <td class="product-name">
-                                <h2 class="h5 text-black"><%= product.name %></h2>
-                            </td>
-                            <td class="product-price">
-                                <h2 class="h6 text-black"><i class="bi bi-currency-rupee"></i><%= product.price %></h2>
-                            </td>
-                            <td>
-                                <button class="cart-item-count mr-3 decrease-quantity" onclick="changeQuantity('<%= product._id %>', '<%= product.productId %>', -1)">-</button>
-                                <span id="quantityNumber_<%= product.productId %>"><%= product.quantity %></span>
-                                <button class="cart-item-count mr-3 increase-quantity" onclick="changeQuantity('<%= product._id %>', '<%= product.productId %>', 1)">+</button>
-                                <div class="error text-danger" id="quantity-error"></div>
-                            </td>
-                            <td class="product-total"><i class="bi bi-currency-rupee"></i><%= product.price * product.quantity %></td>
-                            <td>
-                                <button type="button" class="btn btn-black btn-sm remove-product-btn" onclick="deleteProduct('<%= product.productId %>')"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                        <% }) %>
+                            <tr class="product-row" data-product-id="<%= product._id %>">
+                                <td class="product-thumbnail">
+                                    <% if (product.image && product.image.length > 0) { %>
+                                    <img src="uploads/<%= product.image[0] %>" alt="Image" class="img-fluid">
+                                    <% } else { %>
+                                    <p>No image available</p>
+                                    <% } %>
+                                </td>
+                                <td class="product-name">
+                                    <h2 class="h5 text-black"><%= product.name %></h2>
+                                    <h6 class="h5 text-black"><%= product.size %></h6>
+                                </td>
+                                <td class="product-price">
+                                    <h2 class="h6 text-black" id="productPrice_<%= product._id %>">
+                                        <i class="bi bi-currency-rupee"></i><%= product.price %>
+                                    </h2>
+                                </td>
+                                <td>
+                                    <button class="cart-item-count mr-3 decrease-quantity" onclick="changeQuantity('<%= product._id %>', '<%= product.productId %>', -1,'<%= product.size %>', '<%= product.stock %>')">-</button>
+                                    <span id="quantityNumber_<%= product.productId %>"><%= product.quantity %></span>
+                                    <button class="cart-item-count mr-3 increase-quantity" onclick="changeQuantity('<%= product._id %>', '<%= product.productId %>', 1,'<%= product.size %>', '<%= product.stock %>')">+</button>
+                                    <div class="error text-danger" id="quantity-error"></div>
+                                </td>
+                                <td class="product-total" id="productTotal_<%= product._id %>">
+                                    <i class="bi bi-currency-rupee"></i><%= product.price * product.quantity %>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-black btn-sm remove-product-btn" onclick="deleteProduct('<%= product.productId %>','<%= product.size %>')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <% }) %>
                         <tr>
                     </tbody>
                 </table>
@@ -241,55 +249,65 @@
         let errorMessageElement = document.getElementById('errorMessage');
         errorMessageElement.style.display = 'none';
     }
-    function changeQuantity(cartId, productId, count) {
-        console.log(`Cart ID: ${cartId}, Product ID: ${productId}, Count: ${count}`);
-        let quantityElement = document.getElementById(`quantityNumber_${productId}`);
-        let currentQuantity = parseInt(quantityElement.innerHTML);
-        let quantityError = document.getElementById('quantity-error')
-        hideErrorMessage();
-        if (currentQuantity + count <= 0) {
-            deleteProduct(productId);
-        } else {
-            $.ajax({
-                url: '/cart/updateQuantity',
-                method: 'POST',
-                data: {
-                    cart: cartId,
-                    product: productId,
-                    count: count
-                },
-                success: (response) => {
-                    console.log(response); 
+    function changeQuantity(cartId, productId, count, size, stock) {
+    console.log(`Cart ID: ${cartId}, Product ID: ${productId}, Count: ${count}`);
+    let quantityElement = document.getElementById(`quantityNumber_${productId}`);
+    let currentQuantity = parseInt(quantityElement.innerHTML);
+    let quantityError = document.getElementById('quantity-error');
+    hideErrorMessage();
+    if (currentQuantity + count <= 0) {
+        deleteProduct(productId, size);
+    } else {
+        $.ajax({
+            url: '/cart/updateQuantity',
+            method: 'POST',
+            data: {
+                cart: cartId,
+                product: productId,
+                count: count,
+                size: size,
+                stock: stock
+            },
+            success: (response) => {
+                console.log(response); // Debugging: Log the response
 
-                    if (response.success) {
-                        quantityElement.innerHTML = response.newQuantity;
-                        if (response.newTotalPrice !== undefined) {
-                            let totalPriceElement = document.getElementById('totalPrice');
-                            totalPriceElement.innerHTML = response.newTotalPrice;
-                        }
-                    } else {
-                        showErrorMessage(response.message);
-                    }
-                    if(response.newQuantity === 0){
-                        quantityElement.innerHTML = 'Out of Stock';
-                    }
-                },
-                error: (error) => {
-                    console.error('AJAX Error:', error);
-                    if(error){
-                        document.getElementById('quantity-error').textContent = 'stock over';
-                    }
+                if (response.success) {
+                    // Update the quantity
+                    quantityElement.innerHTML = response.newQuantity;
+
+                    // Update the total price for this product
+                    let productRow = document.querySelector(`.product-row[data-product-id="${productId}"]`);
+                    let totalElement = document.getElementById(`productTotal_${productId}`);
+                    totalElement.innerHTML = `<i class="bi bi-currency-rupee"></i>${response.newTotalPrice}`;
+
+                    // Update the cart totals
+                    document.querySelector('.subtotal-amount').innerHTML = `<i class="bi bi-currency-rupee"></i>${response.cartSubtotal}`;
+                    document.querySelector('.total-amount').innerHTML = `<i class="bi bi-currency-rupee"></i>${response.cartTotal}`;
+                } else {
+                    showErrorMessage(response.message);
                 }
-            });
-        }
+                if (response.newQuantity === 0) {
+                    quantityElement.innerHTML = 'Out of Stock';
+                }
+            },
+            error: (error) => {
+                console.error('AJAX Error:', error);
+                if (error) {
+                    quantityError.textContent = 'Stock over';
+                }
+            }
+        });
     }
+}
 
-    function deleteProduct(productId) {
+
+    function deleteProduct(productId,size) {
         $.ajax({
             url: '/cart/delete',
             method: 'POST',
             data: {
-                productId: productId
+                productId: productId,
+                size:size
             },
             success: (response) => {
                 if (response.success) {

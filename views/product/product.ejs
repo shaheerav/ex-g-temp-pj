@@ -12,9 +12,9 @@
             <th scope="col">Brand</th>
             <th scope="col">Description</th>
             <th scope="col">Category</th>
-            <th scope="col">Size</th>
+            <th scope="col">Size & stock</th>
             <th scope="col">Price</th>
-            <th scope="col">Stock</th>
+            <th scope="col">color</th>
             <th scope="col">Image</th>
           </tr>
         </thead>
@@ -28,14 +28,19 @@
                 <td><%= product[i].brand %></td>
                 <td><%= product[i].description %></td>
                 <td><%= product[i].category ? product[i].category.name : 'N/A' %></td>
-                <td><%= product[i].size %></td>
+                <td>
+                  <% product[i].size.forEach((size) => { %>
+                    <%= size.size %> (<%= size.stock %>)
+                  <% }) %>
+                </td>
                 <td><%= product[i].price %></td>
                 <td>
-                  <% if(product[i].stock === 0) { %>
-                    <span style="color: red;">Out of Stock</span>
-                  <% } else { %>
-                    <%= product[i].stock %>
-                  <% } %>
+                  <div style="display: inline-block; background-color: <%= product[i].color %>;
+                  width: 10px;
+                  height: 10px;
+                  border: 1px solid rgb(14, 15, 14);
+                  "></div>
+                    <%= product[i].color %>
                 </td>
                 <td><% if(product[i].image){ %>
                   <a href="/product/showImages?id=<%= product[i]._id %>"><img src="/uploads/<%= product[i].image[0] %>" style="width: 50px; height: 60px;" alt="product Image"></a>
