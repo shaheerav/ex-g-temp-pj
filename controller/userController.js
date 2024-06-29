@@ -722,7 +722,7 @@ const addToCart = async (req, res) => {
         totalAmount: {
           $sum: {
             $multiply: [
-              { $toDouble: '$products.price' }, // Convert price to double
+              { $toDouble: '$products.price' },
               '$products.quantity',
             ]
           }
@@ -904,10 +904,8 @@ const updateQuantity = async (req, res) => {
     let { cart, product, count, size, stock } = req.body;
     const user = req.session.user;
     count = parseInt(count);
-    console.log(cart, product, count, size, stock);
 
     const userCart = await Cart.findOne({ userId: user });
-    console.log('userCart', userCart);
 
     if (userCart && userCart.products) {
       const productInCart = userCart.products.find(p => p.productId.toString() === product);
@@ -929,13 +927,17 @@ const updateQuantity = async (req, res) => {
       productInCart.quantity = newQuantity;
       await userCart.save();
 
-      const newTotalPrice = productInCart.quantity * productInCart.price;
+      const newTotalPrice = productInCart.quantity * productDetails.price;
       const cartSubtotal = userCart.products.reduce((total, p) => total + p.quantity * p.price, 0);
+      const cartTotal = cartSubtotal; // Adjust if there are other costs like shipping or taxes
 
-      console.log('cart updated successfully');
       return res.status(200).json({
         success: true,
         message: "Cart updated successfully",
+        newQuantity,
+        newTotalPrice,
+        cartSubtotal,
+        cartTotal
       });
     } else {
       return res.status(404).json({ success: false, message: "User cart not found or cart has no products" });
@@ -945,6 +947,7 @@ const updateQuantity = async (req, res) => {
     return res.status(500).json({ success: false, message: "An error occurred while updating the cart" });
   }
 };
+
 
 
 
@@ -1115,6 +1118,8 @@ const checkoutLoad = async (req,res) =>{
     
     let productList = cartData[0].products.map(item => {
       const productDetail = cartData[0].productDetails.find(product => product._id.toString() === item.productId.toString());
+      const sizeObject = productDetail.size.find(sizeObj => sizeObj.size === item.size);
+
       return {
         _id: item._id,
         productId: productDetail._id,
@@ -1122,7 +1127,7 @@ const checkoutLoad = async (req,res) =>{
         price: item.price,
         name: productDetail.name,
         image: productDetail.image,
-        stock: productDetail.stock
+        stock :sizeObject.stock
       };
     });
     
@@ -1161,6 +1166,7 @@ const placeOrder = async (req, res) => {
     const productIds = userCart.products.map(product => ({
       productId: product.productId,
       quantity: product.quantity,
+      size :product.size
     }));
 
     // Save payment details
@@ -1629,77 +1635,101 @@ const returnProduct = async (req,res)=>{
 const productReturnOrder = async (req, res) => {
   console.log('Reached product return order handler');
   try {
-    const userId = req.session.user;
-    const { productId, orderId, quantity } = req.body;
+      const userId = req.session.user;
+      const { productId, orderId, quantity } = req.body;
 
-    if (!orderId) {
-      return res.status(400).json({ success: false, message: 'Order not available' });
-    }
-
-    if (!productId) {
-      return res.status(400).json({ success: false, message: 'Product not available' });
-    }
-
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
-
-    const productExists = order.products.some(product => product.productId.toString() === productId);
-    if (!productExists) {
-      return res.status(404).json({ success: false, message: 'Product not found in the order' });
-    }
-
-    const product = await Product.findById(productId);
-    const reason = 'Product not needed';
-
-    let wallet = await Wallet.findOne({ userId: userId });
-
-    if (order.products.length === 1) {
-      // If this is the only product in the order
-      await Order.findByIdAndUpdate(orderId, { orderStatus: reason, status: 'Return' }, { new: true });
-
-      if (!wallet) {
-        // Create a new wallet if it doesn't exist
-        wallet = new Wallet({
-          userId: userId,
-          amount: product.price
-        });
-      } else {
-        // Add to the existing wallet amount
-        wallet.amount += product.price;
+      if (!orderId) {
+          return res.status(400).json({ success: false, message: 'Order not available' });
       }
 
-      await wallet.save();
-      return res.json({ success: true, message: 'Order deleted successfully' });
-    } else {
-      // If there are multiple products in the order
-      const productObject = order.products.find(obj => obj.productId.toString() === productId);
-
-      if (productObject) {
-        productObject.productStatus = 'Cancelled';
-        await order.save();
-
-        if (!wallet) {
-          wallet = new Wallet({
-            userId: userId,
-            amount: product.price
-          });
-        } else {
-          wallet.amount += product.price;
-        }
-
-        await wallet.save();
-        return res.json({ success: true, message: 'Product deleted from order successfully' });
-      } else {
-        return res.status(400).json({ success: false, message: 'Product not available in the order' });
+      if (!productId) {
+          return res.status(400).json({ success: false, message: 'Product not available' });
       }
-    }
+
+      const order = await Order.findById(orderId);
+      if (!order) {
+          return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+
+      const productExists = order.products.some(product => product.productId.toString() === productId);
+      if (!productExists) {
+          return res.status(404).json({ success: false, message: 'Product not found in the order' });
+      }
+
+      const product = await Product.findById(productId);
+      const reason = 'Product not needed';
+
+      let wallet = await Wallet.findOne({ userId: userId });
+
+      if (order.products.length === 1) {
+          // If this is the only product in the order
+          await Order.findByIdAndUpdate(orderId, { orderStatus: reason, status: 'Return' }, { new: true });
+
+          for (const item of order.products) {
+              const product = await Product.findById(item.productId);
+              if (product) {
+                  const sizeObj = product.size.find(size => size.size === item.size);
+                  if (sizeObj) {
+                      await Product.findOneAndUpdate(
+                          { _id: item.productId, 'size.size': item.size },
+                          { $inc: { 'size.$.stock': item.quantity } }
+                      );
+                  }
+              }
+          }
+
+          if (!wallet) {
+              // Create a new wallet if it doesn't exist
+              wallet = new Wallet({
+                  userId: userId,
+                  amount: product.price * quantity
+              });
+          } else {
+              // Add to the existing wallet amount
+              wallet.amount += product.price * quantity;
+          }
+
+          await wallet.save();
+          return res.json({ success: true, message: 'Order deleted successfully' });
+      } else {
+          
+          const productObject = order.products.find(obj => obj.productId.toString() === productId);
+
+          if (productObject) {
+              productObject.productStatus = 'Cancelled';
+              await order.save();
+
+              if (product) {
+                  const sizeObj = product.size.find(size => size.size === productObject.size);
+                  if (sizeObj) {
+                      await Product.findOneAndUpdate(
+                          { _id: productId, 'size.size': productObject.size },
+                          { $inc: { 'size.$.stock': productObject.quantity } }
+                      );
+                  }
+              }
+
+              if (!wallet) {
+                  wallet = new Wallet({
+                      userId: userId,
+                      amount: product.price * quantity
+                  });
+              } else {
+                  wallet.amount += product.price * quantity;
+              }
+
+              await wallet.save();
+              return res.json({ success: true, message: 'Product deleted from order successfully' });
+          } else {
+              return res.status(400).json({ success: false, message: 'Product not available in the order' });
+          }
+      }
   } catch (error) {
-    console.error('Error:', error.message);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+      console.error('Error:', error.message);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
 
 module.exports = {
   registration,

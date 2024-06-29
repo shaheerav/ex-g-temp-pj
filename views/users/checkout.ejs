@@ -156,6 +156,7 @@
 		                      <td name="productName"><%= product.name  %> <strong class="mx-2">x</strong> <%= product.quantity %></td>
 		                      <td><i class="bi bi-currency-rupee"></i><%= product.price*product.quantity  %></td>
 							  <input type="hidden" name="productIds" value="<%=product._id  %>">
+							  <input type="hidden" name=" productStock" id="productStock" value="<%= product.stock %>">
 		                    </tr>
 		                    <tr>
 								<% }) %>

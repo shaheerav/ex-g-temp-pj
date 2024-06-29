@@ -128,7 +128,7 @@ const logout = async (req,res)=>{
     }
 };
 
-  const orderList = async (req,res)=>{
+const orderList = async (req,res)=>{
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
@@ -182,7 +182,6 @@ const logout = async (req,res)=>{
             { $skip: skip },
             { $limit: limit }
         ]);
-         console.log(orders,'orderlist')
         res.render('orderList',{admin:adminData,order:orders,currentPage: page,
             totalPages: Math.ceil(orders.length / limit)});
     }catch(error){
@@ -219,12 +218,20 @@ const updateStatus = async(req,res)=>{
         const {status,orderId}= req.body;
         
         const order = await Order.findByIdAndUpdate(orderId,{$set:{status:status}},{new:true});
+        
 
         if(status==='Delivered'){    
             for (const item of order.products) {
-                await Product.findByIdAndUpdate(item.productId, {
-                    $inc: { stock: -item.quantity }
-                });
+                const product = await Product.findById(item.productId);
+                if(product){
+                    const sizeObj = product .size.find(size =>size.size === item.size);
+                    if(sizeObj){
+                        await Product.findOneAndUpdate(
+                            {_id:item.productId,'size.size':item.size},
+                        {$inc:{'size.$.stock':-item.quantity}}
+                    );
+                    }
+                }
             }
         }
         res.json({success:true})
