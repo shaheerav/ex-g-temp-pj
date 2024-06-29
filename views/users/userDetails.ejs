@@ -14,82 +14,142 @@
   </div>
 <%- include('../partials/breadcrumbs.ejs')  %>
 
-  <div class="card text-center">
-    <div class="card-header">
-      <ul class="nav nav-tabs card-header-tabs">
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="true" href="/userDetails">My profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="true" href="/showAddress?id=<%= isLoggedIn._id %>">Manage Address</a>
-          </li>
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="true" href="/orders">My orders</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-
-<div class="container m-5">
-    <div class="header" style="display: flex;
-    align-items: center;
+<style>
+  .profile-header {
+    position: relative;
+    background: #f5f5f5;
+    padding: 20px 0;
+  }
+  .profile-header .profile-img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  .profile-header .profile-img img {
+    width: 100%;
+    height: 100%;
+  }
+  .profile-header .profile-nav {
+    margin-top: 90px;
+  }
+  .profile-header .profile-nav .nav-item {
+    margin-right: 20px;
+  }
+  .profile-content {
+    margin-top: 20px;
+  }
+  .profile-content .card {
+    margin-bottom: 20px;
+  }
+  .profile-content .card-header {
+    background: #007bff;
+    color: #fff;
+  }
+  .profile-content .list-group-item {
+    display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;">
-        <img src="/images/profile.png" alt="Profile Picture" style="border-radius: 50%;
-        width: 80px;
-        height: 80px;">
-        <div>
-            <h1><%= isLoggedIn.name  %></h1>
-            <button style="padding: 10px 20px;
+  }
+</style>
+<div class="container">
+  <div class="profile-header text-center">
+    <h2><%= isLoggedIn.name %></h2>
+    <p class="lead"><%= isLoggedIn.email %></p>
+    <button style="padding: 10px 20px;
             background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;"><a href="/editProfile?id=<%= isLoggedIn._id %>"style="color:white;" class="text-start">Edit Profile</a></button>
-        </div>
-    </div>
-    <div class="content" style="display: flex;
-            margin-top: 20px;">
-        <div class="sidebar"style="width: 30%;
-        padding-right: 20px;
-        border-right: 1px solid #ddd;">
-            <div class="section" style="margin-bottom: 20px;">
-                <h2 style="
-                margin-bottom: 10px;
-                border-bottom: 1px solid #ddd;
-                padding-bottom: 5px;">Personal Info</h2>
-                <h6>Name: <%= isLoggedIn.name %></h6>
-                <h6>Username: <%= isLoggedIn.username  %></h6>
-                <h6>Email: <%= isLoggedIn.email %></h6>
-                <h6>Phone: <%= isLoggedIn.mobile %></h6>
-                <button ><a href="/changePassword?id=<%= isLoggedIn._id %>"style="color:black;" class="text-start">Change Password</a></button>
-            </div>
-            <div class="section">
-                <h2 style="font-size: 1.2em;
-                margin-bottom: 10px;
-                border-bottom: 1px solid #ddd;
-                padding-bottom: 5px;">Payment Methods</h2>
-                <p>Card 1: **** **** **** 1234</p>
-                <p>Card 2: **** **** **** 5678</p>
-                <button>Add New</button>
-            </div>
-        </div>
-        <div class="main" style="width: 70%;
-            padding-left: 20px;">
-            <div class="section" style="margin-bottom: 20px;">
-                <h2 style="font-size: 1.2em;
-                margin-bottom: 10px;
-                border-bottom: 1px solid #ddd;
-                padding-bottom: 5px;">Wishlist</h2>
-                <p>Item 1 <button>Remove</button></p>
-                <p>Item 2 <button>Remove</button></p>
-                <button>View All Wishlist</button>
-            </div>
-        </div>
-    </div>
-</div>
+    <ul class="nav nav-pills profile-nav justify-content-center">
+      <li class="nav-item">
+        <a class="nav-link active" href="/userDetails" >Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/orders" >Orders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#wishlist" data-toggle="tab">Wishlist</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/showAddress?id=<%= isLoggedIn._id %>" >Address</a>
+      </li>
+    </ul>
+  </div>
 
+  <div class="tab-content profile-content">
+    <div class="tab-pane fade show active" id="profile">
+      <div class="card">
+        <div class="card-header">Profile Information</div>
+        <div class="card-body">
+          <p><strong>Name:</strong> <%= isLoggedIn.name %></p>
+          <p><strong>Email:</strong> <%= isLoggedIn.email %></p>
+          <p><strong>Phone:</strong> <%= isLoggedIn.mobile %></p>
+          <p><strong>username:</strong><%= isLoggedIn.username  %> </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="wishlist">
+      <div class="card">
+        <div class="card-header">My Wishlist</div>
+        <div class="card-body">
+          <div class="row">
+            <% wishlistItems.forEach(function(item) { %>
+            <div class="col-12 col-md-4 col-lg-3 mb-5 wishlist-item" data-product-id="<%= item.productId %>">
+              
+              <a class="product-item" onclick="showDetails('<%= item.productId %>')">
+                <img src="/uploads/<%= item.image[0] %>" img-fluid product-thumbnail style="height: 300px; width: 250px" />
+                <h3 class="product-title"><%= item.name%></h3><p><%= item.id %></p>
+                <strong class="product-price">
+                  <i class="bi bi-currency-rupee"></i><%= item.price%>
+                </strong>
+                <span class="icon-cross">
+                  <img src="images/cross.svg" class="img-fluid" />
+                </span>
+              </a>
+              <a href="#" onclick="addToWishlist('<%= item.productId%>')" id="wishlistIcon_123">remove</a>
+            </div>
+            <% }) %>
+            <!-- Add more products as needed -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function addToWishlist(productId){
+    fetch('/removeFromWishlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+              const item = document.querySelector(`.wishlist-item[data-product-id="${productId}"]`);
+                if (item) {
+                    item.remove();
+                }
+                swal("Removed", "product removed from wishlist!", "success", {
+      button: "ok",});
+            } else {
+                swal('Failed','Failed to remove product from wishlist.','error',{
+                  button: "ok"});
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            swal('error','An error occurred while removing product from wishlist.','error',{button:'ok'});
+        });
+  }
+</script>
 <%- include ('../layouts/user/footer.ejs') %>
 
 
