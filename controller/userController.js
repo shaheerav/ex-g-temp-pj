@@ -652,8 +652,14 @@ const editAddress = async (req,res)=>{
     const isLoggedIn = req.session.user;
     const id = req.query.id;
     const address = await Address.findById({_id:id});
+    const breadcrumbs = [
+      {name:'Home',url:'/'},
+      {name:'Profile',url:'/userDetails'},
+      {name:'Address',url:'/showAddress'},
+      {name:'EditAddress',url:'/editAddress'}
+    ]
     console.log('address',address);
-    res.render('editAddress',{isLoggedIn:isLoggedIn,user:address,count:count});
+    res.render('editAddress',{isLoggedIn:isLoggedIn,user:address,count:count,breadcrumbs});
   }catch(error){
     console.error(error.message);
   }
@@ -1154,11 +1160,10 @@ const placeOrder = async (req, res) => {
     const { addressId, paymentMethod, totalAmount, productName } = req.body;
     console.log(addressId, paymentMethod, totalAmount, productName, 'address and payment method');
 
-    // Validate addressId
-    if (!mongoose.Types.ObjectId.isValid(addressId)) {
-      throw new Error('Invalid address ID format');
-    }
-
+    const address = await Address.findById(addressId);
+    if(!address){
+      return res.status(400).send('address not valid')
+    } 
     // Validate user ID from session
     const userId = req.session.user;
     if (!mongoose.Types.ObjectId.isValid(userId._id)) {
@@ -1170,6 +1175,7 @@ const placeOrder = async (req, res) => {
     if (!userCart || !userCart.products || userCart.products.length === 0) {
       throw new Error('User cart or products are undefined or empty');
     }
+
 
     // Prepare product IDs and quantities for the order
     const productIds = userCart.products.map(product => ({
@@ -1224,12 +1230,12 @@ const placeOrder = async (req, res) => {
             success: true,
             message: 'Razorpay order created successfully',
             order_id: order.id,
-            amount: options.amount / 100, // Convert back to rupees
+            amount: options.amount / 100, 
             key_id: RAZORPAY_ID_KEY,
             product_name: productName,
-            contact: '9495026857', // Example contact info
-            name: 'shaheera', // Example name
-            email: 'vshaheera8@gmail.com', // Example email
+            contact: address.mobile,
+            name: address.fullname,
+            email: address.email
           });
           
         } else {
@@ -1735,9 +1741,32 @@ const productReturnOrder = async (req, res) => {
       }
   } catch (error) {
       console.error('Error:', error.message);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
+      return res.status(500).json({ success: false, message: ' server error' });
   }
 };
+const validateCoupon = async (req, res) => {
+  try {
+    const { couponCode } = req.body;
+    console.log(couponCode, 'code');
+    const coupon = await Coupon.findOne({ code: { $regex: new RegExp(couponCode, "i") } });
+
+    if (!coupon) {
+      return res.status(404).json({ error: 'Coupon not found.' });
+    }
+
+    if (new Date() > new Date(coupon.expiryDate)) {
+      return res.status(400).json({ error: 'Coupon has expired.' });
+    }
+
+    const discountAmount = coupon.maxDiscount;
+    console.log(coupon.maxDiscount, 'coupon code');
+    res.json({ valid: true, discountAmount });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Server error');
+  }
+};
+
 
 
 module.exports = {
@@ -1787,5 +1816,6 @@ module.exports = {
   changingPassword,
   reviweProduct,
   returnProduct,
-  productReturnOrder
+  productReturnOrder,
+  validateCoupon
 };

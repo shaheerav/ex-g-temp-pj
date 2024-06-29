@@ -74,5 +74,6 @@ userRouts.get('/allProduct',controller.allProduct);
 userRouts.get('/searchProduct',controller.searchProudcts);
 userRouts.get('/reviwe:id',controller.reviweProduct);
 userRouts.get('/return:id',controller.returnProduct);
-userRouts.post('/cancel-product/:id',controller.productReturnOrder)
+userRouts.post('/cancel-product/:id',controller.productReturnOrder);
+userRouts.post('/validateCoupon',controller.validateCoupon);
 module.exports = userRouts;
