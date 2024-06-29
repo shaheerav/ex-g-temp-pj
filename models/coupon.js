@@ -22,7 +22,7 @@ const couponSchema = new mongoose.Schema({
     },
     expirityDate:{
         type:Date,
-        default:Date.now,
+        require:true,
     }
 
 },{timestamps:true});

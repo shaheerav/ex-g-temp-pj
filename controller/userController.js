@@ -1,5 +1,6 @@
 const { json } = require("body-parser");
 const mongoose = require("mongoose");
+const moment = require('moment')
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -15,6 +16,7 @@ const Order = require("../models/order");
 const Cart = require('../models/cart');
 const Payment = require('../models/payment');
 const Wallet = require('../models/wallet');
+const Coupon = require('../models/coupon');
 const {getOderDetails} = require('../config/aggregation');
 const { session, use } = require("passport");
 const { getTestError } = require("razorpay/dist/utils/razorpay-utils");
@@ -62,11 +64,18 @@ const homepage = async (req, res) => {
 
       console.log(isLoggedIn, "is login");
     }
+    const coupon = await Coupon.find();
+    const formattedCoupons = coupon.map(coupon => {
+      return {
+          ...coupon._doc, 
+          formattedExpirityDate: moment(coupon.expirityDate).format('MMMM Do YYYY')
+      };
+  });
     const breadcrumbs = [
       { name: 'Home', url: '/' }
     ];
 
-    res.render("index", { productsByCategory, isLoggedIn, count,breadcrumbs });
+    res.render("index", { productsByCategory, isLoggedIn, count,breadcrumbs,coupon:formattedCoupons });
   } catch (error) {
     console.error(error.message);
   }
