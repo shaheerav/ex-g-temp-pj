@@ -168,17 +168,27 @@
                       <% }); %>
                     </select>
                   </div>
+                  <div id="sizes-container" class="mb-3">
+                    <% product.size.forEach((size, index) => { %>
+                    <div class="size-entry mb-3">
+                        <label for="size">Size:</label>
+                        <select name="size[<%= index %>][size]">
+                            <option value="XS" <%= size.size === 'XS' ? 'selected' : '' %>>XS</option>
+                            <option value="S" <%= size.size === 'S' ? 'selected' : '' %>>S</option>
+                            <option value="M" <%= size.size === 'M' ? 'selected' : '' %>>M</option>
+                            <option value="L" <%= size.size === 'L' ? 'selected' : '' %>>L</option>
+                            <option value="XL" <%= size.size === 'XL' ? 'selected' : '' %>>XL</option>
+                            <option value="XXL" <%= size.size === 'XXL' ? 'selected' : '' %>>XXL</option>
+                        </select>
+                
+                        <label for="stock">Stock:</label>
+                        <input type="number" name="size[<%= index %>][stock]" min="0" value="<%= size.stock %>" required>
+                    </div>
+                    <% }) %>
+                </div>
+                
+                <button type="button" onclick="addSize()">Add another size</button>
 
-                  <div class="mb-3">
-                    <label class="form-label">Size</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="Size"
-                      required
-                      value=" <%= product.size %>"
-                    />
-                  </div>
                 
                   
                 <div class="mb-3">
@@ -187,11 +197,6 @@
                     <div class="error" id="price-error"></div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="stock" class="form-label">Stock:</label>
-                    <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>" required>
-                    <div class="error" id="stock-error"></div>
-                </div>
 
                 <div class="mb-3">
                     <label class="form-label">Existing Images</label>
@@ -236,6 +241,29 @@
             <script src="/admin/js/main.js"></script>
             <script src="/javascripts/product.js"></script>
                 <script>
+                    let sizeIndex = 1;
+
+function addSize() {
+  const container = document.getElementById('sizes-container');
+  const newSizeEntry = document.createElement('div');
+  newSizeEntry.classList.add('size-entry');
+  newSizeEntry.innerHTML = `
+    <label for="size">Size:</label>
+    <select name="size[${sizeIndex}][size]">
+      <option value="XS">XS</option>
+      <option value="S">S</option>
+      <option value="M">M</option>
+      <option value="L">L</option>
+      <option value="XL">XL</option>
+      <option value="XXL">XXL</option>
+    </select>
+
+    <label for="stock">Stock:</label>
+    <input type="number" name="size[${sizeIndex}][stock]" min="0" required>
+  `;
+  container.appendChild(newSizeEntry);
+  sizeIndex++;
+};
                     document.addEventListener('DOMContentLoaded', function () {
                 var input = document.querySelector('.input-image');
                 var previewContainer = document.querySelector('.image-preview-container');

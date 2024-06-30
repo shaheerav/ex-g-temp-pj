@@ -948,9 +948,6 @@ const updateQuantity = async (req, res) => {
   }
 };
 
-
-
-
 const showOrder = async(req,res)=>{
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) ||5;
@@ -960,6 +957,10 @@ const showOrder = async(req,res)=>{
     if (!isLoggedIn) {
       return res.status(401).send('User not logged in');
     }
+    const breadcrumbs = [
+      {name:'Home',url:'/'},
+      {name:'Orders',url:'/orders'}
+    ]
 
     const userId = isLoggedIn._id;
     console.log(userId, 'user');
@@ -1024,7 +1025,6 @@ const showOrder = async(req,res)=>{
     
     const cart = await Cart.find({ userId: userId });
     let count = 0;
-    if (orderDetails.length > 0) {
       const orderDetailedList = orderDetails.map(order => {
         const productList = order.products.map(product => ({
           productName: product.name,
@@ -1057,15 +1057,9 @@ const showOrder = async(req,res)=>{
       const totalOrder = totalOrdersCount;
       console.log(totalOrder);
       const totalPages = Math.ceil(totalOrder/limit);
-      const breadcrumbs = [
-        {name:'Home',url:'/'},
-        {name:'Orders',url:'/orders'}
-      ]
+      
 
       res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: filteredOrderForm,totalPages: totalPages,currentPage:page,breadcrumbs});
-    } else {
-      res.render('order', { isLoggedIn: isLoggedIn, count: count, orderForm: '',totalpages:0 });
-    }
 
   } catch (error) {
     console.error('Error:', error);

@@ -214,6 +214,7 @@
                 </div>
                 <div class="image-upload-container">
         <input type="file" class="input-image" name="images[]" accept="image/*" multiple>
+        <div class="error" id="image-error"></div>
         <br><br>
         <div style="margin-left: 300px;">
         <div class="image-preview-container" style=" width: 300px;height: 300px;"></div>
@@ -273,7 +274,7 @@
     sizeIndex++;
   };
   //**************cropped image*********
-        document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     var input = document.querySelector('.input-image');
     var previewContainer = document.querySelector('.image-preview-container');
     var croppers = [];
@@ -389,6 +390,11 @@ function validateForm() {
                 const price = document.getElementById('price').value.trim();
                 if (price === '' || isNaN(price) || parseFloat(price) <= 0) {
                     document.getElementById('price-error').textContent = 'Please enter valid product price';
+                    isValid = false;
+                }
+                const images = document.querySelector('.input-image').files;
+                if (images.length === 0) {
+                    document.getElementById('image-error').textContent = 'Please upload at least one image';
                     isValid = false;
                 }
 

@@ -134,6 +134,7 @@ const orderList = async (req,res)=>{
     const skip = (page - 1) * limit;
     try{
         const adminData = await User.findById({_id:req.session.User_id});
+        const orderCount = await Order.countDocuments();
         const orders = await Order.aggregate([
             {$unwind:'$products'},
             {$lookup:{
@@ -182,8 +183,10 @@ const orderList = async (req,res)=>{
             { $skip: skip },
             { $limit: limit }
         ]);
+        const totalPages= Math.ceil(orderCount/limit);
+        console.log(orderCount,totalPages)
         res.render('orderList',{admin:adminData,order:orders,currentPage: page,
-            totalPages: Math.ceil(orders.length / limit)});
+            totalPages});
     }catch(error){
         console.error(error.message)
     }

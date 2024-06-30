@@ -142,7 +142,7 @@ const updateProduct = async (req,res)=>{
     try{
 
         const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-        const {id, name, brand, description, category, size, price, stock } = req.body;
+        const {id, name, brand, description, category, size, price} = req.body;
         const user = await User.findById(req.session.User_id);
         const categories = await Category.find();
         const product = await Product.findById(id);
@@ -164,12 +164,21 @@ const updateProduct = async (req,res)=>{
                 brand,
                 description,
                 category,
-                size,
                 price,
-                stock,
                 image: finalImage,
             }
         }, { new: true });
+        if (size && size.length > 0) {
+            updatedProduct.size = []; // Clear existing sizes and update with new ones
+            size.forEach((entry) => {
+              updatedProduct.size.push({
+                size: entry.size,
+                stock: entry.stock
+              });
+            });
+          }
+      
+          await updatedProduct.save();
 
         console.log(updatedProduct, "updating done");
 if(!updateProduct){
