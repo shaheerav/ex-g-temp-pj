@@ -1,0 +1,40 @@
+<%- include('../layouts/admin/header.ejs') %>
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-lg-10">
+            <div class="bg-light rounded h-100 p-4">
+                <h6 class="mb-4">Basic Form</h6>
+                <form action="" method="post">
+                    <div class="mb-3">
+                        <label for="code" class="form-label">Coupon Code</label>
+                        <input type="text" class="form-control" id="code" name="code">
+                    </div>
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Coupon Type</label>
+                        <input type="text" class="form-control" id="type" name="type">
+                    </div>
+                    <div class="mb-3">
+                        <label for="discount" class="form-label">Max Discount</label>
+                        <input type="number" class="form-control" id="discount" name="discount">
+                    </div>
+                    <div class="mb-3">
+                        <label for="discription" class="form-label">Discription</label>
+                        <input type="text" class="form-control" id="discription" name="discription">
+                    </div>
+                    <div class="mb-3">
+                        <label for="Limit" class="form-label">Limit</label>
+                        <input type="number" class="form-control" id="limit" name="limit">
+                    </div>
+                    <div class="mb-3">
+                        <label for="expired" class="form-label">Expirity Date</label>
+                        <input type="date" class="form-control" id="date" name="date">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Add Coupon</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Form End -->
+<%- include('../layouts/admin/footer.ejs') %>

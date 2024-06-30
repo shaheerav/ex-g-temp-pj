@@ -34,6 +34,9 @@ adminRouts.get('/unblock-user',authAdmin.isLogin,controllAdmin.unblockUser);
 adminRouts.get('/orderList',authAdmin.isLogin,controllAdmin.orderList);
 adminRouts.get('/updatePaymentStatus',controllAdmin.updatePaymentStatus);
 adminRouts.post('/updateStatus',controllAdmin.updateStatus);
-adminRouts.get('/orderDetails',controllAdmin.orderDetails)
+adminRouts.get('/orderDetails',controllAdmin.orderDetails);
+adminRouts.get('/coupon',controllAdmin.couponPageLoad);
+adminRouts.get('/addCoupon',controllAdmin.addCouponPageLoad);
+adminRouts.post('/addCoupon',controllAdmin.addCoupon);
 
 module.exports = adminRouts;

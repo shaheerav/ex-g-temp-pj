@@ -1,0 +1,47 @@
+<%- include('../layouts/admin/header.ejs') %>
+<button type="button" class="btn btn-primary m-5" style="margin: 8px;"><a href="/admin/addCoupon" class="text-light">Add New Coupon</a></button>
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+       
+        <div class="col-12">
+            <div class="bg-light rounded h-100 p-4">
+                <h6 class="mb-4">Responsive Table</h6>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Coupon code</th>
+                                <th scope="col">Coupon Type</th>
+                                <th scope="col">Max Discount</th>
+                                <th scope="col">Discription</th>
+                                <th scope="col">Limit</th>
+                                <th scope="col">Expirity Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if(coupon.length >0) {%>
+                                <% for(let i =0 ; i<coupon.length;i++) {%>
+                            <tr>
+                                <td><%=i+1%></td>
+                                <td><%= coupon[i].code%></td>
+                                <td><%= coupon[i].type%></td>
+                                <td><%= coupon[i].maxDiscount%></td>
+                                <td><%= coupon[i].discription%></td>
+                                <td><%= coupon[i].limit%></td>
+                                <td><%= coupon[i].formattedExpirityDate%></td>
+                            </tr>
+                            <% } %>
+                            <% }else{ %>
+                                <tr>
+                                    <td colspan="7">No Coupon</td>
+                                  </tr>
+                                  <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../layouts/admin/footer.ejs') %>

@@ -1,4 +1,112 @@
 <%- include('../layouts/user/header.ejs') %>
+<style>
+  .coupon {
+  width: 400px;
+  height: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: auto;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  text-transform: uppercase;
+}
+.coupon::before,
+.coupon::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  z-index: -1;
+}
+
+.coupon::before {
+  left: 0;
+  background-image: radial-gradient(
+    circle at 0 50%,
+    transparent 25px,
+    gold 26px
+  );
+}
+
+.coupon::after {
+  right: 0;
+  background-image: radial-gradient(
+    circle at 100% 50%,
+    transparent 25px,
+    gold 26px
+  );
+}
+
+.coupon > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.left {
+  width: 20%;
+  border-right: 2px dashed rgba(0, 0, 0, 0.13);
+}
+.left div {
+  transform: rotate(-90deg);
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.center {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.right {
+  width: 120px;
+  background-image: radial-gradient(
+    circle at 100% 50%,
+    transparent 25px,
+    #fff 26px
+  );
+}
+.right div {
+  font-family: "Libre Barcode 128 Text", cursive;
+  font-size: 1.5rem;
+  font-weight: 400;
+  transform: rotate(-90deg);
+}
+
+.center h2 {
+  background: #000;
+  color: gold;
+  padding: 0 10px;
+  font-size: 2.15rem;
+  white-space: nowrap;
+}
+
+.center h3 {
+  font-size: 2.15rem;
+}
+.center small {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+@media screen and (max-width:500px){
+  .coupon {
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .left div {
+    transform: rotate(0deg);
+  }
+  .right div {
+    transform: rotate(0deg);
+    
+  }
+}
+</style>
 <!-- Start Hero Section -->
 <div class="hero">
   <div class="container">
@@ -31,6 +139,27 @@
 <!-- End Hero Section -->
 <!-- Start Product Section men -->
 <%- include('../partials/breadcrumbs') %>
+<% if(coupon.length>0) {%>
+  <% for(let i =0 ; i<coupon.length;i++){ %>
+<div class="coupon">
+  <div class="left">
+    <div><%= coupon[i].discription%></div>
+  </div>
+  <div class="center">
+    <div>
+      <h2><i class="bi bi-currency-rupee"></i><%= coupon[i].maxDiscount%>OFF</h2>
+      <h3>Coupon</h3>
+      <small><%= coupon[i].formattedExpirityDate%></small>
+    </div>
+  </div>
+  
+  <div class="right">
+    <div><%= coupon[i].code%></div>
+  </div>
+  
+</div>
+<% } %>
+<% } %>
 <% Object.keys(productsByCategory).forEach(function(categoryName) { %>
   <div class="product-section">
     <div class="container">

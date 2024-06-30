@@ -123,22 +123,20 @@
 		        </div>
 		        <div class="col-md-6">
 
-		          <div class="row mb-5">
-		            <div class="col-md-12">
-		              <h2 class="h3 mb-3 text-black">Coupon Code</h2>
-		              <div class="p-3 p-lg-5 border bg-white">
-
-		                <label for="c_code" class="text-black mb-3">Enter your coupon code if you have one</label>
-		                <div class="input-group w-75 couponcode-wrap">
-		                  <input type="text" class="form-control me-2" id="c_code" placeholder="Coupon Code" aria-label="Coupon Code" aria-describedby="button-addon2">
-		                  <div class="input-group-append">
-		                    <button class="btn btn-black btn-sm" type="button" id="button-addon2">Apply</button>
-		                  </div>
-		                </div>
-
-		              </div>
-		            </div>
-		          </div>
+					<div class="row mb-5">
+						<div class="col-md-12">
+						  <h2 class="h3 mb-3 text-black">Coupon Code</h2>
+						  <div class="p-3 p-lg-5 border bg-white">
+							<label for="c_code" class="text-black mb-3">Enter your coupon code if you have one</label>
+							<div class="input-group w-75 couponcode-wrap">
+							  <input type="text" class="form-control me-2" id="couponCode" placeholder="Coupon Code" aria-label="Coupon Code" aria-describedby="button-addon2">
+							  <div class="input-group-append">
+								<button class="btn btn-black btn-sm" type="button" id="couponButton">Apply</button>
+							  </div>
+							</div>
+						  </div>
+						</div>
+					  </div>
 
 		          <div class="row mb-5">
 		            <div class="col-md-12">
@@ -158,15 +156,22 @@
 							  <input type="hidden" name="productIds" value="<%=product._id  %>">
 							  <input type="hidden" name=" productStock" id="productStock" value="<%= product.stock %>">
 		                    </tr>
+							<% }) %>
 		                    <tr>
-								<% }) %>
-		                      <td class="text-black font-weight-bold"><strong>Cart Subtotal</strong></td>
-		                      <td class="text-black"><i class="bi bi-currency-rupee"></i><%= total  %></td>
-		                    </tr>
-		                    <tr>
-		                      <td class="text-black font-weight-bold"><strong>Order Total</strong></td>
-		                      <td class="text-black font-weight-bold"><strong><i class="bi bi-currency-rupee"></i><%= total %></strong></td>
-		                    </tr>
+								
+								<tr>
+									<td class="text-black font-weight-bold"><strong>Cart Subtotal</strong></td>
+									<td class="text-black"><i class="bi bi-currency-rupee"></i><%= total %></td>
+								  </tr>
+								  <tr id="couponDiscountRow" style="display:none;">
+									<td class="text-black font-weight-bold"><strong>Coupon Discount</strong></td>
+									<td class="text-black" id="couponDiscountAmount"></td>
+								  </tr>
+								  <tr>
+									<td class="text-black font-weight-bold"><strong>Order Total</strong></td>
+									<td class="text-black font-weight-bold"><strong><i class="bi bi-currency-rupee"></i><span id="orderTotal"><%= total %></span></strong></td>
+								  </tr>
+								  <input type="hidden" id="finalTotal" name="finalTotal" value="<%= total %>">
 		                  </tbody>
 		                </table>
 							<div class="form-group m-5">
@@ -306,7 +311,7 @@
         return;
     }
 
-    const totalAmount = <%= total %>;
+    const finalTotal = parseFloat(document.getElementById('finalTotal').value);;
     const productName = Array.from(document.getElementsByName('productName')).map(input => input.innerText.trim());
 
     fetch('/checkout', {
@@ -317,7 +322,7 @@
         body: JSON.stringify({
             addressId: selectedAddressId,
             paymentMethod: paymentMethod,
-            totalAmount: totalAmount,
+            totalAmount: finalTotal,
             productName: productName
         })
     })
@@ -444,7 +449,72 @@
 						console.error('Error:', error);
 						alert('An error occurred while cancelling the order.');
 						});
-					}
+					};
+//coupon validation
+$('#couponButton').click(function() {
+  const couponCode = $('#couponCode').val().trim();
+
+  fetch('/validateCoupon', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ couponCode: couponCode })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.valid) {
+      const discountedAmount = parseFloat(data.discountAmount); // Ensure this is a number
+      let total = parseFloat($('#finalTotal').val()); // Get the current total amount from the hidden input field
+
+      if (isNaN(total)) {
+        console.error('Current total amount is not a number');
+        swal("Error", "Invalid current total amount.", "error");
+        return;
+      }
+
+      if (isNaN(discountedAmount)) {
+        console.error('Discount amount is not a number');
+        swal("Error", "Invalid discount amount received.", "error");
+        return;
+      }
+
+      const newTotal = Math.max(total - discountedAmount, 0); // Ensure the new total is not negative
+
+      // Update the order total
+      $('#orderTotal').text(newTotal.toFixed(2));
+      $('#finalTotal').val(newTotal.toFixed(2)); // Update the hidden input field
+
+      // Show the coupon discount row and update its amount
+      $('#couponDiscountRow').show();
+      $('#couponDiscountAmount').html(`<i class="bi bi-currency-rupee"></i>${discountedAmount.toFixed(2)}`);
+      
+      // Disable the coupon input and button after successful application
+      $('#couponCode').prop('disabled', true);
+      $('#couponButton').prop('disabled', true);
+      
+      swal("Coupon Applied", "Discount applied successfully!", "success");
+    } else {
+      swal("Invalid Coupon", "The coupon code entered is not valid.", "error");
+    }
+  })
+  .catch(error => {
+    console.error('Error applying coupon:', error);
+    swal("Error", "An error occurred while applying the coupon. Please try again later.", "error");
+  });
+});
+
+$('#orderForm').submit(function(event) {
+  const finalTotal = parseFloat($('#finalTotal').val());
+
+  if (isNaN(finalTotal) || finalTotal <= 0) {
+    event.preventDefault();
+    swal("Error", "Invalid order total. Please check the order details and try again.", "error");
+  }
+});
+
+
+					
 		</script>
 
 <script src="js/bootstrap.bundle.min.js"></script>

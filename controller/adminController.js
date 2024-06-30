@@ -3,10 +3,12 @@ const Order = require('../models/order');
 const Payment = require('../models/payment');
 const bcrypt = require("bcrypt");
 const Product = require('../models/products');
+const Coupon = require('../models/coupon');
 const randomString = require('randomstring');
 const nodemailer = require('nodemailer');
 const { format } = require('morgan');
-const {getOderDetails} = require('../config/aggregation')
+const {getOderDetails} = require('../config/aggregation');
+const moment = require('moment');
 
 const adminPage = async (req,res)=>{
     try{
@@ -255,6 +257,60 @@ const orderDetails = async(req,res)=>{
         res.status(500).send('Internal Server Error');
     }
 }
+const couponPageLoad = async (req,res)=>{
+    try{
+        const adminData = await User.findById({_id:req.session.User_id});
+        if(!adminData){
+            return res.status(400).send('admin please logged in')
+        };
+        const coupon = await Coupon.find();
+
+        const formattedCoupons = coupon.map(coupon => {
+            return {
+                ...coupon._doc, 
+                formattedExpirityDate: moment(coupon.expirityDate).format('MMMM Do YYYY')
+            };
+        });
+        res.render('coupon',{admin:adminData,coupon:formattedCoupons})
+        
+
+    }catch(error){
+        console.error(error.message);
+        res.status(500).send('server Error',error.message);
+    }
+};
+const addCouponPageLoad = async (req,res)=>{
+    try{
+        const adminData = await User.findById({_id:req.session.User_id});
+        if(!adminData){
+            return res.status(400).send('admin please logged in')
+        }
+        res.render('addCoupon',{admin:adminData})
+    }catch(error){
+        console.error(error.message);
+        res.status(500).send('server errror',error.message)
+    }
+};
+const addCoupon = async (req,res)=>{
+    try{
+        const {code,type,discount,discription,limit,date} = req.body;
+        console.log('date from form ',code,type,discount,discription,limit,date);
+        let coupon = new Coupon({
+            code:code,
+            type:type,
+            maxDiscount:discount,
+            discription:discription,
+            limit:limit,
+            expirityDate:date
+        });
+         await coupon.save();
+        res.redirect('/admin/coupon')
+
+    }catch(error){
+        console.error(error.message);
+        res.status(500).send('server Error',error.message)
+    }
+}
 module.exports={
     adminPage,
     adminVerify,
@@ -269,5 +325,8 @@ module.exports={
     orderList,
     updatePaymentStatus,
     updateStatus,
-    orderDetails
+    orderDetails,
+    couponPageLoad,
+    addCouponPageLoad,
+    addCoupon
 }
