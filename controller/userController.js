@@ -18,6 +18,7 @@ const Payment = require('../models/payment');
 const Wallet = require('../models/wallet');
 const Coupon = require('../models/coupon');
 const Wishlist = require('../models/wishList');
+const Review = require('../models/review');
 const {getOderDetails} = require('../config/aggregation');
 const { session, use } = require("passport");
 const { getTestError } = require("razorpay/dist/utils/razorpay-utils");
@@ -1665,7 +1666,8 @@ const reviweProduct = async (req,res)=>
         return res.status(400).send('OrderId not available');
       };
       console.log(orderId,'orderId');
-      res.render('reviweProduct',{isLoggedIn,count:0});
+      const order = await getOderDetails(orderId);
+      res.render('reviweProduct',{isLoggedIn,count:0,order});
 
     }catch(error){
       console.error(error.message);
@@ -1867,6 +1869,29 @@ const removeFromWishlist = async (req,res)=>{
     console.error(error.message)
   }
 
+};
+const reviweToProduct = async (req,res)=>{
+  try{
+    const userId = req.session.user;
+    if(!userId){
+      return res.status(400).send('not logged in');
+    }
+    const {productId,rating, comment}= req.body;
+    if(!productId || !rating || !comment){
+      return res.status(400).json({ success: false, message: 'All fields are required.' });
+    };
+    const review = new Review({
+      productId:productId,
+      userId:userId,
+      rating:rating,
+      comment:comment
+    });
+    await review.save();
+    res.json({ success: true, message: 'Review submitted successfully.' });
+  }catch(error){
+    console.error(error.message);
+    res.status(400).send('server error',error.message);
+  }
 }
 
 module.exports = {
@@ -1919,5 +1944,6 @@ module.exports = {
   productReturnOrder,
   validateCoupon,
   addToWishlist,
-  removeFromWishlist
+  removeFromWishlist,
+  reviweToProduct
 };

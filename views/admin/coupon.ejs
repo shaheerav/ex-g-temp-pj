@@ -30,6 +30,7 @@
                                 <td><%= coupon[i].discription%></td>
                                 <td><%= coupon[i].limit%></td>
                                 <td><%= coupon[i].formattedExpirityDate%></td>
+                                <td><button class="btn btn-primary"><a href="/admin/delete-coupon?id=<%= coupon[i]._id %>" style="color: white;">Remove</a></button></td>
                             </tr>
                             <% } %>
                             <% }else{ %>

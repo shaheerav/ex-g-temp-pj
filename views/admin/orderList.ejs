@@ -125,7 +125,13 @@
     .then(data => {
       if (data.success) {
         alert('Order status changed successfully.');
-        window.location.href = '/admin/orderList';
+        swal("Status changed!", "Order status changed successfully.", "success", {
+                            button: "ok",
+                        }).then((value) => {
+                            if (value) {
+                                window.location.href = '/admin/orders';
+                            }
+                        });
       } else {
         alert('Error updating order status: ' + data.message);
       }

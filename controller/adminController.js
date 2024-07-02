@@ -311,6 +311,78 @@ const addCoupon = async (req,res)=>{
         res.status(500).send('server Error',error.message)
     }
 }
+const salesReport = async (req,res)=>{
+    try{
+        const adminData = await User.findById({_id:req.session.User_id});
+        if(!adminData){
+            return res.status(400).send('admin please logged in')
+        }
+        const orders = await Order.aggregate([
+            {$unwind:'$products'},
+            {$lookup:{
+                from:'products',
+                localField:'products.productId',
+                foreignField:'_id',
+                as:'productDetails'
+            }},
+            {$unwind:'$productDetails'},
+            {$lookup:{
+                from:'users',
+                localField:'userId',
+                foreignField:'_id',
+                as:'userInfo'
+            }},
+            {$unwind:'$userInfo'},
+            {$lookup:{
+                from:'payments',
+                localField:'payment',
+                foreignField:'_id',
+                as:'paymentInfo'
+            }},
+            {$unwind:'$paymentInfo'},
+            {$group:{
+                _id:'$_id',
+                products:{'$push':{
+                    productId: '$products.productId',
+                    productName: '$productDetails.name',
+                    productImage: '$productDetails.image',
+                    productPrice:'$productDetails.price',
+                    quantity: '$products.quantity',}},
+                payment:{'$first':'$paymentInfo'},
+                userId:{'$first':'$userInfo'},
+                totalAmount:{'$first':'$totalAmount'},
+                DateOrder :{'$first':'$DateOrder'},
+                status:{'$first':'$status'}
+            }},
+            {$project:{
+                _id:1,
+                products:1,
+                payment:1,
+                userId:1,
+                totalAmount:1,
+                DateOrder:{$dateToString:{format:"%Y-%m-%d %H:%M:%S",date:"$DateOrder"}},
+                status:1
+            }},{ $sort: { DateOrder: -1 } }, 
+        ]);
+        console.log(orders)
+        res.render('salesReport',{admin:adminData,order:orders})
+
+    }catch(error){
+        console.error(error.message)
+        res.status(500).send('server error',error.message);
+    }
+};
+const removeCoupon = async(req,res)=>{
+    try{
+        const id = req.query.id;
+        await Coupon.findByIdAndDelete(id);
+        res.redirect('/coupon')
+
+    }catch(error){
+        console.error(error.messsage);
+        res.status(500).send('server error',error.message);
+    }
+}
 module.exports={
     adminPage,
     adminVerify,
@@ -328,5 +400,6 @@ module.exports={
     orderDetails,
     couponPageLoad,
     addCouponPageLoad,
-    addCoupon
+    addCoupon,
+    salesReport,removeCoupon
 }

@@ -77,5 +77,6 @@ userRouts.get('/return:id',controller.returnProduct);
 userRouts.post('/cancel-product/:id',controller.productReturnOrder);
 userRouts.post('/validateCoupon',controller.validateCoupon);
 userRouts.post('/addToWishlist',controller.addToWishlist);
-userRouts.post('/removeFromWishlist',controller.removeFromWishlist)
+userRouts.post('/removeFromWishlist',controller.removeFromWishlist);
+userRouts.post('/review',controller.reviweToProduct);
 module.exports = userRouts;
