@@ -383,6 +383,79 @@ const removeCoupon = async(req,res)=>{
         res.status(500).send('server error',error.message);
     }
 }
+const fileredSalesReport = async (req,res)=>{
+    try{
+        const adminData = await User.findById(req.session.User_id);
+        if (!adminData) {
+            return res.status(400).send('Admin not logged in');
+        }
+
+        // Extracting startDate and endDate from query parameters
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
+
+        // MongoDB aggregation pipeline with date filtering
+        const orders = await Order.aggregate([
+            { $match: {
+                DateOrder: { $gte: new Date(startDate), $lte: new Date(endDate) }
+            }},
+            { $unwind: '$products' },
+            { $lookup: {
+                from: 'products',
+                localField: 'products.productId',
+                foreignField: '_id',
+                as: 'productDetails'
+            }},
+            { $unwind: '$productDetails' },
+            { $lookup: {
+                from: 'users',
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'userInfo'
+            }},
+            { $unwind: '$userInfo' },
+            { $lookup: {
+                from: 'payments',
+                localField: 'payment',
+                foreignField: '_id',
+                as: 'paymentInfo'
+            }},
+            { $unwind: '$paymentInfo' },
+            { $group: {
+                _id: '$_id',
+                products: { $push: {
+                    productId: '$products.productId',
+                    productName: '$productDetails.name',
+                    productImage: '$productDetails.image',
+                    productPrice: '$productDetails.price',
+                    quantity: '$products.quantity'
+                }},
+                payment: { $first: '$paymentInfo' },
+                userId: { $first: '$userInfo' },
+                totalAmount: { $first: '$totalAmount' },
+                DateOrder: { $first: { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$DateOrder" } } },
+                status: { $first: '$status' }
+            }},
+            { $project: {
+                _id: 1,
+                products: 1,
+                payment: 1,
+                userId: 1,
+                totalAmount: 1,
+                DateOrder: 1,
+                status: 1
+            }},
+            { $sort: { DateOrder: -1 } }
+        ]);
+
+        res.render('filteredSalesReport', { admin: adminData, order: orders });
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error: ' + error.message);
+    }
+}
+    
 module.exports={
     adminPage,
     adminVerify,
@@ -401,5 +474,6 @@ module.exports={
     couponPageLoad,
     addCouponPageLoad,
     addCoupon,
-    salesReport,removeCoupon
+    salesReport,removeCoupon,
+    fileredSalesReport
 }

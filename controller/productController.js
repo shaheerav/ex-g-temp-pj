@@ -154,8 +154,7 @@ const updateProduct = async (req,res)=>{
         if (req.files && req.files.length > 0) {
             const imagePaths = req.files.map(file => file.filename);
             console.log('Uploaded image paths:', imagePaths); 
-            let images = new Set(imagePaths);
-            finalImage = Array.from(images); // Override with new images if uploaded
+            finalImage = finalImage.concat(imagePaths); 
         }
          
         const updatedProduct = await Product.findByIdAndUpdate(id, {
@@ -313,8 +312,57 @@ const rating = async(req,res)=>{
 }catch{
     throw new Error(error);
 
-}}
+}};
+const offerPageLoad = async (req,res)=>{
+    try{
+        const productId = req.query.id;
+        console.log(productId);
+        const user = await User.findById(req.session.User_id);
+        const product = await Product.findById(productId);
 
+        const offer = product.offer;
+        console.log(product)
+        
+        
+        res.render('offer',{admin:user,product})
+
+
+    }catch(error){
+        res.status(500).send('Server error',error.message);
+    }
+}
+const productOffer = async (req,res)=>{
+    try{
+        const { productId } = req.params;
+        const { offer, offerStart, offerEnd } = req.body;
+        const product = await Product.findByIdAndUpdate(
+            productId,
+            { $set: { offer, offerStart, offerEnd } },
+            { new: true }
+          );
+          if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+          }
+          
+          res.json({ success: true, message: 'Offer added successfully', product });
+        } catch (error) {
+          console.error('Error updating offer:', error);
+          res.status(500).json({ success: false, message:'server error'})
+}
+}
+const removeOffer = async(req,res)=>{
+    try{
+        const productId = req.query.id;
+        console.log(productId,'id')
+        await Product.findByIdAndUpdate(productId,{offer:null,offerStart:null,offerEnd:null});
+         
+        res.redirect(`/product/offers?id=${productId}`)
+        
+
+    }catch(error){
+        res.status(500).send('server Error');
+    }
+}
 module.exports = {
     showProduct,
     newProduct,
@@ -326,5 +374,7 @@ module.exports = {
     removeSoftDeletePro,
     showImages,
     deleteImage,
-    rating
+    rating,
+    productOffer,offerPageLoad,
+    removeOffer
 }

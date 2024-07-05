@@ -131,7 +131,17 @@
         <form action="/add-to-cart/<%= product._id %>" method="post" id="addToCartForm">
           <input type="hidden" name="productId" value="<%= product._id %>">
           <h3 class="py-4" name="name"><%= product.name %></h3>
-          <h2><i class="bi bi-currency-rupee" name="price"></i><%= product.price %></h2>
+          <% if (bestOffer) { %>
+          <h2><del><i class="bi bi-currency-rupee" name="price"></i><%= product.price %></del> <i class="bi bi-currency-rupee" name="price"></i><%= bestOfferPrice %></h2>
+          
+            <p>Discounted Price: <%= bestOfferPrice %></p>
+            <p>Offer: <%= bestOffer.offer %>%</p>
+            <p>Offer Start: <%= new Date(bestOffer.offerStart).toLocaleDateString() %></p>
+            <p>Offer End: <%= new Date(bestOffer.offerEnd).toLocaleDateString() %></p>
+          <% } else { %>
+            <p>No current offers available.</p>
+            <h2><i class="bi bi-currency-rupee" name="price"></i><%= product.price %> </h2>
+          <% } %>
           <% if (isOutOfStock) { %>
             <h4 class="text-danger">Out of Stock</h4>
           <% } else { %>

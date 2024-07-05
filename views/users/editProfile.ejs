@@ -6,7 +6,13 @@
       <div class="bg-light rounded h-100 p-4">
         <h6 class="mb-4">Edit User</h6>
         <div id="error"></div>
+        <% if( message){ %>
+          <div class="alert alert-danger" role="alert">
+              <%= message %>
+          </div>
+      <% } %>
         <form action="/editProfile" method="post" id="profile">
+
           <div class="mb-3">
             <input type="hidden" value="<%= user._id %>" name="id">
             <label for="name" class="form-label">Name</label>
