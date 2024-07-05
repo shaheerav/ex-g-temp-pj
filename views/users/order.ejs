@@ -199,21 +199,22 @@
         >
           <a href="/return<%= orderForm[i].orderId %>" class="m-3" style="text-decoration: none">Return your order</a>
         </div>
-          <% } %>
-        </div>
         <div
           style="
             width: 200px;
             border: 1px solid gray;
             border-radius: 5%;
             margin: 20px;
-            margin-left: 917px;
-            margin-top: -20px;
+            margin-left: 900px;
+            margin-top: -10px;
             text-align: center;
           "
         >
-          <a href="#" class="m-3" style="text-decoration: none">Invoice</a>
+          <a href="/invoice/<%= orderForm[i].orderId %>" class="m-3" style="text-decoration: none">Invoice</a>
         </div>
+          <% } %>
+        </div>
+        
       </div>
         <% } %> <% }else{ %>
           <h1>No orders</h1>

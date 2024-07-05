@@ -4,6 +4,7 @@ const moment = require("moment");
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const PDFDocument = require('pdfkit'); 
 const { body, validationResult } = require("express-validator");
 const OTPGenerator = require("otp-generator");
 const randonString = require("randomstring");
@@ -2430,6 +2431,47 @@ const reviweToProduct = async (req, res,next) => {
     next(error)
   }
 };
+const invoiceDownload = async (req,res,next)=>{
+    try {
+      const orderId = req.params.orderId;
+
+      const order = await getOderDetails(orderId);
+      console.log(order,'oderlist')
+
+      if (!order) {
+          return res.status(404).send('Order not found');
+      }
+
+      const doc = new PDFDocument();
+
+      res.setHeader('Content-disposition', `attachment; filename=invoice_${orderId}.pdf`);
+      res.setHeader('Content-type', 'application/pdf');
+
+      doc.pipe(res);
+
+      // Add content to the PDF
+      doc.fontSize(25).text('Invoice', { align: 'center' });
+      doc.moveDown();
+      doc.fontSize(16).text(`Order ID: ${order._id}`);
+      doc.text(`Customer Name: ${order.address.fullname}`);
+      doc.text(`Date: ${new Date(order.DateOrder).toLocaleDateString()}`);
+      doc.moveDown();
+      
+      doc.text('Items:');
+      order.products.forEach(item => {
+          doc.text(`- ${item.product.name}: $${item.product.price} x ${item.quantity}`);
+      });
+      
+      doc.moveDown();
+      doc.fontSize(18).text(`Total Amount: $${order.totalAmount}`, { align: 'right' });
+
+      // Finalize the PDF and end the stream
+      doc.end();
+
+  }catch(error){
+    next(error)
+  }
+}
 
 module.exports = {
   registration,
@@ -2483,4 +2525,5 @@ module.exports = {
   addToWishlist,
   removeFromWishlist,
   reviweToProduct,
+  invoiceDownload
 };

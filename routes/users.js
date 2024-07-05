@@ -89,5 +89,6 @@ userRouts.post("/validateCoupon", controller.validateCoupon);
 userRouts.post("/addToWishlist", controller.addToWishlist);
 userRouts.post("/removeFromWishlist", controller.removeFromWishlist);
 userRouts.post("/review", controller.reviweToProduct);
+userRouts.get('/invoice/:orderId',controller.invoiceDownload)
 
 module.exports = userRouts;
