@@ -8,7 +8,7 @@ const paymentSchema = new mongoose.Schema({
     },
     paymentMethod:{
         type:String,
-        enum:['COD','Cart-Payment','Bank-transger','PayPal','Razorpay'],
+        enum:['COD','Cart-Payment','Bank-transger','PayPal','Razorpay','Wallet'],
         require:true
     },
     amount:{

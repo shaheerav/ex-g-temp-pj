@@ -1635,7 +1635,26 @@ const placeOrder = async (req, res) => {
             });
         }
       });
-    } else {
+    }else if(paymentMethod === "Wallet"){
+      const wallet = await Wallet.findOne({userId:userId});
+      if(!wallet){
+        res.json({success:false,message:'No Wallet available now'});
+      }
+      await Cart.deleteOne({ userId: userId });
+      const walletBalance = wallet.amount;
+      console.log(walletBalance,'walletbalance');
+      if(walletBalance >= totalAmount){
+        const newBalance = walletBalance - totalAmount;
+        console.log(newBalance);
+        wallet.amount = newBalance;
+        await wallet.save();
+        return res.json({ success: true, message: 'Payment successful using Wallet' });
+      }else{
+        return res.json({ success: false, message: 'Insufficient wallet balance' });
+      }
+
+    }
+     else {
       res
         .status(400)
         .json({ success: false, message: "Invalid payment method selected" });

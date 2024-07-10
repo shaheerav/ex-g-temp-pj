@@ -362,6 +362,16 @@ const removeOffer = async(req,res)=>{
     }catch(error){
         res.status(500).send('server Error');
     }
+};
+const searchProduct = async(req,res)=>{
+    try{
+        const user = await User.findById(req.session.User_id);
+        const product = await Product.find();
+        res.render('search',{admin:user,product})
+    }catch(error){
+        console.error('server error',error.message);
+        res.status(500).send('Server Error');
+    }
 }
 module.exports = {
     showProduct,
@@ -376,5 +386,6 @@ module.exports = {
     deleteImage,
     rating,
     productOffer,offerPageLoad,
-    removeOffer
+    removeOffer,
+    searchProduct
 }

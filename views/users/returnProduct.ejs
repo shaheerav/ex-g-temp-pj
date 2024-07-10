@@ -1,4 +1,15 @@
 <%- include ('../layouts/user/header.ejs') %>
+<div class="borderNav">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-lg-5">
+          <div class="intro-excerpt">
+          </div>
+        </div>
+        <div class="col-lg-7"></div>
+      </div>
+    </div>
+  </div>
 <div class="card-body row m-5">
     
     <% if (order.products && order.products.length > 0) { %>
@@ -51,8 +62,18 @@
                     if (response.success) {
                         alert(response.message);
                         window.location.href = '/orders';
+                        swal("succes to Return!", "Your order has been successfully Returned.", "success", {
+                                button: "Go to Orders",
+                            }).then((value) => {
+                                if (value) {
+                                    window.location.href = '/orders';
+                                }
+                            });
+                        
                     } else {
-                        alert(response.message);
+                        swal("Return failed", error.description || "Your ordered product not able to return.", "error", {
+                                button: "try again",
+                            })
                     }
                 },
                 error: function(error) {

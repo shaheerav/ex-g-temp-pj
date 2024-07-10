@@ -1,6 +1,6 @@
 <%- include('../layouts/user/header.ejs') %>
 		<!-- Start Hero Section -->
-			<div class="hero">
+			<div class="borderNav">
 				<div class="container">
 					<div class="row justify-content-between">
 						<div class="col-lg-5">
@@ -184,6 +184,7 @@
 							  <select name="payment" id="payment" class="form-control">
 								<option value="Razorpay">Razorpay</option>
 								<option value="COD">Cash-On-Delivery</option>
+								<option value="Wallet">Wallet</option>
 							  </select>
 							</div>
 						  
@@ -389,13 +390,7 @@ function placeOrder() {
     .then(res => {
         if (res.success) {
             if (paymentMethod === 'COD') {
-                swal("Order Placed!", "Your order has been successfully placed.", "success", {
-                    button: "Go to Orders",
-                }).then((value) => {
-                    if (value) {
-                        window.location.href = '/orders';
-                    }
-                });
+                handleOrderSuccess("Your order has been successfully placed.", "/orders");
             } else if (paymentMethod === 'Razorpay') {
                 const options = {
                     key: `${res.key_id}`,
@@ -425,7 +420,9 @@ function placeOrder() {
 				});
 
                 razorpayObject.open();
-            }
+            }else if(paymentMethod === 'Wallet'){
+				handleOrderSuccess("Your order has been successfully placed.", "/orders");
+			}
         } else {
             swal("Error placing order", res.message || "An error occurred while processing your order. Please try again later.", "error", {
                 dangerMode: true,
@@ -468,7 +465,15 @@ function handleRazorpayFailure(error,orderId) {
     // Send payment failure status to backend
     sendPaymentStatusToBackend(null, false,orderId);
 }
-
+function handleOrderSuccess(message, redirectUrl) {
+    swal("Order Placed!", message, "success", {
+        button: "Go to Orders",
+    }).then((value) => {
+        if (value) {
+            window.location.href = '/orders';
+        }
+    });
+}
 function sendPaymentStatusToBackend(paymentId, success,orderId) {
 	console.log(orderId,'order id')
     fetch('/process-payment', {

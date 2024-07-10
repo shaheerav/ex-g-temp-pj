@@ -1,6 +1,6 @@
 <%- include ('../layouts/user/header.ejs') %>
 
-<div class="hero">
+<div class="borderNav">
     <div class="container">
       <div class="row justify-content-between">
         <div class="col-lg-5">
@@ -78,6 +78,7 @@
           <p><strong>Phone:</strong> <%= isLoggedIn.mobile %></p>
           <p><strong>Username:</strong><%= isLoggedIn.username  %> </p>
           <p><Strong>Refferal code:</Strong><%= isLoggedIn.referralCode  %></p>
+          <a href="/changePassword">Chanage password</a>
         </div>
       </div>
     </div>

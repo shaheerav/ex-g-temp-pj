@@ -52,4 +52,5 @@ productRouts.get("/removesoftDeleteP",authAdmin.isLogin, controllProduct.removeS
 productRouts.get('/offers',authAdmin.isLogin,controllProduct.offerPageLoad);
 productRouts.post('/:productId/offer',authAdmin.isLogin,controllProduct.productOffer);
 productRouts.get('/offerRemove',authAdmin.isLogin,controllProduct.removeOffer);
+productRouts.get('/search',authAdmin.isLogin,controllProduct.searchProduct)
 module.exports = productRouts;
