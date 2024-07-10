@@ -89,6 +89,10 @@ userRouts.post("/validateCoupon", controller.validateCoupon);
 userRouts.post("/addToWishlist", controller.addToWishlist);
 userRouts.post("/removeFromWishlist", controller.removeFromWishlist);
 userRouts.post("/review", controller.reviweToProduct);
-userRouts.get('/invoice/:orderId',controller.invoiceDownload)
+userRouts.get('/invoice/:orderId',controller.invoiceDownload);
+userRouts.post('/process-payment',controller.paymentProcess);
+userRouts.get('/shippingcharge',controller.shippingCharge);
+userRouts.get('/payAgain:id',controller.payAgain);
+userRouts.post('/payAgain',controller.tryPaymentAgain);
 
 module.exports = userRouts;

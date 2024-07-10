@@ -32,6 +32,7 @@ adminRouts.get("/addCoupon",authAdmin.isLogin, controllAdmin.addCouponPageLoad);
 adminRouts.post("/addCoupon",authAdmin.isLogin, controllAdmin.addCoupon);
 adminRouts.get("/salesReport",authAdmin.isLogin, controllAdmin.salesReport);
 adminRouts.get("/delete-coupon",authAdmin.isLogin, controllAdmin.removeCoupon);
-adminRouts.get('/filtered-report',authAdmin.isLogin, controllAdmin.fileredSalesReport)
+adminRouts.get('/filtered-report',authAdmin.isLogin, controllAdmin.fileredSalesReport);
+adminRouts.get('/chart-data',authAdmin.isLogin,controllAdmin.filterData);
 
 module.exports = adminRouts;

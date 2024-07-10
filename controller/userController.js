@@ -20,7 +20,7 @@ const Wallet = require("../models/wallet");
 const Coupon = require("../models/coupon");
 const Wishlist = require("../models/wishList");
 const Review = require("../models/review");
-const { getOderDetails } = require("../config/aggregation");
+const { getOderDetails,getOderDetailsList } = require("../config/aggregation");
 const { session, use } = require("passport");
 const { getTestError } = require("razorpay/dist/utils/razorpay-utils");
 const APP_ID = process.env.APP_ID;
@@ -1410,6 +1410,7 @@ const showOrder = async (req, res,next) => {
         orderId: order._id,
         status: order.status,
         payment: payment.paymentMethod,
+        paymentStatus:payment.status,
         totalAmount: order.totalAmount,
         orderDate: order.DateOrder,
         products: productList,
@@ -1428,8 +1429,8 @@ const showOrder = async (req, res,next) => {
     );
 
     const totalOrder = totalOrdersCount;
-    console.log(totalOrder);
     const totalPages = Math.ceil(totalOrder / limit);
+    console.log(filteredOrderForm,'orders list')
 
     res.render("order", {
       isLoggedIn: isLoggedIn,
@@ -1530,12 +1531,13 @@ const checkoutLoad = async (req, res ,next) => {
 };
 const placeOrder = async (req, res) => {
   try {
-    const { addressId, paymentMethod, totalAmount, productName } = req.body;
+    const { addressId, paymentMethod, totalAmount, productName,shippingCharge, bonus } = req.body;
     console.log(
       addressId,
       paymentMethod,
       totalAmount,
       productName,
+      shippingCharge,bonus,
       "address and payment method"
     );
 
@@ -1578,6 +1580,7 @@ const placeOrder = async (req, res) => {
       products: productIds,
       payment: payment._id,
       totalAmount: totalAmount,
+      shippingCharge:shippingCharge,
       status: "Ordered",
     });
     await order.save();
@@ -1585,35 +1588,42 @@ const placeOrder = async (req, res) => {
     // Update payment with order ID
     payment.orderId = order._id;
     await payment.save();
+    const codLimit =1000;
 
     // Handle different payment methods
     if (paymentMethod === "COD") {
       console.log("Payment in COD");
-      res.json({ success: true, message: "Order placed successfully" });
+      if(totalAmount>1000){
+        return res.status(400).json({ success: false, message: 'COD is not allowed for orders above Rs 1000.' });
+      }else{
+        res.json({ success: true, message: "Order placed successfully" });
       await Cart.deleteOne({ userId: userId });
+      }
+      
     } else if (paymentMethod === "Razorpay") {
       const options = {
         amount: totalAmount * 100, 
         currency: "INR",
-        receipt: uuid.v4(), 
+        receipt: payment._id, 
         notes: {
           productName: productName,
         },
       };
       await Cart.deleteOne({ userId: userId });
       // Create Razorpay order
-      razorpayInstance.orders.create(options, (err, order) => {
+      razorpayInstance.orders.create(options, (err, razorpayOrder) => {
         if (!err) {
           res.status(200).json({
             success: true,
             message: "Razorpay order created successfully",
-            order_id: order.id,
+            order_id: razorpayOrder.id,
             amount: options.amount / 100,
             key_id: RAZORPAY_ID_KEY,
             product_name: productName,
-            contact: address.mobile,
+            contact: address.mobile, 
             name: address.fullname,
             email: address.email,
+            db_order_id:order._id
           });
         } else {
           console.error("Error creating Razorpay order:", err);
@@ -1668,7 +1678,8 @@ const showOrderDetails = async (req, res,next) => {
     const isLoggedIn = await User.findById(user);
     if (!isLoggedIn) {
       return res.status(404).render('404',{url:req.originalUrl,isLoggedIn:false,count:0,message:"Please login"});
-    }
+    };
+    console.log(orderId,'order Id')
     const order = await getOderDetails(orderId);
 
     const breadcrumbs = [
@@ -2471,6 +2482,123 @@ const invoiceDownload = async (req,res,next)=>{
   }catch(error){
     next(error)
   }
+};
+const paymentProcess = async(req,res)=>{
+  try{
+    const { paymentId, success,orderId } = req.body;
+    const userId =req.session.user || req.user
+    const paymentStatus = success ? 'paid' : 'failed';
+    await Payment.findOneAndUpdate({orderId:orderId},{status:paymentStatus});
+    console.log('payment status change',success);
+    res.json({success:true});
+} catch (error) {
+    console.error(`Error processing payment: ${error}`);
+    res.json({ success: false });
+  }
+};
+const shippingCharges = {
+'Kerala' : 40,
+'Thamilnadu':70,
+'karnadaka':100,
+'Default':100
+}
+const shippingCharge = async (req,res)=>{
+  try{
+    const {addressId} = req.query;
+    console.log(addressId,'add id')
+    const address = await Address.findById(addressId);
+    if(!address){
+      return res.status(404).json({error:'Address not foundd'});
+    }
+    const state = address.state;
+    const shippingCharge = shippingCharges[state] || shippingCharge['Default'];
+    res.json ({shippingCharge});
+    console.log('pass the shipping charge',shippingCharge)
+
+  }catch(error){
+    console.error('Server Error',error.message);
+    res.status(500).json({ error: 'Server Error' });
+  }
+};
+const payAgain = async (req,res,next)=>{
+  try{
+    const orderId = req.params.id;
+    console.log(orderId,'orderId')
+    const user = req.session.user || req.user;
+    const isLoggedIn = await User.findById(user);
+    if (!isLoggedIn) {
+      return res.status(404).render('404',{url:req.originalUrl,isLoggedIn:false,count:0,message:"Please login"});
+    }
+    const order = await getOderDetailsList(orderId);
+    console.log(order)
+
+    const breadcrumbs = [
+      { name: "Home", url: "/" },
+      { name: "Orders", url: "/orders" },
+      { name: "OrderDetails", url: "/orderDetails" },
+    ];
+
+    res.render("payAgain", {
+      isLoggedIn: isLoggedIn,
+      count: 0,
+      order: order,
+      breadcrumbs,
+    });
+
+  }catch(error){
+    console.error(error.message);
+    next(error)
+  }
+};
+
+const tryPaymentAgain = async(req,res)=>{
+  try{
+    const {orderId} = req.body;
+    console.log(orderId,'orderid');
+    const order = await getOderDetailsList(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    const productName = order.products.map(product => product.product.name).join(', ');
+    console.log(productName,'product name');
+      const options = {
+        amount: order.totalAmount * 100, 
+        currency: "INR",
+        receipt: order.payment._id, 
+        notes: {
+          productName: productName,
+        },
+      };
+      // Create Razorpay order
+      razorpayInstance.orders.create(options, (err, razorpayOrder) => {
+        if (!err) {
+          res.status(200).json({
+            success: true,
+            message: "Razorpay order created successfully",
+            order_id: razorpayOrder.id,
+            amount: options.amount / 100,
+            key_id: RAZORPAY_ID_KEY,
+            product_name: productName,
+            contact: order.address.mobile, 
+            name: order.address.fullname,
+            email: order.address.email,
+            db_order_id:order._id
+          });
+        } else {
+          console.error("Error creating Razorpay order:", err);
+          res
+            .status(400)
+            .json({
+              success: false,
+              message: "Failed to create Razorpay order",
+            });
+        }
+      });
+  
+  }catch(error){
+    console.error("Error in tryPaymentAgain:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 }
 
 module.exports = {
@@ -2525,5 +2653,9 @@ module.exports = {
   addToWishlist,
   removeFromWishlist,
   reviweToProduct,
-  invoiceDownload
+  invoiceDownload,
+  paymentProcess,
+  shippingCharge,
+  payAgain,
+  tryPaymentAgain
 };
