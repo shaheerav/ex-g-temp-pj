@@ -28,11 +28,11 @@ const newCategory = async (req,res)=>{
 const addCategory = async (req,res)=>{
     try {
         const normalizedName = req.body.name.toLowerCase();
+        const user = await User.findById(req.session.User_id);
 
         const existingCategory = await Category.findOne({ name: normalizedName }).collation({ locale: 'en', strength: 2 });
 
         if (existingCategory) {
-            const user = await User.findById(req.session.User_id);
             return res.render('category-add', { admin: user, message: 'Category with this name already exists.' });
         }
 

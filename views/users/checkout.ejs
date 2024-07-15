@@ -184,7 +184,7 @@
 							  <select name="payment" id="payment" class="form-control">
 								<option value="Razorpay">Razorpay</option>
 								<option value="COD">Cash-On-Delivery</option>
-								<option value="Wallet">Wallet</option>
+								<option value="Wallet"><i class="bi bi-wallet2"></i>Wallet</option>
 							  </select>
 							</div>
 						  
@@ -557,7 +557,7 @@ function sendPaymentStatusToBackend(paymentId, success,orderId) {
 						})
 						.catch(error => {
 						console.error('Error:', error);
-						alert('An error occurred while cancelling the order.');
+						swal("Error", "An error occurred while cancelling the order.", "error");
 						});
 					};
 //coupon validation

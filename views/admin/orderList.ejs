@@ -68,7 +68,7 @@
 <ul class="pagination">
   <% for (let i = 1; i <= totalPages; i++) { %>
   <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-    <a class="page-link" href="/orders?page=<%= i %>"><%= i %></a>
+    <a class="page-link" href="/admin/orderList?page=<%= i %>"><%= i %></a>
   </li>
   <% } %>
 </ul>
@@ -124,22 +124,33 @@
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        alert('Order status changed successfully.');
+        
         swal("Status changed!", "Order status changed successfully.", "success", {
                             button: "ok",
                         }).then((value) => {
                             if (value) {
-                                window.location.href = '/admin/orders';
+                                window.location.href = '/admin/orderList';
                             }
                         });
       } else {
-        alert('Error updating order status: ' + data.message);
+        swal("Error", "An error occurred while updating the status: " + data.message, "error", {
+                    button: "ok",
+                }).then((value) => {
+                    if (value) {
+                        window.location.reload(); // Reload the page on error
+                    }
+                });
       }
     })
     .catch(error => {
-      console.error('Error:', error);
-      alert('An error occurred while updating the status.');
-    });
+      swal("Error", "An error occurred while updating the status.", "error", {
+                button: "ok",
+            }).then((value) => {
+                if (value) {
+                    window.location.reload(); // Reload the page on network or other unexpected errors
+                }
+            });
+        });
   }
 </script>
 

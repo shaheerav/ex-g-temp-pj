@@ -98,7 +98,7 @@
 
       if (userId.trim() === "") {
         console.error("Invalid userId:", userId);
-        alert("Invalid user ID");
+        swal("Error", "Invalid userId.", "error");
         return;
       }
 
@@ -116,11 +116,13 @@
 
       const data = await response.json();
       console.log('Resend OTP response:', data);
-      alert('OTP resent successfully');
+      swal("renset!", 'OTP resent successfully', "success", {
+        button: "ok",
+    })
 
     } catch (error) {
       console.error('Error during OTP resend:', error);
-      alert('Failed to resend OTP');
+      swal("Error", "Failed to resend OTP.", "error");
     }
   }
 

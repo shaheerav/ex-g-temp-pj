@@ -28,8 +28,10 @@
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <i class="fa fa-chart-line fa-3x text-primary"></i>
                             <div class="ms-3">
+                              <% if(totalSale >0) {%>
                                 <p class="mb-2">Total Sale</p>
                                 <h6 class="mb-0">&#8377;<%= totalSale[0].totalSale%></h6>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -37,8 +39,10 @@
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <i class="fa fa-chart-bar fa-3x text-primary"></i>
                             <div class="ms-3">
+                              <% if(totalorder >0) {%>
                                 <p class="mb-2">Total Order</p>
                                 <h6 class="mb-0"><%= totalorder[0].totalOrder%></h6>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -46,8 +50,10 @@
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <i class="fa fa-chart-area fa-3x text-primary"></i>
                             <div class="ms-3">
+                              <% if(totalUsers>0){ %>
                                 <p class="mb-2">Total Users</p>
                                 <h6 class="mb-0"><%= totalUsers[0].totalUsers%></h6>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -55,8 +61,10 @@
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <i class="fa fa-chart-pie fa-3x text-primary"></i>
                             <div class="ms-3">
+                              <% if(totalProduct>0){ %>
                                 <p class="mb-2">Total product</p>
                                 <h6 class="mb-0"><%= totalProduct[0].totalProduct%></h6>
+                                <% } %>
                             </div>
                         </div>
                     </div>

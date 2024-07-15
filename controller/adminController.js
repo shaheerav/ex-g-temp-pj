@@ -506,21 +506,21 @@ const removeCoupon = async(req,res)=>{
         res.status(500).send('server error',error.message);
     }
 }
-const fileredSalesReport = async (req,res)=>{
-    try{
+const fileredSalesReport = async (req, res) => {
+    try {
         const adminData = await User.findById(req.session.User_id);
         if (!adminData) {
             return res.status(400).send('Admin not logged in');
         }
 
         // Extracting startDate and endDate from query parameters
-        const startDate = req.query.startDate;
-        const endDate = req.query.endDate;
+        const startDate = new Date(req.query.startDate);
+        const endDate = new Date(req.query.endDate);
 
         // MongoDB aggregation pipeline with date filtering
         const orders = await Order.aggregate([
             { $match: {
-                DateOrder: { $gte: new Date(startDate), $lte: new Date(endDate) }
+                DateOrder: { $gte: startDate, $lte: endDate }
             }},
             { $unwind: '$products' },
             { $lookup: {
@@ -551,7 +551,8 @@ const fileredSalesReport = async (req,res)=>{
                     productName: '$productDetails.name',
                     productImage: '$productDetails.image',
                     productPrice: '$productDetails.price',
-                    quantity: '$products.quantity'
+                    quantity: '$products.quantity',
+                    discount: '$products.discount' // Assuming discount is a field in products
                 }},
                 payment: { $first: '$paymentInfo' },
                 userId: { $first: '$userInfo' },
@@ -566,18 +567,30 @@ const fileredSalesReport = async (req,res)=>{
                 userId: 1,
                 totalAmount: 1,
                 DateOrder: 1,
-                status: 1
+                status: 1,
+                totalQuantity: { $sum: '$products.quantity' }, // Calculating total quantity
+                totalDiscount: { $sum: '$products.discount' } // Calculating total discount
             }},
             { $sort: { DateOrder: -1 } }
         ]);
 
-        res.render('filteredSalesReport', { admin: adminData, order: orders });
+        // Calculating grand total amount and total number of orders
+        const totalSales = orders.reduce((acc, order) => acc + order.totalAmount, 0);
+        const orderCount = orders.length;
+
+        res.render('filteredSalesReport', {
+            admin: adminData,
+            order: orders,
+            totalSales,
+            orderCount
+        });
 
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error: ' + error.message);
     }
 };
+
 const filterData = async (req,res)=>{
     const filter = req.query.filter;
 

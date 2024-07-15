@@ -81,7 +81,7 @@ body{
                     <a href="/admin/orderList" class="nav-item nav-link"><i class="bi bi-truck"></i>Orders</a>
                     <a href="/admin/salesReport" class="nav-item nav-link"><i class="bi bi-bar-chart"></i>Sales Report</a>
                     <a href="/admin/coupon" class="nav-item nav-link"><i class="bi bi-star"></i>Coupon Management</a>
-                    <a href="chart.html" class="nav-item nav-link"><i class="bi bi-file-richtext"></i>Banner Management</a>
+                    <!--<a href="chart.html" class="nav-item nav-link"><i class="bi bi-file-richtext"></i>Banner Management</a>-->
                 </div>
             </nav>
         </div>
@@ -139,6 +139,7 @@ body{
       
         <button type="submit">Filter</button>
       </form>
+      
 	<table id="example" class="display nowrap" style="width:100%">
         <thead>
             <tr>
@@ -162,7 +163,7 @@ body{
                 <% }); %>
                 
                 <td><%= order[i].DateOrder %></td>
-                <td><%= order[i].totalAmount%></td>
+                <td><%= order[i].totalAmount%>INR</td>
             </tr>
             <% } %>
           <% } else { %>

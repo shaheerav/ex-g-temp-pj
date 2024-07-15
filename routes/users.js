@@ -94,5 +94,6 @@ userRouts.post('/process-payment',controller.paymentProcess);
 userRouts.get('/shippingcharge',controller.shippingCharge);
 userRouts.get('/payAgain:id',controller.payAgain);
 userRouts.post('/payAgain',controller.tryPaymentAgain);
+userRouts.get('/wishlist',controller.wishlistDisplay);
 
 module.exports = userRouts;

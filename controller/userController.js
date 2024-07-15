@@ -36,6 +36,7 @@ const razorpayInstance = new Razorpay({
 var count = 0;
 const homepage = async (req, res,next) => {
   try {
+    
     const categories = await Category.find({});
 
     const productPromises = categories.map((category) =>
@@ -46,11 +47,29 @@ const homepage = async (req, res,next) => {
 
     const productsByCategory = {};
     categories.forEach((category, index) => {
+      const categoryProducts = products[index].map((product) => {
+        // Calculate best offer price logic here
+        let bestOfferPrice = product.price; // Default to product price if no offers found
+
+        if (product.offer || (category.offer && category.offer > 0)) {
+          const productOfferPrice = product.price - (product.price * (product.offer || 0)) / 100;
+          const categoryOfferPrice = product.price - (product.price * (category.offer || 0)) / 100;
+
+          bestOfferPrice = Math.min(productOfferPrice, categoryOfferPrice);
+        }
+
+        return {
+          ...product.toObject(),
+          bestOfferPrice,
+        };
+      });
+
       productsByCategory[category.name] = {
         description: category.description,
-        products: products[index],
+        products: categoryProducts,
       };
     });
+
 
     const isLoggedIn = req.session.user || req.user;
     let count = 0;
@@ -1272,7 +1291,7 @@ const updateQuantity = async (req, res) => {
       }
       productInCart.quantity = newQuantity;
       await userCart.save();
-
+      
       const newTotalPrice = productInCart.quantity * productDetails.price;
       const cartSubtotal = userCart.products.reduce(
         (total, p) => total + p.quantity * p.price,
@@ -1610,6 +1629,7 @@ const placeOrder = async (req, res) => {
         },
       };
       await Cart.deleteOne({ userId: userId });
+      
       // Create Razorpay order
       razorpayInstance.orders.create(options, (err, razorpayOrder) => {
         if (!err) {
@@ -1648,6 +1668,8 @@ const placeOrder = async (req, res) => {
         console.log(newBalance);
         wallet.amount = newBalance;
         await wallet.save();
+        payment.status = 'paid';
+        await payment.save();
         return res.json({ success: true, message: 'Payment successful using Wallet' });
       }else{
         return res.json({ success: false, message: 'Insufficient wallet balance' });
@@ -2461,47 +2483,66 @@ const reviweToProduct = async (req, res,next) => {
     next(error)
   }
 };
-const invoiceDownload = async (req,res,next)=>{
-    try {
-      const orderId = req.params.orderId;
+const invoiceDownload = async (req, res, next) => {
+  try {
+    const orderId = req.params.orderId;
 
-      const order = await getOderDetails(orderId);
-      console.log(order,'oderlist')
+    // Assuming getOderDetails retrieves the order details
+    const order = await getOderDetails(orderId);
 
-      if (!order) {
-          return res.status(404).send('Order not found');
-      }
+    if (!order) {
+        return res.status(404).send('Order not found');
+    }
 
-      const doc = new PDFDocument();
+    // Create a new PDF document
+    const doc = new PDFDocument();
 
-      res.setHeader('Content-disposition', `attachment; filename=invoice_${orderId}.pdf`);
-      res.setHeader('Content-type', 'application/pdf');
+    // Set response headers for PDF download
+    res.setHeader('Content-disposition', `attachment; filename=invoice_${orderId}.pdf`);
+    res.setHeader('Content-type', 'application/pdf');
 
-      doc.pipe(res);
+    // Pipe the PDF document to the response stream
+    doc.pipe(res);
+    doc.fontSize(25).text('TrendSetter', { align: 'center' }); // Your website name
+    doc.moveDown();
+    // Add content to the PDF
+    doc.fontSize(25).text('Invoice', { align: 'center' });
+    doc.moveDown();
 
-      // Add content to the PDF
-      doc.fontSize(25).text('Invoice', { align: 'center' });
-      doc.moveDown();
-      doc.fontSize(16).text(`Order ID: ${order._id}`);
-      doc.text(`Customer Name: ${order.address.fullname}`);
-      doc.text(`Date: ${new Date(order.DateOrder).toLocaleDateString()}`);
-      doc.moveDown();
-      
-      doc.text('Items:');
-      order.products.forEach(item => {
-          doc.text(`- ${item.product.name}: $${item.product.price} x ${item.quantity}`);
-      });
-      
-      doc.moveDown();
-      doc.fontSize(18).text(`Total Amount: $${order.totalAmount}`, { align: 'right' });
+    // Order details section
+    doc.fontSize(12);
+    doc.text(`Order ID: ${order._id}`);
+    doc.text(`Date: ${moment(order.DateOrder).format('MMMM Do YYYY, h:mm:ss a')}`); // Format date as desired
 
-      // Finalize the PDF and end the stream
-      doc.end();
+    doc.moveDown();
+    doc.text(`Customer Name: ${order.address.fullname}`);
+    doc.text(`Customer Email: ${order.address.email}`);
 
-  }catch(error){
-    next(error)
-  }
+    // Display discount if available
+    if (order.discount) {
+        doc.text(`Discount: ${order.discount}%`);
+    }
+
+    doc.moveDown();
+    doc.fontSize(14).text('Items:', { underline: true });
+
+    // List of ordered items
+    doc.fontSize(12);
+    order.products.forEach(item => {
+        doc.text(`- ${item.product.name}: ₹${item.product.price.toFixed(2)} x ${item.quantity}`);
+    });
+
+    doc.moveDown();
+    doc.fontSize(16).text(`Total Amount: ₹${order.totalAmount.toFixed(2)}`, { align: 'right' });
+
+    // Finalize the PDF and end the stream
+    doc.end();
+
+} catch (error) {
+    next(error);
+}
 };
+
 const paymentProcess = async(req,res)=>{
   try{
     const { paymentId, success,orderId } = req.body;
@@ -2619,7 +2660,65 @@ const tryPaymentAgain = async(req,res)=>{
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 }
+const wishlistDisplay = async(req,res)=>{
+  try{
+    const user = req.session.user || req.user;
+    const wishlistItems = await Wishlist.find({ user }).populate('products.productId').lean();
 
+  const formattedWishlistItems = [];
+
+  for (const item of wishlistItems) {
+    const product = item.products.productId; // Access the populated productId
+    const category = await Category.findById(product.category).lean();
+
+    let bestOffer = null;
+    let bestOfferPrice = product.price;
+
+    // Check for category offer
+    if (category && category.offer) {
+      const categoryOfferPrice = product.price - (product.price * category.offer) / 100;
+      if (categoryOfferPrice < bestOfferPrice) {
+        bestOffer = {
+          offer: category.offer,
+          offerStart: category.offerStart,
+          offerEnd: category.offerEnd
+        };
+        bestOfferPrice = categoryOfferPrice;
+      }
+    }
+
+    // Check for product-specific offer
+    if (product.offer) {
+      const productOfferPrice = product.price - (product.price * product.offer) / 100;
+      if (productOfferPrice < bestOfferPrice) {
+        bestOffer = {
+          offer: product.offer,
+          offerStart: product.offerStart,
+          offerEnd: product.offerEnd
+        };
+        bestOfferPrice = productOfferPrice;
+      }
+    }
+
+    const formattedItem = {
+      _id: item._id,
+      product: {
+        _id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.image[0], // Assuming you retrieve the first image URL
+        bestOfferPrice,
+        bestOffer
+      }
+    };
+
+    formattedWishlistItems.push(formattedItem);
+  }
+
+  }catch(error){
+    console.error(error.message);
+  }
+}
 module.exports = {
   registration,
   addUser,
@@ -2676,5 +2775,6 @@ module.exports = {
   paymentProcess,
   shippingCharge,
   payAgain,
-  tryPaymentAgain
+  tryPaymentAgain,
+  wishlistDisplay
 };
