@@ -1,3 +1,4 @@
+const category = require('../models/category');
 const Category = require('../models/category');
 const User = require('../models/userModel');
 const showCategoty = async (req,res)=>{
@@ -27,11 +28,11 @@ const newCategory = async (req,res)=>{
 const addCategory = async (req,res)=>{
     try {
         const normalizedName = req.body.name.toLowerCase();
+        const user = await User.findById(req.session.User_id);
 
         const existingCategory = await Category.findOne({ name: normalizedName }).collation({ locale: 'en', strength: 2 });
 
         if (existingCategory) {
-            const user = await User.findById(req.session.User_id);
             return res.render('category-add', { admin: user, message: 'Category with this name already exists.' });
         }
 
@@ -117,6 +118,49 @@ const removeSoftDeleteCategory = async (req,res)=>{
         console.log(error.message);
     }
 };
+const offerPage = async(req,res)=>{
+    try{
+        const categoryid = req.query.id;
+        const user = await User.findById(req.session.User_id);
+        const category = await Category.findById(categoryid);
+        res.render('offer',{admin:user,category});
+
+    }catch(error){
+        res.status(500).send('server error');
+    }
+};
+const categoryOffer = async (req,res)=>{
+    try{
+        const { categoryId } = req.params;
+        console.log(categoryId,'id')
+        const { offer, offerStart, offerEnd } = req.body;
+        const category = await Category.findByIdAndUpdate(
+            categoryId,
+            { $set: { offer, offerStart, offerEnd } },
+            { new: true }
+          );
+          if (!category) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+          }
+          
+          res.json({ success: true, message: 'Offer added successfully', category });
+        } catch (error) {
+          console.error('Error updating offer:', error);
+          res.status(500).json({ success: false, message:'server error'})
+}
+};
+const removeOffer = async(req,res)=>{
+    try{
+        const categoryId = req.query.id;
+        await Category.findByIdAndUpdate(categoryId,{offer:'',offerStart:'',offerEnd:''});
+         
+        res.redirect(`/category/offers?id=${categoryId}`)
+        
+
+    }catch(error){
+        res.status(500).send('server Error');
+    }
+}
 module.exports ={
     showCategoty,
     newCategory,
@@ -125,5 +169,7 @@ module.exports ={
     updateCategory,
     deleteCategory,
     softDeleteCategory,
-    removeSoftDeleteCategory
+    removeSoftDeleteCategory,
+    offerPage,categoryOffer,
+    removeOffer
 }
