@@ -1,6 +1,7 @@
 <%- include('../layouts/admin/header.ejs')  %>
 <div class="col-12">
   <h2>Product List</h2>
+  <button type="button" class="btn btn-primary" style="margin: 8px;"><a href="/product/search" class="text-light">Search Product</a></button>
   <button type="button" class="btn btn-primary" style="margin: 8px;"><a href="/product/addProduct" class="text-light">Add New Product</a></button>
   <div class="bg-light rounded h-100 p-4">
     <div class="table-responsive">
@@ -61,8 +62,9 @@
                       <a href="/product/softdeleteproduct?id=<%= product[i]._id %>" class="text-light">Unlink</a>
                       <% }else{ %>
                       <a href="/product/removeSoftDeleteP?id=<%= product[i]._id %>" class="text-light">Link</a>
-                      <% } %>
+                      <% } %> 
                     </button>
+                    <button type="button" class="btn btn-primary"> <a href="/product/offers?id=<%= product[i]._id %>" class="text-light">Offer</a></button>
                   </div>
                 </td>
               </tr>
@@ -72,8 +74,10 @@
               <td colspan="9">No Product</td>
             </tr>
           <% } %>
+          <!-- Offer Modal -->
           </tbody>
           </table>
+          
           <ul class="pagination">
             <% for (let i = 1; i <= totalPages; i++) { %>
             <li class="page-item <%= i === currentPage ? 'active' : '' %>">
@@ -86,5 +90,4 @@
     </div>
   </div>
 </div>
-
 <%- include('../layouts/admin/footer.ejs')  %>
