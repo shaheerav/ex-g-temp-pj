@@ -25,6 +25,7 @@
             <td>
               <div class="btn-group" role="group" aria-label="Basic example">
                 <a href="/category/edit-category?id=<%= category[i]._id %>" class="btn btn-primary text-light">EDIT</a>
+                <a href="/category/offers?id=<%= category[i]._id %>" class="btn btn-primary text-light">Offers</a>
                 <% if(!category[i].softDelete) { %>
                   <a href="/category/softdeleteCategory?id=<%= category[i]._id %>" class="btn btn-primary text-light">UNLINK</a>
                 <% } else { %>
