@@ -42,6 +42,24 @@ app.use('/category',categoryRouter);
 const publicUploadsPath = path.join(__dirname, 'public', 'uploads');
 app.use('/uploads', express.static(publicUploadsPath));
 
+app.use((req, res, next) => {
+  res.status(404).render('users/404', {
+    url: req.originalUrl,
+    isLoggedIn: req.session.user || req.user,
+    count: 0,
+    message: "Page not found"
+  });
+});
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).render('users/500', {
+    error: err,
+    isLoggedIn: req.session.user || req.user,
+    count: 0
+  });
+});
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
