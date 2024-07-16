@@ -34,10 +34,7 @@ const connectDB = async () => {
     try {
         mongoose.set('strictQuery', false);
         console.log(process.env.MONGODB_URI)
-        const conn = await mongoose.connect(mysecret,{
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        } );
+        const conn = await mongoose.connect(mysecret );
         console.log(`MongoDB Connected`);
 
         cron.schedule('0 0 * * *', removeExpiredOffers);
