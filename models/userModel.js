@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require('uuid');
 
 const userData =  new mongoose.Schema({
     name:{
@@ -49,6 +50,16 @@ const userData =  new mongoose.Schema({
         type:String,
         default:''
     },
+    googleId:{
+        type:String,
+        unique:true,
+        spare:true
+    },
+    referralCode: {
+        type: String,
+        unique: true
+    },
+    
     
 },{
     timestamps:true

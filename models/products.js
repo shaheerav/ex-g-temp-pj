@@ -8,6 +8,7 @@ const sizeSchema = new mongoose.Schema({
       max: 200
     }
   });
+
 const productSchema = new mongoose.Schema({
     name:{
         type:String,
@@ -49,7 +50,19 @@ const productSchema = new mongoose.Schema({
         type:mongoose.Types.ObjectId,
         ref:'Review',
         require:true
-    }
+    },
+    offer: {
+        type: Number,
+        default: 0,
+        min: [0, 'Offer must be a non-negative number'],
+        max: [100, 'Offer cannot exceed 100%']
+      },
+      offerStart: {
+        type: Date
+      },
+      offerEnd: {
+        type: Date
+      }
 },{
     timestamps:true
 });
