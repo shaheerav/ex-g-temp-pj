@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/tiny-slider.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+    <title>DataTables Example</title>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css" />
+    
+</head>
+<body>
+        <!-- Start Header/Navigation -->
+        <nav
+          class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
+          arial-label="Furni navigation bar"
+        >
+          <div class="container">
+            <a class="navbar-brand" href="index.html">Trend Setter<span>.</span></a>
+    
+            <button
+              class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarsFurni"
+              aria-controls="navbarsFurni"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse" id="navbarsTrend">
+              <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                <li class="home active">
+                  <a class="nav-link" href="/">Home</a>
+                </li>
+                <li><a class="nav-link" href="/men">Men</a></li>
+                <li><a class="nav-link" href="/search">Search Product</a></li>
+              </ul>
+    
+              <div class="nav-item dropdown ms-auto mb-2 mb-md-0">
+                <li>
+                  <a
+                    href="#"
+                    class="nav-link dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    style="color: white"
+                    ><img src="images/user.svg" />
+                    <% if (isLoggedIn) { %>
+                    <!-- Content to show when the user is logged in -->
+                    <% if(isLoggedIn.displayName) {%>
+                    <samp><%= isLoggedIn.displayName %></samp>
+                    <% } else if (isLoggedIn.name) {%>
+                    <samp><%= isLoggedIn.name %></samp>
+                    <% } %>
+                    <!-- Other content for logged-in users -->
+                    <% } else { %> Sign in <% } %></a
+                  >
+                  <div class="dropdown-menu bg-transparent border-0">
+                    <a href="/userDetails" class="dropdown-item">Your Account</a>
+                    <a href="/orders" class="dropdown-item">Your Order</a>
+                    <a href="element.html" class="dropdown-item">Wish List</a>
+                    <a href="/users" class="dropdown-item">Sign Up</a>
+                    <% if (isLoggedIn){ %>
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                    <%} else { %>
+                    <a href="/login" class="dropdown-item">Login</a>
+                    <% } %>
+                  </div>
+                </li>
+              </div>
+              <li>
+                <a class="nav-link" href="/cart">
+                  <div class="cart-container">
+                    <img src="images/cart.svg" class="cart-image" />
+                    <span class="badge badge-light"><%if(count){%>
+                        <%= count %>
+                    <%}else{%>
+                    0
+                <%}%></span>
+                  </div>
+                </a>
+              </li>
+            </div>
+          </div>
+        </nav>
+        <!-- End Header/Navigation -->
+      </body>
+    </html>
+<div class="col-md-12 " style="padding-bottom: 150px; padding-top: 50px;">
+    <table id="myTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th width="40%">Name</th>
+                <th width="24%">Brand</th>
+                <th width="13%">Category</th>
+                <th width="13%">Price</th>
+                <th width="10%">Image</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <% if(product.length > 0){ %>
+                <% for(let i = 0; i < product.length; i++){ %>
+                    <td><%= product[i].name %></td>
+                    <td><%= product[i].brand %></td>
+                    <td><%= product[i].category ? product[i].category.name : 'N/A' %></td>
+                    <td><%= product[i].price %></td>
+                    <td><% if(product[i].image){ %>
+                      <a href="/product/showImages?id=<%= product[i]._id %>"><img src="/uploads/<%= product[i].image[0] %>" style="width: 50px; height: 60px;" alt="product Image"></a>
+                      <% } else { %>
+                      <span> NO Image Available </span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% } %>
+              <% } else { %>
+                <tr>
+                  <td colspan="9">No Product</td>
+                </tr>
+              <% } %>
+        </tbody>
+    </table>
+</div>
+
+    <script>
+        $(document).ready(function() {
+            $('#myTable').DataTable();
+        });
+    </script>
+    <footer class="footer-section">
+        <div class="container relative">
+    
+            <div class="sofa-img">
+                <img src="images/logo1.png" alt="Image" class="img-fluid">
+            </div>
+    
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="subscription-form">
+                        <h3 class="d-flex align-items-center"><span class="me-1"><img src="images/envelope-outline.svg" alt="Image" class="img-fluid"></span><span>Subscribe to Newsletter</span></h3>
+    
+                        <form action="#" class="row g-3">
+                            <div class="col-auto">
+                                <input type="text" class="form-control" placeholder="Enter your name">
+                            </div>
+                            <div class="col-auto">
+                                <input type="email" class="form-control" placeholder="Enter your email">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary">
+                                    <span class="fa fa-paper-plane"></span>
+                                </button>
+                            </div>
+                        </form>
+    
+                    </div>
+                </div>
+            </div>
+    
+            <div class="row g-5 mb-5">
+                <div class="col-lg-4">
+                    <div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">Trend Setter<span>.</span></a></div>
+                    <p class="mb-4">Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique. Pellentesque habitant</p>
+    
+                    <ul class="list-unstyled custom-social">
+                        <li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-twitter"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-instagram"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-linkedin"></span></a></li>
+                    </ul>
+                </div>
+    
+                <div class="col-lg-8">
+                    <div class="row links-wrap">
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">About us</a></li>
+                                <li><a href="#">Services</a></li>
+                                <li><a href="#">Blog</a></li>
+                                <li><a href="#">Contact us</a></li>
+                            </ul>
+                        </div>
+    
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Support</a></li>
+                                <li><a href="#">Knowledge base</a></li>
+                                <li><a href="#">Live chat</a></li>
+                            </ul>
+                        </div>
+    
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Jobs</a></li>
+                                <li><a href="#">Our team</a></li>
+                                <li><a href="#">Leadership</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+    
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Nordic Chair</a></li>
+                                <li><a href="#">Kruzo Aero</a></li>
+                                <li><a href="#">Ergonomic Chair</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+    
+            </div>
+    
+            <div class="border-top copyright">
+                <div class="row pt-4">
+                    <div class="col-lg-6">
+                        <p class="mb-2 text-center text-lg-start">Copyright &copy;<script>document.write(new Date().getFullYear());</script>. All Rights Reserved. &mdash; Designed with love by <a href="https://untree.co">Untree.co</a> Distributed By <a hreff="https://themewagon.com">ThemeWagon</a>  <!-- License information: https://untree.co/license/ -->
+        </p>
+                    </div>
+    
+                    <div class="col-lg-6 text-center text-lg-end">
+                        <ul class="list-unstyled d-inline-flex ms-auto">
+                            <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+    
+                </div>
+            </div>
+    
+        </div>
+    </footer>
+    <script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/tiny-slider.js"></script>
+<script src="js/custom.js"></script>
+</body>
+</html>
