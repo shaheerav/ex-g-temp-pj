@@ -36,15 +36,21 @@ const handleFileUploads = (req, res, next) => {
 };
 
 const controllProduct = require("../controller/productController");
-productRouts.get("/", controllProduct.showProduct);
-productRouts.get("/addProduct", controllProduct.newProduct);
-productRouts.post("/addProduct",handleFileUploads, controllProduct.addProduct);
-productRouts.get("/edit-product", controllProduct.editProduct);
-productRouts.post("/edit-product",handleFileUploads,controllProduct.updateProduct);
-productRouts.get('/showImages',controllProduct.showImages);
-productRouts.post('/showImages/:productId/:index', controllProduct.deleteImage);
-productRouts.get("/delete-product", controllProduct.deleteProduct);
-productRouts.put('/rating',controllProduct.rating);
-productRouts.get("/softdeleteProduct", controllProduct.softDeleteProduct);
-productRouts.get("/removesoftDeleteP", controllProduct.removeSoftDeletePro);
+const authAdmin = require("../middleware/adminAuth");
+
+productRouts.get("/", authAdmin.isLogin, controllProduct.showProduct);
+productRouts.get("/addProduct", authAdmin.isLogin,controllProduct.newProduct);
+productRouts.post("/addProduct",authAdmin.isLogin,handleFileUploads, controllProduct.addProduct);
+productRouts.get("/edit-product",authAdmin.isLogin, controllProduct.editProduct);
+productRouts.post("/edit-product",authAdmin.isLogin,handleFileUploads,controllProduct.updateProduct);
+productRouts.get('/showImages',authAdmin.isLogin,controllProduct.showImages);
+productRouts.post('/showImages/:productId/:index',authAdmin.isLogin, controllProduct.deleteImage);
+productRouts.get("/delete-product",authAdmin.isLogin, controllProduct.deleteProduct);
+productRouts.put('/rating',authAdmin.isLogin,controllProduct.rating);
+productRouts.get("/softdeleteProduct",authAdmin.isLogin, controllProduct.softDeleteProduct);
+productRouts.get("/removesoftDeleteP",authAdmin.isLogin, controllProduct.removeSoftDeletePro);
+productRouts.get('/offers',authAdmin.isLogin,controllProduct.offerPageLoad);
+productRouts.post('/:productId/offer',authAdmin.isLogin,controllProduct.productOffer);
+productRouts.get('/offerRemove',authAdmin.isLogin,controllProduct.removeOffer);
+productRouts.get('/search',authAdmin.isLogin,controllProduct.searchProduct)
 module.exports = productRouts;
