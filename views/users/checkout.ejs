@@ -1,6 +1,6 @@
 <%- include('../layouts/user/header.ejs') %>
 		<!-- Start Hero Section -->
-			<div class="hero">
+			<div class="borderNav">
 				<div class="container">
 					<div class="row justify-content-between">
 						<div class="col-lg-5">
@@ -166,7 +166,12 @@
 								  <tr id="couponDiscountRow" style="display:none;">
 									<td class="text-black font-weight-bold"><strong>Coupon Discount</strong></td>
 									<td class="text-black" id="couponDiscountAmount"></td>
+									
 								  </tr>
+								  <tr id="shippingChargeRow" style="display:none;">
+									<td class="text-black font-weight-bold"><strong>Shipping Charge</strong></td>
+									<td class="text-black" id="shippingChargeAmount"></td>
+								</tr>
 								  <tr>
 									<td class="text-black font-weight-bold"><strong>Order Total</strong></td>
 									<td class="text-black font-weight-bold"><strong><i class="bi bi-currency-rupee"></i><span id="orderTotal"><%= total %></span></strong></td>
@@ -179,6 +184,7 @@
 							  <select name="payment" id="payment" class="form-control">
 								<option value="Razorpay">Razorpay</option>
 								<option value="COD">Cash-On-Delivery</option>
+								<option value="Wallet"><i class="bi bi-wallet2"></i>Wallet</option>
 							  </select>
 							</div>
 						  
@@ -288,13 +294,65 @@
 				});
 
 				selectedAddressId = addressId;
+				fetchShippingCharge(addressId);
 				}
+				async function fetchShippingCharge(addressId){
+					try{
+						const response = await fetch(`/shippingCharge?addressId=${addressId}`);
+						if(!response.ok){
+							throw new Error('Failed to fetch shipping charge');
+						}
+						const data = await response.json();
+						const shippingcharge = parseFloat(data.shippingCharge); //shipping charge
+						console.log(shippingcharge,'shipping charge');
+						let total = parseFloat($('#finalTotal').val()); // current total
+						console.log(total,'current total');
+						if (isNaN(total)) {
+							console.error('Current total amount is not a number');
+							swal("Error", "Invalid current total amount.", "error");
+							return;
+						}
+						if (isNaN(shippingcharge)) {
+							console.error('Discount amount is not a number');
+							swal("Error", "Invalid discount amount received.", "error");
+							return;
+						}
+						const newTotal = Math.max(total + shippingcharge,0);
+
+						//update current values
+						$('#orderTotal').text(newTotal.toFixed(2));
+						$('#finalTotal').val(newTotal.toFixed(2));
+						//discount row show
+						$('#shippingChargeRow').show();
+						$('#shippingChargeAmount').html(`<i class="bi bi-currency-rupee"></i>${shippingcharge.toFixed(2)}`);
+						swal("Shipping Charge Added", `shipping chare${shippingcharge.toFixed(2)} added`, "success");
+
+
+					}catch(error){
+						console.error('Error fetching shipping charge:',error.message);
+						swal("Error", "An error occurred while adding shipping charge. Please try again later.", "error");
+					}
+				}
+
+
+/*// Ensure form submission checks the final total
+$('#orderForm').submit(function (event) {
+  const finalTotal = parseFloat($('#finalTotal').val());
+
+  if (isNaN(finalTotal) || finalTotal <= 0) {
+    event.preventDefault();
+    swal("Error", "Invalid order total. Please check the order details and try again.", "error");
+  }
+});*/
 	
 				
 
-				function placeOrder() {
+function placeOrder() {
     const paymentMethod = document.getElementById('payment').value;
+	const shippingChargeElement = document.getElementById('shippingChargeAmount');
+  
 
+  const shippingCharge = shippingChargeElement ? parseFloat(shippingChargeElement.innerText) : 0;
     if (!selectedAddressId) {
         swal("Please select an address", {
             dangerMode: true,
@@ -323,20 +381,16 @@
             addressId: selectedAddressId,
             paymentMethod: paymentMethod,
             totalAmount: finalTotal,
-            productName: productName
+            productName: productName,
+			shippingCharge:shippingCharge,
+			
         })
     })
     .then(response => response.json())
     .then(res => {
         if (res.success) {
             if (paymentMethod === 'COD') {
-                swal("Order Placed!", "Your order has been successfully placed.", "success", {
-                    button: "Go to Orders",
-                }).then((value) => {
-                    if (value) {
-                        window.location.href = '/orders';
-                    }
-                });
+                handleOrderSuccess("Your order has been successfully placed.", "/orders");
             } else if (paymentMethod === 'Razorpay') {
                 const options = {
                     key: `${res.key_id}`,
@@ -345,13 +399,7 @@
                     name: `${res.product_name}`,
                     order_id: `${res.order_id}`,
                     handler: function(response) {
-                        swal("Order Placed!", "Your order has been successfully placed.", "success", {
-                            button: "Go to Orders",
-                        }).then((value) => {
-                            if (value) {
-                                window.location.href = '/orders';
-                            }
-                        });
+						handleRazorpaySuccess(response,res.db_order_id);
                     },
                     prefill: {
                         name: `${res.name}`,
@@ -367,16 +415,16 @@
                 };
 
                 const razorpayObject = new Razorpay(options);
-                razorpayObject.on('payment.failed', function(response) {
-                    swal("Payment Failed", response.error.description, "error", {
-                        button: "Try Again",
-                    });
-                });
+                razorpayObject.on('payment.failed',function(response){
+					handleRazorpayFailure(response.error,res.db_order_id);
+				});
 
                 razorpayObject.open();
-            }
+            }else if(paymentMethod === 'Wallet'){
+				handleOrderSuccess("Your order has been successfully placed.", "/orders");
+			}
         } else {
-            swal("Error placing order", "An error occurred while processing your order. Please try again later.", "error", {
+            swal("Error placing order", res.message || "An error occurred while processing your order. Please try again later.", "error", {
                 dangerMode: true,
                 button: true,
             });
@@ -388,6 +436,68 @@
             dangerMode: true,
             button: true,
         });
+    });
+}
+function handleRazorpaySuccess(response,orderId) {
+    // Handle successful payment response from Razorpay
+    swal("Order Placed!", "Your order has been successfully placed.", "success", {
+        button: "Go to Orders",
+    }).then((value) => {
+        if (value) {
+            window.location.href = '/orders';
+        }
+    });
+
+    // Send payment success status to backend
+    sendPaymentStatusToBackend(response.razorpay_payment_id, true , orderId);
+}
+
+function handleRazorpayFailure(error,orderId) {
+    // Handle payment failure from Razorpay
+    swal("Payment Failed", error.description || "Your payment was not successful. Please try again.", "error", {
+        button: "try again",
+    }).then((value)=>{
+		if(value){
+			window.location.href = '/orders'
+		}
+	})
+
+    // Send payment failure status to backend
+    sendPaymentStatusToBackend(null, false,orderId);
+}
+function handleOrderSuccess(message, redirectUrl) {
+    swal("Order Placed!", message, "success", {
+        button: "Go to Orders",
+    }).then((value) => {
+        if (value) {
+            window.location.href = '/orders';
+        }
+    });
+}
+function sendPaymentStatusToBackend(paymentId, success,orderId) {
+	console.log(orderId,'order id')
+    fetch('/process-payment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            paymentId: paymentId,
+            success: success,
+			orderId:orderId
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            swal("Error", "Failed to send payment status to backend.", "error");
+        }else{
+			console.log('Payment status updated successfully');
+		}
+    })
+    .catch(error => {
+        console.error('Error sending payment status:', error);
+        swal("Error", "An error occurred while sending payment status to backend.", "error");
     });
 }
 
@@ -447,7 +557,7 @@
 						})
 						.catch(error => {
 						console.error('Error:', error);
-						alert('An error occurred while cancelling the order.');
+						swal("Error", "An error occurred while cancelling the order.", "error");
 						});
 					};
 //coupon validation

@@ -1,4 +1,20 @@
 <%- include('../layouts/user/header.ejs') %>
+<style>
+  #otp-inputs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .otp-input {
+    width: 3rem;
+    height: 3rem;
+    text-align: center;
+    font-size: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+  }
+</style>
 
 <!-- Start Hero Section -->
 <div class="hero">
@@ -6,17 +22,13 @@
     <div class="row justify-content-between">
       <div class="col-lg-6">
         <div class="hero-img-wrap">
-          <img
-            src="images/familypic.png"
-            class="img-fluid"
-            style="height: 500px"
-          />
+          <img src="images/familypic.png" class="img-fluid" style="height: 500px" />
         </div>
       </div>
       <div class="col-lg-6">
         <h2 style="color: white">Verify OTP</h2>
         <div class="intro-excerpt">
-          <form action="" method="post">
+          <form id="otpForm" action="/verifyOTP" method="post">
             <div class="form-group">
               <label style="color: white">Enter your OTP</label><br />
               <div id="otp-inputs">
@@ -28,34 +40,24 @@
                 <input type="text" class="otp-input" maxlength="1" />
               </div>
               <input type="hidden" name="otp" id="otp" />
-              <div id="timer" style="font-size: 2em;
-      color:white;">60</div>
               <input type="hidden" name="user_id" value="<%= user_id %>" />
+              <div id="timer" style="font-size: 2em; color: white;">60</div>
             </div>
             <div class="col">
-              <button
-              id="resendOtpButton"
-                onclick="resendOtp('<%= user_id %>')"
-                class="btn btn-primary"
-                type="button"
-              >
-                Resend otp</button
-              ><br /><br />
+              <button id="resendOtpButton" onclick="resendOtp('<%= user_id %>')" class="btn btn-primary" type="button">
+                Resend OTP
+              </button><br /><br />
             </div>
             <div class="col">
-              <button
-                type="submit"
-                class="btn btn-primary btn-lg"
-                style="margin-left: 160px"
-              >
+              <button type="submit" class="btn btn-primary btn-lg" style="margin-left: 160px">
                 Verify OTP
               </button>
             </div>
             <div>
-              <p>Don't have an account please <a href="/users">Register</a></p>
+              <p>Don't have an account? Please <a href="/users">Register</a></p>
             </div>
             <% if (typeof message !== 'undefined') { %>
-            <p style="color: white; font-weight:bold;"><%= message %> <a href="/login">login</a> now</p>
+            <p style="color: white; font-weight: bold;"><%= message %> <a href="/login">login</a> now</p>
             <% } %>
           </form>
         </div>
@@ -64,37 +66,42 @@
   </div>
 </div>
 <!-- End Hero Section -->
-<script>
-  function startResendTimer(){
-    let resendBtn = document.getElementById('resendOtpButton');
-    if(resendBtn){
-      resendBtn.style.display = "none";
-      
-    setTimeout(function(){
-      resendBtn.style.display ='block';
-      console.log("resend button work after one minut")
-    },60000)
-    }else{
-      console.error('resend button has some error')
-    }
-    
-  }
-  window.onload = startResendTimer();
 
-    let userId ;
-    
-    async function resendOtp(userId) {
-      try{
-        userId= userId;
-        console.log('receiving resendOTP request:',userId);
-  
-      // Check if userId is a non-empty string before making the request
+<%- include('../layouts/user/footerlogin.ejs') %>
+
+<script>
+  function generateOtp() {
+    const inputs = document.querySelectorAll('.otp-input');
+    const otp = Array.from(inputs).map(input => input.value).join('');
+    document.getElementById('otp').value = otp;
+  };
+
+  document.getElementById('otpForm').addEventListener('submit', generateOtp);
+
+  function startResendTimer() {
+    let resendBtn = document.getElementById('resendOtpButton');
+    if (resendBtn) {
+      resendBtn.style.display = "none";
+      setTimeout(function () {
+        resendBtn.style.display = 'block';
+        console.log("Resend button is now visible");
+      }, 60000);
+    } else {
+      console.error('Resend button has some error');
+    }
+  }
+  window.onload = startResendTimer;
+
+  async function resendOtp(userId) {
+    try {
+      console.log('Receiving resendOTP request:', userId);
+
       if (userId.trim() === "") {
-          console.error("Invalid userId:", userId);
-          alert("Invalid user ID");
-          return;
-        }
-  
+        console.error("Invalid userId:", userId);
+        swal("Error", "Invalid userId.", "error");
+        return;
+      }
+
       const response = await fetch("/resendOtp", {
         method: "POST",
         headers: {
@@ -102,46 +109,40 @@
         },
         body: JSON.stringify({ userId }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`Failed to resend OTP. Server returned status ${response.status}`);
-        }
-  
-        const data = await response.json();
-        console.log('Resend OTP response: ',data);
-        alert('OTP resent successfylly');
-  
-    } catch (error) {
-      console.error('Error during OTP resend :', error);
-      alert('Failed to resend OTP');
-    }
-  };
-  
-  //Shedule the resendOtp function after 5 minuts
-  setTimeout(async() => {
-    const userId = document.querySelector('#user_id').value;
-    await resendOtp(userId);
-  }, 1 * 60 * 1000);
-  
-  //timer
-  let timeLeft = 60; // 1 minute (60 seconds)
-
-    // Function to update the timer
-    function updateTimer() {
-      const timerElement = document.getElementById('timer');
-      timerElement.textContent = timeLeft;
-      
-      if (timeLeft > 0) {
-        timeLeft--;
-        setTimeout(updateTimer, 1000); // Call updateTimer every 1 second
-      } else {
-        timerElement.textContent = 'Time is up!';
       }
-    }
 
-    // Start the timer
+      const data = await response.json();
+      console.log('Resend OTP response:', data);
+      swal("renset!", 'OTP resent successfully', "success", {
+        button: "ok",
+    })
+
+    } catch (error) {
+      console.error('Error during OTP resend:', error);
+      swal("Error", "Failed to resend OTP.", "error");
+    }
+  }
+
+  let timeLeft = 60;
+
+  function updateTimer() {
+    const timerElement = document.getElementById('timer');
+    timerElement.textContent = timeLeft;
+
+    if (timeLeft > 0) {
+      timeLeft--;
+      setTimeout(updateTimer, 1000);
+    } else {
+      timerElement.textContent = 'Time is up!';
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
     updateTimer();
-    document.addEventListener("DOMContentLoaded", () => {
+
     const inputs = document.querySelectorAll('.otp-input');
 
     inputs.forEach((input, index) => {
@@ -159,4 +160,3 @@
     });
   });
 </script>
-<%- include('../layouts/user/footerlogin.ejs') %>

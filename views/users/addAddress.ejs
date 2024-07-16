@@ -1,6 +1,20 @@
 <%- include ('../layouts/user/header.ejs') %>
-<%- include('../partials/breadcrumbs.ejs')  %>
 
+<div class="borderNav">
+  <div class="container">
+      <div class="row justify-content-between">
+          <div class="col-lg-5">
+              <div class="intro-excerpt">
+                  
+              </div>
+          </div>
+          <div class="col-lg-7">
+              
+          </div>
+      </div>
+  </div>
+</div>
+<%- include('../partials/breadcrumbs.ejs')  %>
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
       <div class="col-sm-12 col-xl-6">
@@ -72,13 +86,23 @@
                 <label for="state" class="form-label"
                   >State</label
                 >
-                <input
-                  type="text"
+                <select
                   class="form-control"
                   name="state"
                   required
                   id="address-sta"
-                />
+                ><option value="Kerala">Kerala</option>
+                <option value="Thamilnadu">Thamilnadu</option>
+                <option value="karnadaka">Karnadaka</option>
+                <option value="Default">Maharashtra</option>
+                <option value="Default">Chhattisgarh</option>
+                <option value="Default">Bihar</option>
+                <option value="Default">Goa</option>
+                <option value="Default">Punjab</option>
+                <option value="Default">Mizoram</option>
+                <option value="Default">Andhra Pradesh</option>
+                <option value="Default">West Bengal</option>
+                </select>
               </div>
               <div class="mb-3">
                 <label for="country" class="form-label"
@@ -86,11 +110,14 @@
                 >
                 <input
                   type="text"
-                  class="form-control"
-                  name="country"
-                  id="address-cou"
-                  required
+                  
                 />
+                <select class="form-control"
+                name="country"
+                id="address-cou"
+                required>
+                <option>India</option>
+                </select>
               </div>
   
             <button type="submit" class="btn btn-primary">save</button>

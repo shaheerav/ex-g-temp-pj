@@ -1,11 +1,11 @@
 <%- include('../layouts/user/header.ejs') %>
     <!-- Start Hero Section -->
-    <div class="hero">
+    <div class="borderNav">
         <div class="container">
             <div class="row justify-content-between">
                 <div class="col-lg-5">
                     <div class="intro-excerpt">
-                        <h1>Order</h1>
+                        <h1>Cancelled Order</h1>
                     </div>
                 </div>
                 <div class="col-lg-7"></div>
@@ -13,19 +13,20 @@
         </div>
     </div>
     <!-- End Hero Section -->
-    <%- include('../partials/breadcrumbs.ejs') %>
     <div class="card text-center">
-      <div class="card-header">
-        <ul class="nav nav-tabs card-header-tabs">
-          <li class="nav-item">
-            <a class="nav-link " aria-current="true" href="/orders">Ordered</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/cancelledList">Cancelled</a>
-          </li>
-        </ul>
+        <div class="card-header">
+          <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+              <a class="nav-link " aria-current="true" href="/orders">Ordered</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/cancelledList">Cancelled</a>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
+    <%- include('../partials/breadcrumbs.ejs') %>
+    
     <% if (orderForm.length > 0) { %>
       <% for (let i = 0; i < orderForm.length; i++) { %>
     <div class="card m-5 " style="margin-bottom: 150px;">
@@ -75,11 +76,7 @@
     </div>
     <% } %>
         <% } %>
-        <div class="pagination">
-          <% for (let page = 1; page <= totalPages; page++) { %>
-            <button class="page-link" onclick="fetchOrders(<%= page %>)"><%= page %></button>
-          <% } %>
-        </div>
+        
 
     <!-- Start Footer Section -->
     <footer class="footer-section">

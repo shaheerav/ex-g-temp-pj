@@ -191,6 +191,12 @@
                   <strong class="product-price">
                     <i class="bi bi-currency-rupee"></i><%= item.price %>
                   </strong>
+                  <% if (item.bestOfferPrice && item.bestOfferPrice < item.price) { %>
+                    <strong class="product-offer-price">
+                      <i class="bi bi-currency-rupee"></i><%= item.bestOfferPrice %>
+                      <span class="badge bg-success">Offer</span>
+                    </strong>
+                  <% } %>
                   <span class="icon-cross">
                     <img src="images/cross.svg" class="img-fluid" />
                   </span>
@@ -204,6 +210,7 @@
     </div>
   </div>
 <% }); %>
+
 <!-- End Product Sections -->
 
 <!-- Start Why Choose Us Section -->
