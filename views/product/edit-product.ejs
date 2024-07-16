@@ -201,7 +201,7 @@
                   </div>
 
                   <div class="image-upload-container">
-                    <input type="file" class="input-image" name="images[]" accept="image/*" multiple>
+                    <input type="file" class="input-image" name="images[]"  id= "inputImage"accept="image/*" multiple>
                     <br><br>
                     <div style="margin-left: 300px;">
                     <div class="image-preview-container" style=" width: 300px;height: 300px;"></div>
@@ -236,6 +236,18 @@
             <script src="/admin/js/main.js"></script>
             <script src="/javascripts/product.js"></script>
                 <script>
+                    document.getElementById('inputImage').addEventListener('change', function (event) {
+        const files = event.target.files;
+
+        // Check each selected file
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) {
+                document.getElementById('inputImage').value = '';
+                document.getElementById('images-error').textContent = 'Please select only image files.';
+                return;
+            }
+        });
+    });
                     document.addEventListener('DOMContentLoaded', function () {
                 var input = document.querySelector('.input-image');
                 var previewContainer = document.querySelector('.image-preview-container');

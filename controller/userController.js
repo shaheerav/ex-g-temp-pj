@@ -6,7 +6,8 @@ const nodemailer = require("nodemailer");
 const { body, validationResult } = require("express-validator");
 const OTPGenerator = require("otp-generator");
 const randonString = require("randomstring");
-const Category = require('../models/category')
+const Category = require('../models/category');
+const Review = require('../models/review');
 
 const Product = require("../models/products");
 const Address = require('../models/address');
@@ -140,7 +141,7 @@ const addUser = async (req, res) => {
       console.log('user added');
 
     } else {
-      res.render("signup", { message: "User registration has failed",isLoggedIn:isLoggedIn });
+      res.render("signup", { message: "User registration has failed",isLoggedIn:isLoggedIn,count:0 });
     }
     console.log("User added");
   } catch (error) {
@@ -372,10 +373,7 @@ const productDetails = async (req, res) => {
     const isLoggedIn = req.session.user;
     console.log( id);
     const product = await Product.findById( id );
-    const ratingData = {
-      star:4,
-      totalrating:100
-    };
+    const reviews = await Review.find({productId:id}).populate('userId','name');
     const userid = isLoggedIn._id; 
     const size = product.size;
     const cart = await Cart.findOne({ userId: userid });
@@ -383,7 +381,7 @@ const productDetails = async (req, res) => {
     if (cart && Array.isArray(cart.products)) {
       isProductInCart = cart.products.some(cartProduct => cartProduct.productId.toString() === id);
     }
-      res.render("productDetails", { product: product, isLoggedIn: isLoggedIn,ratingData:ratingData,size:size,count:count,isOutOfStock: product.stock === 0,isProductInCart:isProductInCart });
+      res.render("productDetails", { product: product, isLoggedIn: isLoggedIn,reviews,size:size,count:count,isOutOfStock: product.stock === 0,isProductInCart:isProductInCart });
   
   } catch (error) {
     res.status(500).send(error.message);
@@ -1441,6 +1439,27 @@ const changingPassword = async (req,res)=>{
         res.status(500).send('Server Error');
     }
 };
+const addReview = async(req,res)=>{
+  try{
+    const productId  = req.params.id;
+    console.log(productId,'productid');
+    const { rating, comment } = req.body;
+    const userId = req.session.user._id;
+    console.log('in the review page')
+    const newReview = new Review({
+      productId,
+      userId,
+      rating,
+      comment
+    });
+
+    await newReview.save();
+    res.redirect(`/productDetails?id=${productId}`)
+
+  }catch(error){
+    res.status(500).send(error.message);
+  }
+}
 module.exports = {
   registration,
   addUser,
@@ -1491,5 +1510,6 @@ module.exports = {
   authFacebook,
   facebookCallback,
   changePassword,
-  changingPassword
+  changingPassword,
+  addReview
 };

@@ -1,588 +1,407 @@
-<!-- /*
-* Bootstrap 5
-* Template Name: Furni
-* Template Author: Untree.co
-* Template URI: https://untree.co/
-* License: https://creativecommons.org/licenses/by/3.0/
-*/ -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <meta name="author" content="Untree.co" />
-    <link rel="shortcut icon" href="favicon.png" />
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="favicon.png">
+  <meta name="description" content="">
+  <meta name="keywords" content="bootstrap, bootstrap4">
+  <title>Trend Setter</title>
 
-    <meta name="description" content="" />
-    <meta name="keywords" content="bootstrap, bootstrap4" />
+  <!-- Bootstrap CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="css/tiny-slider.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="stylesheets/style.css">
+</head>
 
-    <!-- Bootstrap CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link href="css/tiny-slider.css" rel="stylesheet" />
-    <link href="css/style.css" rel="stylesheet" />
-    <title>Trend Setter</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-    />
-    <link rel="stylesheet" href="stylesheets/style.css" />
-  </head>
+<body>
+  <style>
+    /* Zooming */
+    * {
+      box-sizing: border-box;
+    }
+    .img-zoom-container {
+      position: relative;
+    }
+    .img-zoom-lens {
+      position: absolute;
+      visibility: hidden;
+      border: 1px solid #d4d4d4;
+      width: 100px;
+      height: 100px;
+    }
+    .img-container:hover .img-zoom-result {
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+    .img-container .img-zoom-result {
+      border: 1px solid #d4d4d4;
+      width: 500px;
+      height: 300px;
+      border-radius: 10px;
+    }
+    .img-container:hover {
+      cursor: zoom-in;
+    }
+    .position-static {
+      height: 500px;
+      width: 100%;
+      background-color: black;
+      color: white;
+    }
+    .cart-container {
+      position: relative;
+      display: inline-block;
+    }
+    .cart-image {
+      display: block;
+    }
+    .badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
 
-  <body>
-    <style>
-      /*zooming*/
-      * {
-        box-sizing: border-box;
-      }
-
-      .img-zoom-container {
-        position: relative;
-      }
-
-      .img-zoom-lens {
-        position: absolute;
-        visibility: hidden;
-        border: 1px solid #d4d4d4;
-
-        /*set the size of the lens:*/
-        width: 100px;
-        height: 100px;
-      }
-      .img-container:hover .img-zoom-result {
-        display: block;
-        transition: opacity 0.3s ease;
-      }
-      .img-container .img-zoom-result {
-        border: 1px solid #d4d4d4;
-        /*set the size of the result div:*/
-        width: 500px;
-        height: 300px;
-        /* Add other styling properties as needed */
-        border-radius: 10x;
-      }
-      .img-container:hover {
-        cursor: zoom-in;
-      }
-      .position-static {
-        height: 500px;
-        width: 100%;
-        background-color: black;
-        color: white;
-      }
-      .cart-container {
-        position: relative;
-        display: inline-block;
-      }
-
-      /* Style for the image */
-      .cart-image {
-        display: block;
-      }
-
-      /* Style for the badge */
-      .badge {
-        position: absolute;
-        top: -12px; /* Adjust this value as needed */
-        left: 50%;
-        transform: translateX(-50%);
-      }
-    </style>
-    <!-- Start Header/Navigation -->
-    <nav
-      class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
-      arial-label="Furni navigation bar"
-    >
-      <div class="container">
-        <a class="navbar-brand" href="index.html">Trend Setter<span>.</span></a>
-
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarsFurni"
-          aria-controls="navbarsFurni"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarsFurni">
-          <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-            <li class="nav-item active">
-              <a class="nav-link" href="/">Home</a>
-            </li>
-            <li><a class="nav-link" href="/men">Men</a></li>
-            <li><a class="nav-link" href="/women">Women</a></li>
-            <li><a class="nav-link" href="/kids">Kids</a></li>
-            <li><a class="nav-link" href="/footwear">Footwear</a></li>
-          </ul>
-
-          <div class="nav-item dropdown ms-auto mb-2 mb-md-0">
-            <li>
-              <a
-                href="#"
-                class="nav-link dropdown-toggle"
-                data-bs-toggle="dropdown"
-                style="color: white"
-                ><img src="images/user.svg" />
-                <% if (isLoggedIn) { %>
-                <!-- Content to show when the user is logged in -->
-                <samp><%= isLoggedIn.name %></samp>
-                <!-- Other content for logged-in users -->
-                <% } else { %> signIn <% } %></a
-              >
-              <div class="dropdown-menu bg-transparent border-0">
-                <a href="button.html" class="dropdown-item">Your Account</a>
-                <a href="typography.html" class="dropdown-item">Your Order</a>
-                <a href="element.html" class="dropdown-item">Wish List</a>
-                <a href="/users" class="dropdown-item">Register</a>
-                <% if (isLoggedIn){ %>
-                <a href="/logout" class="dropdown-item">Logout</a>
-                <%} else { %>
-                <a href="/login" class="dropdown-item">Login</a>
-                <% } %>
-              </div>
-            </li>
-          </div>
+  <!-- Start Header/Navigation -->
+  <nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Trend Setter<span>.</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarsFurni">
+        <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+          <li class="nav-item active"><a class="nav-link" href="/">Home</a></li>
+          <li><a class="nav-link" href="/men">Men</a></li>
+          <li><a class="nav-link" href="/women">Women</a></li>
+          <li><a class="nav-link" href="/kids">Kids</a></li>
+          <li><a class="nav-link" href="/footwear">Footwear</a></li>
+        </ul>
+        <div class="nav-item dropdown ms-auto mb-2 mb-md-0">
           <li>
-            <a class="nav-link" href="/cart">
-              <img src="images/cart.svg">
-              <span class="badge badge-light" id="cart-count"><%= count %></span>
+            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" style="color: white">
+              <img src="images/user.svg">
+              <% if (isLoggedIn) { %>
+              <samp><%= isLoggedIn.name %></samp>
+              <% } else { %> signIn <% } %>
             </a>
+            <div class="dropdown-menu bg-transparent border-0">
+              <a href="button.html" class="dropdown-item">Your Account</a>
+              <a href="typography.html" class="dropdown-item">Your Order</a>
+              <a href="element.html" class="dropdown-item">Wish List</a>
+              <a href="/users" class="dropdown-item">Register</a>
+              <% if (isLoggedIn) { %>
+              <a href="/logout" class="dropdown-item">Logout</a>
+              <% } else { %>
+              <a href="/login" class="dropdown-item">Login</a>
+              <% } %>
+            </div>
           </li>
         </div>
+        <li>
+          <a class="nav-link" href="/cart">
+            <img src="images/cart.svg">
+            <span class="badge badge-light" id="cart-count"><%= count %></span>
+          </a>
+        </li>
       </div>
-    </nav>
-    <!-- End Header/Navigation -->
-    <section class="container sproduct my-3 pt-3">
-      <div class="row mt-3">
-        <div class="col-lg-5">
-          <div class="col">
-            <div class="img-container">
-              <img
-                src="/uploads/<%= product.image[0]  %>"
-                style="height: 500px; width: 400px"
-                id="myimage"
-              />
-              <div id="myresult" class="img-zoom-result"></div>
-            </div>
-            <div class="row">
-              <div class="col mt-3">
-                <% product.image.forEach(function(imageSrc,index) { %>
-                <img
-                  src="/uploads/<%= imageSrc %>"
-                  alt="Product Image"
-                  style="width: 100px; height: 100px"
-                  class="thumbnail"
-                  onclick="changeMainImageAndZoom('<%= imageSrc %>')"
-                  data-index = "<%= index %>"
-                />
-                <% }); %>
-              </div>
+    </div>
+  </nav>
+  <!-- End Header/Navigation -->
+
+  <section class="container sproduct my-3 pt-3">
+    <div class="row mt-3">
+      <div class="col-lg-5">
+        <div class="col">
+          <div class="img-container">
+            <img src="/uploads/<%= product.image[0] %>" style="height: 500px; width: 400px" id="myimage">
+            <div id="myresult" class="img-zoom-result"></div>
+          </div>
+          <div class="row">
+            <div class="col mt-3">
+              <% product.image.forEach(function(imageSrc, index) { %>
+              <img src="/uploads/<%= imageSrc %>" alt="Product Image" style="width: 100px; height: 100px" class="thumbnail" onclick="changeMainImageAndZoom('<%= imageSrc %>')" data-index="<%= index %>">
+              <% }); %>
             </div>
           </div>
         </div>
-        <div class="col-lg-7">
-          
-          <form action="/add-to-cart/<%= product._id %>" method="post">
+      </div>
+      <div class="col-lg-7">
+        <form action="/add-to-cart/<%= product._id %>" method="post">
           <input type="hidden" name="productId" value="<%= product._id %>">
           <h6>home/<%= product.category.name %></h6>
           <h3 class="py-4" name="name"><%= product.name %></h3>
           <h2><i class="bi bi-currency-rupee" name="price"></i><%= product.price %></h2>
           <% if (isOutOfStock) { %>
-            <h4 class="text-danger">Out of Stock</h4>
+          <h4 class="text-danger">Out of Stock</h4>
           <% } else { %>
-            <label for="size-select">Select Size:</label>
-            <h2><%= product.size %></h2>
-            <div>
-              
-              <% if(!isProductInCart){ %>
-                <label for="quantity">Quantity:</label>
-              <input type="number" id="quantity" name="quantity" min="1" value="1" style="width: 50px; height: 40px; padding-left: 10px; font-size: 16px; margin-right: 1px;" required>
-              <button class="buy-btn btn" type="submit">Add to cart</button>
-              <% }else{ %>
-                <h5>Product already in the Cart</h5>
-              <% } %>
-            </div>
+          <label for="size-select">Select Size:</label>
+          <h2><%= product.size %></h2>
+          <div>
+            <% if (!isProductInCart) { %>
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1" value="1" style="width: 50px; height: 40px; padding-left: 10px; font-size: 16px; margin-right: 1px;" required>
+            <button class="buy-btn btn" type="submit">Add to cart</button>
+            <% } else { %>
+            <h5>Product already in the Cart</h5>
+            <% } %>
+          </div>
           <% } %>
         </form>
-          
-          <h4 class="mt-5 mb-5">Product Details</h4>
-          <span> <%= product.description %> </span>
-          <div class="stars" id="stars">
-            <span class="star" data-value="1">★</span>
-            <span class="star" data-value="2">★</span>
-            <span class="star" data-value="3">★</span>
-            <span class="star" data-value="4">★</span>
-            <span class="star" data-value="5">★</span>
-          </div>
-          <div class="review">
-            <p>Share your review</p>
-            <textarea id="review"
-            placeholder="Write your review here"></textarea>
-            <button id="submit">Submit</button>
-            <div class="reviews" id="reviews">
+        <h4 class="mt-5 mb-5">Product Details</h4>
+        <span><%= product.description %></span>
+        <div class="stars" id="stars">
+          <span class="star" data-value="1">★</span>
+          <span class="star" data-value="2">★</span>
+          <span class="star" data-value="3">★</span>
+          <span class="star" data-value="4">★</span>
+          <span class="star" data-value="5">★</span>
+        </div>
+        <form action="/reviews/<%= product._id %>" method="POST">
+          <select for="rating">
+            <option value="1">1-star</option>
+            <option value="2">2-star</option>
+            <option value="3">3-star</option>
+            <option value="4">4-star</option>
+            <option value="5">5-star</option>
+          </select>
+          <textarea name="comment" rows="4" required></textarea>
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+    </div>
+  </section>
 
-            </div>
+  <!-- Start Footer Section -->
+  <footer class="footer-section my-3">
+    <div class="container relative">
+      <div class="sofa-img">
+        <img src="images/logo1.png" alt="Image" class="img-fluid">
+      </div>
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="subscription-form">
+            <h3 class="d-flex align-items-center">
+              <span class="me-1"><img src="images/envelope-outline.svg" alt="Image" class="img-fluid"></span>
+              <span>Subscribe to Newsletter</span>
+            </h3>
+            <form action="#" class="row g-3">
+              <div class="col-auto">
+                <input type="text" class="form-control" placeholder="Enter your name">
+              </div>
+              <div class="col-auto">
+                <input type="email" class="form-control" placeholder="Enter your email">
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                  <span class="fa fa-paper-plane"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="socials d-flex gap-3 justify-content-start justify-content-lg-end">
+            <a href="#"><span class="fa fa-facebook"></span></a>
+            <a href="#"><span class="fa fa-twitter"></span></a>
+            <a href="#"><span class="fa fa-instagram"></span></a>
+            <a href="#"><span class="fa fa-linkedin"></span></a>
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- Start Footer Section -->
-    <footer class="footer-section my-3">
-      <div class="container relative">
-        <div class="sofa-img">
-          <img src="images/logo1.png" alt="Image" class="img-fluid" />
-        </div>
-
-        <div class="row">
-          <div class="col-lg-8">
-            <div class="subscription-form">
-              <h3 class="d-flex align-items-center">
-                <span class="me-1"
-                  ><img
-                    src="images/envelope-outline.svg"
-                    alt="Image"
-                    class="img-fluid" /></span
-                ><span>Subscribe to Newsletter</span>
-              </h3>
-
-              <form action="#" class="row g-3">
-                <div class="col-auto">
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Enter your name"
-                  />
-                </div>
-                <div class="col-auto">
-                  <input
-                    type="email"
-                    class="form-control"
-                    placeholder="Enter your email"
-                  />
-                </div>
-                <div class="col-auto">
-                  <button class="btn btn-primary">
-                    <span class="fa fa-paper-plane"></span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <div class="row g-5 mb-5">
-          <div class="col-lg-4">
-            <div class="mb-4 footer-logo-wrap">
-              <a href="#" class="footer-logo">Trend Setter<span>.</span></a>
-            </div>
-            <p class="mb-4">
-              Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio
-              quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam
-              vulputate velit imperdiet dolor tempor tristique. Pellentesque
-              habitant
-            </p>
-
-            <ul class="list-unstyled custom-social">
+      <div class="row g-5 mb-5">
+        <div class="col-lg-4">
+          <div class="mb-4">
+            <h3 class="footer-heading">Contact Info</h3>
+            <ul class="list-unstyled">
               <li>
-                <a href="#"><span class="fa fa-brands fa-facebook-f"></span></a>
+                <h6>Location:</h6>
+                <span>203 Fake St. Mountain View, San Francisco, California, USA</span>
               </li>
               <li>
-                <a href="#"><span class="fa fa-brands fa-twitter"></span></a>
+                <h6>Email:</h6>
+                <span>info@yourdomain.com</span>
               </li>
               <li>
-                <a href="#"><span class="fa fa-brands fa-instagram"></span></a>
-              </li>
-              <li>
-                <a href="#"><span class="fa fa-brands fa-linkedin"></span></a>
+                <h6>Phone:</h6>
+                <span>+1 232 3235 324</span>
               </li>
             </ul>
           </div>
-
-          <div class="col-lg-8">
-            <div class="row links-wrap">
-              <div class="col-6 col-sm-6 col-md-3">
-                <ul class="list-unstyled">
-                  <li><a href="#">About us</a></li>
-                  <li><a href="#">Services</a></li>
-                  <li><a href="#">Blog</a></li>
-                  <li><a href="#">Contact us</a></li>
-                </ul>
-              </div>
-
-              <div class="col-6 col-sm-6 col-md-3">
-                <ul class="list-unstyled">
-                  <li><a href="#">Support</a></li>
-                  <li><a href="#">Knowledge base</a></li>
-                  <li><a href="#">Live chat</a></li>
-                </ul>
-              </div>
-
-              <div class="col-6 col-sm-6 col-md-3">
-                <ul class="list-unstyled">
-                  <li><a href="#">Jobs</a></li>
-                  <li><a href="#">Our team</a></li>
-                  <li><a href="#">Leadership</a></li>
-                  <li><a href="#">Privacy Policy</a></li>
-                </ul>
-              </div>
-
-              <div class="col-6 col-sm-6 col-md-3">
-                <ul class="list-unstyled">
-                  <li><a href="#">Nordic Chair</a></li>
-                  <li><a href="#">Kruzo Aero</a></li>
-                  <li><a href="#">Ergonomic Chair</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
-
-        <div class="border-top copyright">
-          <div class="row pt-4">
-            <div class="col-lg-6">
-              <p class="mb-2 text-center text-lg-start">
-                Copyright &copy;
-                <script>
-                  document.write(new Date().getFullYear());
-                </script>
-                . All Rights Reserved. &mdash; Designed with love by
-                <a href="https://untree.co">Untree.co</a> Distributed By
-                <a hreff="https://themewagon.com">ThemeWagon</a>
-                <!-- License information: https://untree.co/license/ -->
-              </p>
+        <div class="col-lg-8">
+          <div class="row links-wrap">
+            <div class="col-6 col-sm-6 col-md-3">
+              <ul class="list-unstyled">
+                <li><a href="#">About us</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="#">Testimonials</a></li>
+                <li><a href="#">Contact us</a></li>
+              </ul>
             </div>
-
-            <div class="col-lg-6 text-center text-lg-end">
-              <ul class="list-unstyled d-inline-flex ms-auto">
-                <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
-                <li><a href="#">Privacy Policy</a></li>
+            <div class="col-6 col-sm-6 col-md-3">
+              <ul class="list-unstyled">
+                <li><a href="#">Support</a></li>
+                <li><a href="#">Knowledge base</a></li>
+                <li><a href="#">Live chat</a></li>
+              </ul>
+            </div>
+            <div class="col-6 col-sm-6 col-md-3">
+              <ul class="list-unstyled">
+                <li><a href="#">Jobs</a></li>
+                <li><a href="#">Press</a></li>
+                <li><a href="#">Blog</a></li>
+              </ul>
+            </div>
+            <div class="col-6 col-sm-6 col-md-3">
+              <ul class="list-unstyled">
+                <li><a href="#">Shop</a></li>
+                <li><a href="#">Shipping</a></li>
+                <li><a href="#">Returns</a></li>
+                <li><a href="#">Pay</a></li>
               </ul>
             </div>
           </div>
         </div>
       </div>
-    </footer>
-    <!-- End Footer Section -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/tiny-slider.js"></script>
-    <script src="js/custom.js"></script>
-      <script>
+      <div class="border-top copyright">
+        <div class="row pt-4">
+          <div class="col-lg-6">
+            <p class="mb-2 text-center text-lg-start">
+              &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | Trend Setter
+            </p>
+          </div>
+          <div class="col-lg-6 text-center text-lg-end">
+            <ul class="list-unstyled d-inline-flex ms-auto">
+              <li class="me-4"><a href="#">Terms</a></li>
+              <li class="me-4"><a href="#">Privacy</a></li>
+              <li><a href="#">Compliances</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- End Footer Section -->
+  
 
-      </script>
-      
-    <script>
-      //***********************image zoom**************************
-      function imageZoom(imgID, resultID) {
-        var img, lens, result, cx, cy;
-        img = document.getElementById(imgID);
-        result = document.getElementById(resultID);
-        /*create lens:*/
-        lens = document.createElement("DIV");
-        lens.setAttribute("class", "img-zoom-lens");
-        /*insert lens:*/
-        img.parentElement.insertBefore(lens, img);
-        /*calculate the ratio between result DIV and lens:*/
-        cx = result.offsetWidth / lens.offsetWidth;
-        cy = result.offsetHeight / lens.offsetHeight;
-        /*set background properties for the result DIV:*/
-        result.style.backgroundImage = "url('" + img.src + "')";
-        result.style.backgroundSize =
-          img.width * cx + "px " + img.height * cy + "px";
-        /*execute a function when someone moves the cursor over the image, or the lens:*/
-        lens.addEventListener("mousemove", moveLens);
-        img.addEventListener("mousemove", moveLens);
-        /*and also for touch screens:*/
-        lens.addEventListener("touchmove", moveLens);
-        img.addEventListener("touchmove", moveLens);
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="js/tiny-slider.js"></script>
+  <script src="js/custom.js"></script>
+  <script>
+    // Image zoom script
+function imageZoom(imgID, resultID) {
+  var img, lens, result, cx, cy;
+  img = document.getElementById(imgID);
+  result = document.getElementById(resultID);
+  lens = document.createElement("DIV");
+  lens.setAttribute("class", "img-zoom-lens");
+  img.parentElement.insertBefore(lens, img);
+  
+  lens.addEventListener("mousemove", moveLens);
+  img.addEventListener("mousemove", moveLens);
+  lens.addEventListener("touchmove", moveLens);
+  img.addEventListener("touchmove", moveLens);
 
-        function moveLens(e) {
-          var pos, x, y;
-          /*prevent any other actions that may occur when moving over the image:*/
-          e.preventDefault();
-          /*get the cursor's x and y positions:*/
-          pos = getCursorPos(e);
-          /*calculate the position of the lens:*/
-          x = pos.x - lens.offsetWidth / 2;
-          y = pos.y - lens.offsetHeight / 2;
-          /*prevent the lens from being positioned outside the image:*/
-          if (x > img.width - lens.offsetWidth) {
-            x = img.width - lens.offsetWidth;
-          }
-          if (x < 0) {
-            x = 0;
-          }
-          if (y > img.height - lens.offsetHeight) {
-            y = img.height - lens.offsetHeight;
-          }
-          if (y < 0) {
-            y = 0;
-          }
-          lens.style.left = x + "px";
-          lens.style.top = y + "px";
-          result.style.backgroundPosition =
-            "-" + x * cx + "px -" + y * cy + "px";
-        }
+  cx = result.offsetWidth / lens.offsetWidth;
+  cy = result.offsetHeight / lens.offsetHeight;
 
-        function getCursorPos(e) {
-          var a,
-            x = 0,
-            y = 0;
-          e = e || window.event;
-          a = img.getBoundingClientRect();
-          x = e.pageX - a.left;
-          y = e.pageY - a.top;
-          x = x - window.pageXOffset;
-          y = y - window.pageYOffset;
-          return { x: x, y: y };
-        }
-      }
-      // JavaScript code to handle image zoom
-      document.addEventListener("DOMContentLoaded", function () {
-        const imgContainer = document.querySelector(".img-container");
-        const zoomResult = document.querySelector(".img-zoom-result");
+  result.style.backgroundImage = "url('" + img.src + "')";
+  result.style.backgroundSize = (img.width * cx) + "px " + (img.height * cy) + "px";
 
-        imgContainer.addEventListener("mouseenter", function () {
-          zoomResult.style.display = "block";
-          // You may update the content of zoomResult here if needed
-        });
+  function moveLens(e) {
+    var pos, x, y;
+    e.preventDefault();
+    pos = getCursorPos(e);
+    x = pos.x - (lens.offsetWidth / 2);
+    y = pos.y - (lens.offsetHeight / 2);
+    if (x > img.width - lens.offsetWidth) { x = img.width - lens.offsetWidth; }
+    if (x < 0) { x = 0; }
+    if (y > img.height - lens.offsetHeight) { y = img.height - lens.offsetHeight; }
+    if (y < 0) { y = 0; }
+    lens.style.left = x + "px";
+    lens.style.top = y + "px";
+    result.style.backgroundPosition = "-" + (x * cx) + "px -" + (y * cy) + "px";
+  }
 
-        imgContainer.addEventListener("mouseleave", function () {
-          zoomResult.style.display = "none";
-        });
-      });
-      function changeMainImageAndZoom(newImageSrc) {
-  // Change the main image
-  document.getElementById("myimage").src = "/uploads/" + newImageSrc;
-
-  // Change the zoomed image
-  document.getElementById("myresult").style.backgroundImage =
-    "url('/uploads/" + newImageSrc + "')";
+  function getCursorPos(e) {
+    var a, x = 0, y = 0;
+    e = e || window.event;
+    a = img.getBoundingClientRect();
+    x = e.pageX - a.left;
+    y = e.pageY - a.top;
+    x = x - window.pageXOffset;
+    y = y - window.pageYOffset;
+    return { x: x, y: y };
+  }
 }
 
+imageZoom("myimage", "myresult");
 
-      imageZoom("myimage", "myresult");
-      /***************************changing image*****************/
-      function changeMainImage(newImageSrc) {
-        document.getElementById("myimage").src = "/uploads/" + newImageSrc;
-      }
-
-      //rating and review
-      const stars = document.querySelectorAll(".star");
-const rating = document.getElementById("rating");
-const reviewText = document.getElementById("review");
-const submitBtn = document.getElementById("submit");
-const reviewsContainer = document.getElementById("reviews");
-
-stars.forEach((star) => {
-	star.addEventListener("click", () => {
-		const value = parseInt(star.getAttribute("data-value"));
-		rating.innerText = value;
-
-		// Remove all existing classes from stars
-		stars.forEach((s) => s.classList.remove("one", 
-												"two", 
-												"three", 
-												"four", 
-												"five"));
-
-		// Add the appropriate class to 
-		// each star based on the selected star's value
-		stars.forEach((s, index) => {
-			if (index < value) {
-				s.classList.add(getStarColorClass(value));
-			}
-		});
-
-		// Remove "selected" class from all stars
-		stars.forEach((s) => s.classList.remove("selected"));
-		// Add "selected" class to the clicked star
-		star.classList.add("selected");
-	});
+document.querySelectorAll('.thumbnail').forEach(function(thumbnail) {
+  thumbnail.addEventListener('click', function() {
+    var imgSrc = thumbnail.getAttribute('src');
+    var mainImage = document.getElementById('myimage');
+    mainImage.src = imgSrc;
+    imageZoom("myimage", "myresult");
+  });
 });
 
-submitBtn.addEventListener("click", () => {
-	const review = reviewText.value;
-	const userRating = parseInt(rating.innerText);
-
-	if (!userRating || !review) {
-		alert(
-"Please select a rating and provide a review before submitting."
-			);
-		return;
-	}
-
-	if (userRating > 0) {
-		const reviewElement = document.createElement("div");
-		reviewElement.classList.add("review");
-		reviewElement.innerHTML = 
-`<p><strong>Rating: ${userRating}/5</strong></p><p>${review}</p>`;
-		reviewsContainer.appendChild(reviewElement);
-
-		// Reset styles after submitting
-		reviewText.value = "";
-		rating.innerText = "0";
-		stars.forEach((s) => s.classList.remove("one", 
-												"two", 
-												"three", 
-												"four", 
-												"five", 
-												"selected"));
-	}
+// Rating script
+document.querySelectorAll('.star').forEach(function(star) {
+  star.addEventListener('click', function() {
+    var rating = this.getAttribute('data-value');
+    document.querySelectorAll('.star').forEach(function(star) {
+      star.classList.remove('checked');
+    });
+    for (var i = 0; i < rating; i++) {
+      document.querySelectorAll('.star')[i].classList.add('checked');
+    }
+  });
 });
 
-function getStarColorClass(value) {
-	switch (value) {
-		case 1:
-			return "one";
-		case 2:
-			return "two";
-		case 3:
-			return "three";
-		case 4:
-			return "four";
-		case 5:
-			return "five";
-		default:
-			return "";
-	}
+// Review script
+document.getElementById('submit').addEventListener('click', function() {
+  var reviewText = document.getElementById('review').value;
+  if (reviewText) {
+    var reviewList = document.getElementById('reviews');
+    var newReview = document.createElement('div');
+    newReview.textContent = reviewText;
+    reviewList.appendChild(newReview);
+    document.getElementById('review').value = '';
+  } else {
+    alert("Please write a review before submitting.");
+  }
+});
+
+
+document.getElementById('reviewForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Validate form inputs (you can expand this based on your needs)
+    const rating = document.getElementById('rating').value;
+    const comment = document.getElementById('comment').value;
+
+    if (!rating || !comment) {
+      alert('Please provide both rating and comment.');
+      return;
+    }
+
+    // If validation passes, submit the form
+    this.submit();
+  });
+function changeMainImageAndZoom(imageSrc) {
+  var mainImage = document.getElementById('myimage');
+  mainImage.src = '/uploads/' + imageSrc;
+  imageZoom("myimage", "myresult");
 }
 
-    </script>
-
-    <script>
-      /* <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        fill="currentColor"
-        class ="bi bi-currency-rupee"
-        viewBox="0 0 16 16"
-      >
-        <path d="M4 3.06h2.726c1.22 0 2.12.575 2.325 1.724H4v1.051h5.051C8.855 7.001 8 7.558 6.788 7.558H4v1.317L8.437 14h2.11L6.095 8.884h.855c2.316-.018 3.465-1.476 3.688-3.049H12V4.784h-1.345c-.08-.778-.357-1.335-.793-1.732H12V2H4z" />
-      </svg>*/
-    </script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/tiny-slider.js"></script>
-    <script src="js/custom.js"></script>
-    <script>
-      //--------------changing the images---------------
-    </script>
-    <script src="javascripts/zoomImage.js"></script>
-  </body>
+  </script>
+</body>
 </html>

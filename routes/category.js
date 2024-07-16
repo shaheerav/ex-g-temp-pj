@@ -7,17 +7,17 @@ categoryRouts.set('views','./views/category')
 const bodyParser = require("body-parser");
 categoryRouts.use(bodyParser.json());
 categoryRouts.use(bodyParser.urlencoded({extended:true}));
-
+const authAdmin = require('../middleware/adminAuth');
 const controllCategory = require('../controller/categoryController');
 
 
-categoryRouts.get('/',controllCategory.showCategoty);
-categoryRouts.get('/category-add',controllCategory.newCategory);
-categoryRouts.post('/category-add',controllCategory.addCategory);
-categoryRouts.get('/edit-category',controllCategory.editCategory);
-categoryRouts.post('/edit-category',controllCategory.updateCategory);
-categoryRouts.get('/delete-category',controllCategory.deleteCategory);
-categoryRouts.get('/softdeleteCategory',controllCategory.softDeleteCategory);
-categoryRouts.get('/removeSoftDelete',controllCategory.removeSoftDeleteCategory);
+categoryRouts.get('/',authAdmin.isLogin,controllCategory.showCategoty);
+categoryRouts.get('/category-add',authAdmin.isLogin,controllCategory.newCategory);
+categoryRouts.post('/category-add',authAdmin.isLogin,controllCategory.addCategory);
+categoryRouts.get('/edit-category',authAdmin.isLogin,controllCategory.editCategory);
+categoryRouts.post('/edit-category',authAdmin.isLogin,controllCategory.updateCategory);
+categoryRouts.get('/delete-category',authAdmin.isLogin,controllCategory.deleteCategory);
+categoryRouts.get('/softdeleteCategory',authAdmin.isLogin,controllCategory.softDeleteCategory);
+categoryRouts.get('/removeSoftDelete',authAdmin.isLogin,controllCategory.removeSoftDeleteCategory);
 
 module.exports=categoryRouts;
