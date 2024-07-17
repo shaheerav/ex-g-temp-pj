@@ -94,6 +94,12 @@ a {
       margin-right: 0px; }
       .custom-navbar .custom-navbar-cta li:first-child {
         margin-right: 20px; }
+.borderNav{
+          background: #3b5d50;
+          width: 100%;
+          height: 130px;
+          color: white;
+        }
 
 .hero {
   background: #3b5d50;
