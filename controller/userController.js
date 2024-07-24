@@ -962,7 +962,7 @@ const addToCart = async (req, res, next) => {
     ];
     console.log(userCart);
     if (!userCart) {
-      return res.render("addtocart", {
+      return res.render("addtoCart", {
         isLoggedIn: isLoggedIn,
         productList: [],
         count: 0,
@@ -1005,7 +1005,7 @@ const addToCart = async (req, res, next) => {
     let total = totalAmount[0].totalAmount;
 
     if (cartData.length === 0) {
-      return res.render("addtocart", {
+      return res.render("addtoCart", {
         isLoggedIn: isLoggedIn,
         productList: [],
         count: 0,
@@ -1039,7 +1039,7 @@ const addToCart = async (req, res, next) => {
         0
       );
 
-      res.render("addtocart", {
+      res.render("addtoCart", {
         isLoggedIn: isLoggedIn,
         productList: productList,
         count: count,
@@ -2012,7 +2012,6 @@ const allProduct = async (req, res, next) => {
       });
     }
     const id = isLoggedIn._id;
-    console.log(id);
     const wishlistItems = await Wishlist.aggregate([
       { $match: { userId: new mongoose.Types.ObjectId(id) } },
       { $unwind: "$products" },
