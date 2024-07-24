@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 
-Copy code
 <%- include('../layouts/user/header.ejs') %>
 
 <div class="container">
@@ -36,43 +34,5 @@ Copy code
   <% } %>
 </div>
 
-=======
 
-Copy code
-<%- include('../layouts/user/header.ejs') %>
-
-<div class="container">
-  <h1>My Wishlist</h1>
-  <% if (wishlistItems.length > 0) { %>
-    <% wishlistItems.forEach(function(item) { %>
-      <div class="wishlist-item">
-        <img src="/uploads/<%= item.product.image %>" alt="<%= item.product.name %>" class="wishlist-item-image">
-        <h2><%= item.product.name %></h2>
-        <p class="wishlist-item-price">
-          <% if (item.bestOffer) { %>
-            <span class="offer-price">
-              <i class="bi bi-currency-rupee"></i><%= item.bestOfferPrice %> <!-- Display best offer price -->
-            </span>
-            <span class="original-price">
-              <i class="bi bi-currency-rupee"></i><%= item.product.price %> <!-- Display original price -->
-            </span>
-            <span class="offer-details">
-              <!-- Display offer details -->
-              <%= item.bestOffer.offer %>% off till <%= moment(item.bestOffer.offerEnd).format('MMMM Do YYYY') %>
-            </span>
-          <% } else { %>
-            <span>
-              <i class="bi bi-currency-rupee"></i><%= item.product.price %> <!-- Display original price if no offer -->
-            </span>
-          <% } %>
-        </p>
-        <!-- Add more details or actions as needed -->
-      </div>
-    <% }); %>
-  <% } else { %>
-    <p>No items in your wishlist.</p>
-  <% } %>
-</div>
-
->>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729
 <%- include('../layouts/user/footer.ejs') %>

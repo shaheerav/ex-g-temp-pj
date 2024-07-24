@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <%- include ('../layouts/user/header.ejs') %>
 <div class="borderNav">
   <div class="container">
@@ -50,56 +50,3 @@ text-align: center; "><i class="bi bi-plus" style="color: blue; padding: 10px; "
   <% } %>
 </div>
 <%- include ('../layouts/user/footer.ejs') %>
-=======
-<%- include ('../layouts/user/header.ejs') %>
-<div class="borderNav">
-  <div class="container">
-    <div class="row justify-content-between">
-      <div class="col-lg-5">
-        <div class="intro-excerpt">
-          <h1><%= isLoggedIn.name  %></h1>
-        </div>
-      </div>
-      <div class="col-lg-7"></div>
-    </div>
-  </div>
-</div>
-<%- include('../partials/breadcrumbs.ejs')  %>
-<div class="m-5">
-<h1>Manage Address</h1>
-<div style="font-size: 35px;width: 1200px;
-border: 1px solid gray;
-height: 50px;
-padding: 40px;
-margin: 20px;
-text-align: center; "><i class="bi bi-plus" style="color: blue; padding: 10px; "></i><a href="/addAddress?id=<%= isLoggedIn._id %>"style="text-decoration: none; color: blue;" class="text-start">Add Address</a></div>
-</div>
-<div class="m-5">
-<% if(user.length > 0){ for(let i = 0 ; i< user.length;i++){ %></user.length>
-<div class="card">
-  <div class="card-body">
-    <h5 class="card-title"><%= user[i].fullname  %>  <%= user[i].mobile %></h5>
-    <p class="card-text"><%= user[i].street %>,<%= user[i].city %>,<%= user[i].state %>,<%= user[i].country %>,<%= user[i].pincode %></p>
-    <button type="button" class="btn btn-primary">
-      <a
-        href="/deleteAddress?id=<%= user[i]._id %>"
-        class="text-light"
-        >Delete</a
-      >
-    </button>
-    <button type="button" class="btn btn-primary">
-      <a
-        href="/editAddress?id=<%= user[i]._id %>"
-        class="text-light"
-        >Edit</a
-      >
-    </button>
-
-  </div>
-</div>
-<% } }else{ %>
-  <h1>no address</h1>
-  <% } %>
-</div>
-<%- include ('../layouts/user/footer.ejs') %>
->>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729

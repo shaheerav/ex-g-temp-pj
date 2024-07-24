@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
@@ -70,77 +69,4 @@ const orderSchema = new mongoose.Schema({
     
 },{timestamps:true});
 
-=======
-const mongoose = require('mongoose');
-
-const orderSchema = new mongoose.Schema({
-    userId :{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        require:true,
-    },
-    address:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Address',
-        require:true,
-    },
-    products :[{
-        productId:
-            {
-                type:mongoose.Schema.Types.ObjectId,
-                ref:'Product',
-                require:true,
-            },
-        quantity:{
-            type:Number,
-            require:true,
-        },
-        size:{
-            type:String,
-            require:true
-        },
-        productStatus: {
-            type: String,
-            enum: ['Pending', 'Cancelled', 'Delivered'],
-            default: 'Pending'
-        },
-}],
-    DateOrder:{
-        type:Date,
-        default:Date.now
-    },
-    payment:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Payment',
-        require:true,
-    },
-    shippingCharge:{
-        type:Number,
-        require:true,
-        default:0,
-    },
-    tax:{
-        type:Number,
-        require:true,
-        default:0
-    },
-    totalAmount:{
-        type:Number,
-        default:0,
-        require:true,
-    },
-    status:{
-        type:String,
-        enum:['Ordered','Shipped','Out-For-Delivery','Delivered','Cancelled','Return'],
-        require:true,
-    },
-    orderStatus:{
-        type:String,
-        default:'',
-        require:true
-    },
-    
-},{timestamps:true});
-
->>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729
 module.exports = mongoose.model('Order',orderSchema);
