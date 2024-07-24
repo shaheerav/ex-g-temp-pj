@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <%- include('../layouts/user/header.ejs') %>
 <div class="borderNav">
     <div class="container">
@@ -88,3 +89,95 @@
     });
     </script>
 <%- include('../layouts/user/footer.ejs') %>
+=======
+<%- include('../layouts/user/header.ejs') %>
+<div class="borderNav">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-lg-5">
+          <div class="intro-excerpt">
+          </div>
+        </div>
+        <div class="col-lg-7"></div>
+      </div>
+    </div>
+  </div>
+<div class="card-body row m-5">
+    
+    <% if (order.products && order.products.length > 0) { %>
+        <h5>Products:</h5>
+        <ul>
+            <% order.products.forEach((product, index) => { %>
+                <li>
+                    <form class="review-product-form">
+                        <h6><%= product.product.name %></h6>
+                        <p><strong>Brand:</strong> <%= product.product.brand %></p>
+                        <p><strong>Description:</strong> <%= product.product.description %></p>
+                        <p><strong>Price:</strong> <%= product.product.price %></p>
+                        <img src="/uploads/<%= product.product.image[0] %>" style="width: 80px; height: 100px;">
+                        <p><strong>Quantity:</strong><%= product.quantity %></p>
+                        <input id="productId" name="productId" value="<%= product.productId %>" type="hidden">
+                        <input id="orderId" name="orderId" value="<%= order._id %>" type="hidden">
+                        <input id="quantity" name="quantity" value="<%= product.quantity %>" type="hidden">
+
+                        <label for="rating">Rating:</label>
+                        <select id="rating" name="rating" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+
+                        <label for="comment">Comment:</label>
+                        <textarea id="comment" name="comment" rows="4" cols="50" required></textarea>
+                        
+                        <button class="btn btn-primary" type="submit">Reviwe you Product</button>
+                    </form>
+                </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>No products found.</p>
+    <% } %>
+</div>
+<%- include('../layouts/user/footer.ejs') %>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.review-product-form').on('submit', function(event) {
+            event.preventDefault();
+            const $form = $(this);
+            const productId = $form.find('input[name="productId"]').val();
+            const rating = $form.find('select[name="rating"]').val();
+            const comment = $form.find('textarea[name="comment"]').val();
+
+            $.ajax({
+                url: '/review',
+                method: 'POST',
+                contentType: 'application/json',
+                data:JSON.stringify({
+                    productId: productId,
+                    rating: rating,
+                    comment: comment
+                }),
+                success: function(response) {
+                    console.log('Response:', response);
+                    if (response.success) {
+                        alert(response.message);
+                        window.location.href = '/orders';
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(error) {
+                    console.error('Error deleting product:', error);
+                    alert('An error occurred while processing your request. Please try again.');
+                }
+            });
+        });
+    });
+    </script>
+<%- include('../layouts/user/footer.ejs') %>
+>>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729

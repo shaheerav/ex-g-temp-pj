@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <%-include('../layouts/admin/header.ejs')  %>
 <style>
     /* styles.css */
@@ -230,3 +231,237 @@ fetchChartData('daily');
 
             <%-include('../layouts/admin/footer.ejs')  %>
             
+=======
+<%-include('../layouts/admin/header.ejs')  %>
+<style>
+    /* styles.css */
+.product-image {
+  width: 100px;
+  height: auto;
+}
+
+.product-details {
+  flex-grow: 1;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-sales {
+  color: #6c757d; /* Gray text color */
+  font-size: 0.9rem;
+}
+
+</style>
+            <!-- Sale & Revenue Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-chart-line fa-3x text-primary"></i>
+                            <div class="ms-3">
+                              <% if(totalSale >0) {%>
+                                <p class="mb-2">Total Sale</p>
+                                <h6 class="mb-0">&#8377;<%= totalSale[0].totalSale%></h6>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-chart-bar fa-3x text-primary"></i>
+                            <div class="ms-3">
+                              <% if(totalorder >0) {%>
+                                <p class="mb-2">Total Order</p>
+                                <h6 class="mb-0"><%= totalorder[0].totalOrder%></h6>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-chart-area fa-3x text-primary"></i>
+                            <div class="ms-3">
+                              <% if(totalUsers>0){ %>
+                                <p class="mb-2">Total Users</p>
+                                <h6 class="mb-0"><%= totalUsers[0].totalUsers%></h6>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-chart-pie fa-3x text-primary"></i>
+                            <div class="ms-3">
+                              <% if(totalProduct>0){ %>
+                                <p class="mb-2">Total product</p>
+                                <h6 class="mb-0"><%= totalProduct[0].totalProduct%></h6>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Sale & Revenue End -->
+
+
+            <!-- Sales Chart Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4">
+                    <div class="col-sm-12 col-xl-6">
+                        <div class="filter-options">
+                            <select id="chartFilter">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="yearly">Yearly</option>
+                              </select>
+                          </div>
+                          
+                          <!-- Your chart container -->
+                          <canvas id="myorder" style="width:100%;max-width:600px"></canvas>
+                    </div>
+                    <div class="col-sm-12 col-xl-6">
+                        <div class="bg-light text-center rounded p-4">
+                          <div class="d-flex align-items-center justify-content-between mb-4">
+                            <h6 class="mb-0">Category-wise Sales</h6>
+                            <a href="">Show All</a>
+                          </div>
+                          <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+                        </div>
+                      </div>
+                </div>
+            </div>
+            <!-- Sales Chart End -->
+
+            <div class="admin-section">
+                <h3 class="mb-4">Top 10 Best Selling Products</h3>
+                <ul class="list-group">
+                  <% topProducts.forEach(product => { %>
+                    <li class="list-group-item d-flex align-items-center">
+                      <div class="col-sm-2">
+                        <img src="/uploads/<%= product.image[0] %>" alt="<%= product.name %> Image" class="img-fluid">
+                      </div>
+                      <div class="col-sm-10">
+                        <h5 class="mb-1"><%= product.name %></h5>
+                        <p class="mb-0"><%= product.totalQuantity %> units sold</p>
+                      </div>
+                    </li>
+                  <% }); %>
+                </ul>
+            </div>
+            <!-- Display top 10 best-selling categories -->
+            <div class="admin-section">
+                <h3>Top 10 Best Selling Categories</h3>
+                <ul>
+                <% topCategories.forEach(category => { %>
+                    <li><%= category._id %> - <%= category.totalQuantity %> units sold</li>
+                <% }); %>
+                </ul>
+            </div>
+            <!-- Display top 10 best-selling brands -->
+            <div class="admin-section">
+                <h3>Top 10 Best Selling Brands</h3>
+                <ul>
+                <% topBrands.forEach(brand => { %>
+                    <li><%= brand._id %> - <%= brand.totalQuantity %> units sold</li>
+                <% }); %>
+                </ul>
+            </div>
+  
+            
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Widgets End -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="/path/to/your/js/file.js"></script>
+<!-- Chart Script -->
+<script>
+  // Use a safe block for JSON.stringify
+  var categorySales = <%- JSON.stringify(categorySales || []) %>;
+
+  // Extract values
+  var xValues = categorySales.map(sale => sale._id.toString());
+  var yValues = categorySales.map(sale => sale.totalSales);
+  var barColors = ["#b91d47", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145"];
+  console.log(xValues,'label');
+  // Create the chart
+  new Chart("myChart", {
+    type: "bar",
+    data: {
+      labels: xValues,
+      datasets: [{
+        backgroundColor: barColors,
+        data: yValues
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: "Category-wise Sales"
+      }
+    }
+  });
+  document.getElementById('chartFilter').addEventListener('change', function() {
+  const filter = this.value;
+  fetchChartData(filter);
+});
+
+function fetchChartData(filter) {
+  fetch(`/admin/chart-data?filter=${filter}`)
+    .then(response => response.json())
+    .then(data => updateChart(data))
+    .catch(error => console.error('Error fetching chart data:', error));
+}
+
+let myChart; // Make sure myChart is defined in a scope accessible to all functions
+
+function updateChart(data) {
+  // Example assumes data structure like [{ _id: { year: 2024 }, totalSales: 1000 }, ...]
+  const labels = data.map(item => {
+    if (item._id.day) return `${item._id.day}-${item._id.month}-${item._id.year}`;
+    else if (item._id.week) return `${item._id.week}-${item._id.year}`;
+    else if (item._id.month) return `${item._id.month}-${item._id.year}`;
+    else return `${item._id.year}`;
+  });
+  const values = data.map(item => item.totalSales);
+
+  if (myChart) {
+    myChart.destroy(); // Destroy old chart instance if it exists
+  }
+
+  const ctx = document.getElementById('myorder').getContext('2d');
+  myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Sales',
+        data: values,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+// Initial load
+fetchChartData('daily');
+</script>
+
+            <%-include('../layouts/admin/footer.ejs')  %>
+            
+>>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729

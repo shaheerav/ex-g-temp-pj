@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <%-include('../layouts/user/header.ejs')  %>
     <!-- End Header/Navigation -->
      <style>
@@ -412,4 +413,420 @@ function getStarColorClass(value) {
 }
 
     </script>
+=======
+<%-include('../layouts/user/header.ejs')  %>
+    <!-- End Header/Navigation -->
+     <style>
+      /*zooming*/
+      * {
+        box-sizing: border-box;
+      }
+
+      .img-zoom-container {
+        position: relative;
+      }
+
+      .img-zoom-lens {
+        position: absolute;
+        visibility: hidden;
+        border: 1px solid #d4d4d4;
+
+        /*set the size of the lens:*/
+        width: 100px;
+        height: 100px;
+      }
+      .img-container:hover .img-zoom-result {
+        display: block;
+        transition: opacity 0.3s ease;
+      }
+      .img-container .img-zoom-result {
+        border: 1px solid #d4d4d4;
+        /*set the size of the result div:*/
+        width: 500px;
+        height: 300px;
+        /* Add other styling properties as needed */
+        border-radius: 10x;
+      }
+      .img-container:hover {
+        cursor: zoom-in;
+      }
+      .position-static {
+        height: 500px;
+        width: 100%;
+        background-color: black;
+        color: white;
+      }
+      .cart-container {
+        position: relative;
+        display: inline-block;
+      }
+
+      /* Style for the image */
+      .cart-image {
+        display: block;
+      }
+
+      /* Style for the badge */
+      .badge {
+        position: absolute;
+        top: -12px; /* Adjust this value as needed */
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .size-chart {
+        width: 50%;
+        border-collapse: collapse;
+    }
+    .size-chart th, .size-chart td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    .size-chart th {
+        background-color: #f2f2f2;
+    }
+    .size-available {
+        color: green;
+    }
+    .size-not-available {
+        text-decoration: line-through;
+        color: red;
+    }
+    .color-box {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 1px solid #000;
+        margin-top: 5px;
+    }
+    .size-radio {
+        display: none;
+    }
+    .size-label {
+        cursor: pointer;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        margin: 5px;
+    }
+    .size-radio:checked + .size-label {
+        border: 2px solid green;
+        background-color: #e0ffe0;
+    }
+     </style>
+     <div class="borderNav">
+      <div class="container">
+          <div class="row justify-content-between">
+              <div class="col-lg-5">
+                  <div class="intro-excerpt">
+                      <h1>Product Details</h1>
+                  </div>
+              </div>
+              <div class="col-lg-7"></div>
+          </div>
+      </div>
+  </div>
+  <%- include('../partials/breadcrumbs.ejs') %>
+  <section class="container sproduct my-3 pt-3">
+    <div class="row mt-3">
+      <div class="col-lg-5">
+        <div class="col">
+          <div class="img-container">
+            <img src="/uploads/<%= product.image[0] %>" style="height: 500px; width: 400px" id="myimage" />
+            <div id="myresult" class="img-zoom-result"></div>
+          </div>
+          <div class="row">
+            <div class="col mt-3">
+              <% product.image.forEach(function(imageSrc, index) { %>
+                <img src="/uploads/<%= imageSrc %>" alt="Product Image" style="width: 100px; height: 100px" class="thumbnail" onclick="changeMainImageAndZoom('<%= imageSrc %>')" data-index="<%= index %>" />
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <form action="/add-to-cart/<%= product._id %>" method="post" id="addToCartForm">
+          <input type="hidden" name="productId" value="<%= product._id %>">
+          <h3 class="py-4" name="name"><%= product.name %></h3>
+          <% if (bestOffer) { %>
+          <h2><del><i class="bi bi-currency-rupee" name="price"></i><%= product.price %></del> <i class="bi bi-currency-rupee" name="price"></i><%= bestOfferPrice %></h2>
+          
+            <p>Discounted Price: <%= bestOfferPrice %></p>
+            <p>Offer: <%= bestOffer.offer %>%</p>
+            <p>Offer Start: <%= new Date(bestOffer.offerStart).toLocaleDateString() %></p>
+            <p>Offer End: <%= new Date(bestOffer.offerEnd).toLocaleDateString() %></p>
+          <% } else { %>
+            <p>No current offers available.</p>
+            <h2><i class="bi bi-currency-rupee" name="price"></i><%= product.price %> </h2>
+          <% } %>
+          <% if (isOutOfStock) { %>
+            <h4 class="text-danger">Out of Stock</h4>
+          <% } else { %>
+            <label for="size-select">Select Size:</label>
+            <div class="m-3">
+              <table class="size-chart">
+                <thead>
+                  <tr>
+                    <th>Size</th>
+                    <th>Color</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% 
+                    const allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+                    const availableSizes = product.size.map(s => s.size);
+                    allSizes.forEach(size => {
+                      const sizeClass = availableSizes.includes(size) ? 'size-available' : 'size-not-available';
+                      const disabled = !availableSizes.includes(size) || existingSizesInCart.includes(size) ? 'disabled' : '';
+                      const selected = existingSizesInCart.includes(size) ? 'selected' : '';
+  
+                      // Mark the already selected size as red and disabled
+                      const bgColor = existingSizesInCart.includes(size) ? 'red' : '';
+  
+                  %>
+                  <tr>
+                    <td class="<%= sizeClass %>" >
+                      <% if (!existingSizesInCart.includes(size)) { %>
+                        <label>
+                          <input type="radio" name="size" value="<%= size %>" <%= disabled %> required>
+                          <span class="<%= selected %>" style="background-color: <%= bgColor %>;"><%= size %></span>
+                        </label>
+                      <% } else { %>
+                        <span class="<%= selected %>" style="background-color: <%= bgColor %>;"><%= size %></span>
+                      <% } %>
+                    </td>
+                    <% if (size === 'XS') { %>
+                      <td rowspan="6">
+                        <div class="color-box" style="background-color: <%= product.color %>;"></div>
+                        <%= product.color %>
+                      </td>
+                    <% } %>
+                  </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+            <div>
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" min="1" value="1" style="width: 50px; height: 40px; padding-left: 10px; font-size: 16px; margin-right: 1px;" required>
+                <button class="buy-btn btn" type="submit">Add to cart</button>
+              
+            </div>
+          <% } %>
+        </form>
+        <h4 class="mt-5 mb-5">Product Details</h4>
+        <span><%= product.description %></span>
+        <div class="stars" id="stars">
+          <span class="star" data-value="1">★</span>
+          <span class="star" data-value="2">★</span>
+          <span class="star" data-value="3">★</span>
+          <span class="star" data-value="4">★</span>
+          <span class="star" data-value="5">★</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+
+    <script>
+      //validating form 
+      function validateForm() {
+    var selectedSize = document.querySelector('input[name="size"]:checked');
+    if (!selectedSize) {
+      document.getElementById('sizeSelectionError').style.display = 'block';
+      return false;
+    }
+    return true;
+  }
+  // Enable/disable button based on size selection
+  document.addEventListener('DOMContentLoaded', function() {
+    var addToCartBtn = document.getElementById('addToCartBtn');
+    var sizeRadios = document.querySelectorAll('input[name="size"]');
+    
+    sizeRadios.forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        if (this.checked) {
+          addToCartBtn.removeAttribute('disabled');
+          document.getElementById('sizeSelectionError').style.display = 'none';
+        }
+      });
+    });
+  });
+      //***********************image zoom**************************
+      function imageZoom(imgID, resultID) {
+        var img, lens, result, cx, cy;
+        img = document.getElementById(imgID);
+        result = document.getElementById(resultID);
+        /*create lens:*/
+        lens = document.createElement("DIV");
+        lens.setAttribute("class", "img-zoom-lens");
+        /*insert lens:*/
+        img.parentElement.insertBefore(lens, img);
+        /*calculate the ratio between result DIV and lens:*/
+        cx = result.offsetWidth / lens.offsetWidth;
+        cy = result.offsetHeight / lens.offsetHeight;
+        /*set background properties for the result DIV:*/
+        result.style.backgroundImage = "url('" + img.src + "')";
+        result.style.backgroundSize =
+          img.width * cx + "px " + img.height * cy + "px";
+        /*execute a function when someone moves the cursor over the image, or the lens:*/
+        lens.addEventListener("mousemove", moveLens);
+        img.addEventListener("mousemove", moveLens);
+        /*and also for touch screens:*/
+        lens.addEventListener("touchmove", moveLens);
+        img.addEventListener("touchmove", moveLens);
+
+        function moveLens(e) {
+          var pos, x, y;
+          /*prevent any other actions that may occur when moving over the image:*/
+          e.preventDefault();
+          /*get the cursor's x and y positions:*/
+          pos = getCursorPos(e);
+          /*calculate the position of the lens:*/
+          x = pos.x - lens.offsetWidth / 2;
+          y = pos.y - lens.offsetHeight / 2;
+          /*prevent the lens from being positioned outside the image:*/
+          if (x > img.width - lens.offsetWidth) {
+            x = img.width - lens.offsetWidth;
+          }
+          if (x < 0) {
+            x = 0;
+          }
+          if (y > img.height - lens.offsetHeight) {
+            y = img.height - lens.offsetHeight;
+          }
+          if (y < 0) {
+            y = 0;
+          }
+          lens.style.left = x + "px";
+          lens.style.top = y + "px";
+          result.style.backgroundPosition =
+            "-" + x * cx + "px -" + y * cy + "px";
+        }
+
+        function getCursorPos(e) {
+          var a,
+            x = 0,
+            y = 0;
+          e = e || window.event;
+          a = img.getBoundingClientRect();
+          x = e.pageX - a.left;
+          y = e.pageY - a.top;
+          x = x - window.pageXOffset;
+          y = y - window.pageYOffset;
+          return { x: x, y: y };
+        }
+      }
+      // JavaScript code to handle image zoom
+      document.addEventListener("DOMContentLoaded", function () {
+        const imgContainer = document.querySelector(".img-container");
+        const zoomResult = document.querySelector(".img-zoom-result");
+
+        imgContainer.addEventListener("mouseenter", function () {
+          zoomResult.style.display = "block";
+          // You may update the content of zoomResult here if needed
+        });
+
+        imgContainer.addEventListener("mouseleave", function () {
+          zoomResult.style.display = "none";
+        });
+      });
+      function changeMainImageAndZoom(newImageSrc) {
+  // Change the main image
+  document.getElementById("myimage").src = "/uploads/" + newImageSrc;
+
+  // Change the zoomed image
+  document.getElementById("myresult").style.backgroundImage =
+    "url('/uploads/" + newImageSrc + "')";
+}
+
+
+      imageZoom("myimage", "myresult");
+      /***************************changing image*****************/
+      function changeMainImage(newImageSrc) {
+        document.getElementById("myimage").src = "/uploads/" + newImageSrc;
+      }
+
+      //rating and review
+      const stars = document.querySelectorAll(".star");
+const rating = document.getElementById("rating");
+const reviewText = document.getElementById("review");
+const submitBtn = document.getElementById("submit");
+const reviewsContainer = document.getElementById("reviews");
+
+stars.forEach((star) => {
+	star.addEventListener("click", () => {
+		const value = parseInt(star.getAttribute("data-value"));
+		rating.innerText = value;
+
+		// Remove all existing classes from stars
+		stars.forEach((s) => s.classList.remove("one", 
+												"two", 
+												"three", 
+												"four", 
+												"five"));
+
+		// Add the appropriate class to 
+		// each star based on the selected star's value
+		stars.forEach((s, index) => {
+			if (index < value) {
+				s.classList.add(getStarColorClass(value));
+			}
+		});
+
+		// Remove "selected" class from all stars
+		stars.forEach((s) => s.classList.remove("selected"));
+		// Add "selected" class to the clicked star
+		star.classList.add("selected");
+	});
+});
+
+submitBtn.addEventListener("click", () => {
+	const review = reviewText.value;
+	const userRating = parseInt(rating.innerText);
+
+	if (!userRating || !review) {
+		alert(
+"Please select a rating and provide a review before submitting."
+			);
+		return;
+	}
+
+	if (userRating > 0) {
+		const reviewElement = document.createElement("div");
+		reviewElement.classList.add("review");
+		reviewElement.innerHTML = 
+`<p><strong>Rating: ${userRating}/5</strong></p><p>${review}</p>`;
+		reviewsContainer.appendChild(reviewElement);
+
+		// Reset styles after submitting
+		reviewText.value = "";
+		rating.innerText = "0";
+		stars.forEach((s) => s.classList.remove("one", 
+												"two", 
+												"three", 
+												"four", 
+												"five", 
+												"selected"));
+	}
+});
+
+function getStarColorClass(value) {
+	switch (value) {
+		case 1:
+			return "one";
+		case 2:
+			return "two";
+		case 3:
+			return "three";
+		case 4:
+			return "four";
+		case 5:
+			return "five";
+		default:
+			return "";
+	}
+}
+
+    </script>
+>>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729
     <%-include('../layouts/user/footer.ejs')  %>

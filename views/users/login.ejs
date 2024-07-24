@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <%- include('../layouts/user/header.ejs') %>
 
 <!-- Start Hero Section -->
@@ -107,3 +108,114 @@
 </div>
 <!-- End Hero Section -->
 <%- include('../layouts/user/footerlogin.ejs') %>
+=======
+<%- include('../layouts/user/header.ejs') %>
+
+<!-- Start Hero Section -->
+<div class="hero">
+  <div class="container">
+    <div class="row justify-content-between">
+      <div class="col-lg-6">
+        <div class="hero-img-wrap">
+          <img
+            src="images/familypic.png"
+            class="img-fluid"
+            style="height: 500px"
+          />
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <h2 style="color: white">Login</h2>
+        <hr>
+        <% if(typeof message!=='undefined'){ %>
+        <p style="color: red;"><%= message %></p>
+        <% } %>
+        <div class="row col-lg-6">
+          <div class="col">
+          <button
+          class="btn"
+        >
+          <img
+            src="https://static-00.iconduck.com/assets.00/google-icon-2048x2048-czn3g8x8.png"
+            style="width: 20px; height: 20px"
+          /><a href="/auth/google">Google </a></button
+        >
+      </div>
+      <div class="col">
+       <!-- <button
+          class="btn"
+        >
+          <img
+            src="https://www.vectorico.com/wp-content/uploads/2018/02/Facebook-Logo.png"
+            style="width: 20px; height: 20px"
+          /><a href="/auth/facebook">Facebook</a>
+        </button>-->
+      </div>
+        </div>
+        <div class="intro-excerpt">
+          <form action="/login" method="post">
+            <div class="form-group">
+              <label style="color: white">Username</label><br />
+              <input
+                type="text"
+                class="form-control"
+                name="username"
+                style="background: transparent;color: white; font-size: large; "
+
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-lebel" style="color: white">Password</label
+              ><br />
+
+              <div style="position: relative">
+                <input
+                  type="password"
+                  class="form-control"
+                  name="password"
+                  id="password"
+                  style="background: transparent; padding-right: 30px;
+                  color: white; font-size: large; "
+                />
+                <i
+                  class="bi bi-eye-slash"
+                  id="eyeIcon"
+                  style="
+                    position: absolute;
+                    top: 50%;
+                    right: 10px;
+                    transform: translateY(-50%);
+                    cursor: pointer;
+                    color: white;
+                  "
+                ></i>
+              </div>
+
+              <a href="/forget" style="margin-left: 280px">Forget Password</a>
+            </div>
+            <p>
+              By login, you agree to Trend Setter
+              <a href="/termsofuse">Terms of Use</a> &
+              <a href="/privacypolicy">Privacy Policy</a>
+            </p>
+            <div class="col">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                style="margin-left: 160px"
+              >
+                Login
+              </button>
+            </div>
+            <div>
+              <p>Don't have an account please <a href="/users">Sign UP</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Hero Section -->
+<%- include('../layouts/user/footerlogin.ejs') %>
+>>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729

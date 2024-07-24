@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <%- include('../layouts/user/header.ejs') %>
     <!-- Start Hero Section -->
     <div class="borderNav">
@@ -246,3 +247,253 @@
     </script>
 </body>
 </html>
+=======
+<%- include('../layouts/user/header.ejs') %>
+    <!-- Start Hero Section -->
+    <div class="borderNav">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-lg-5">
+                    <div class="intro-excerpt">
+                        <h1>Cancelled Order</h1>
+                    </div>
+                </div>
+                <div class="col-lg-7"></div>
+            </div>
+        </div>
+    </div>
+    <!-- End Hero Section -->
+    <div class="card text-center">
+        <div class="card-header">
+          <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+              <a class="nav-link " aria-current="true" href="/orders">Ordered</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/cancelledList">Cancelled</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    <%- include('../partials/breadcrumbs.ejs') %>
+    
+    <% if (orderForm.length > 0) { %>
+      <% for (let i = 0; i < orderForm.length; i++) { %>
+    <div class="card m-5 " style="margin-bottom: 150px;">
+        <div class="card-header ">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item p-3">
+                    <h6>ORDER PLACED</h6>
+                    <h5 class="font-weight-bold"><script>
+                      document.write(new Date('<%= orderForm[i].orderDate %>').toLocaleString());
+                  </script></h5>
+                </li>
+                <li class="nav-item p-3">
+                    <h6>TOTAL</h6>
+                    <h5 class="font-weight-bold">₹<%= orderForm[i].totalAmount %></h5>
+                </li>
+                <li class="nav-item p-3 dropdown"> 
+                  <h6>SHIP TO</h6>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <%= orderForm[i].address.fullname %>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <p class="text-center p-3"><%= orderForm[i].address.mobile %>, <%= orderForm[0].address.pincode %> <%= orderForm[0].address.street %></p>
+                    </div>
+                </li>
+                <li class="nav-item p-3">
+                  <a 
+                  class="orderDetails"
+                  onclick="orderDetails('<%= orderForm[i].orderId%>')"
+                  >View Order Details</a>
+                </li>
+            </ul>
+            <div class="corner-box">
+              <h6 class="p-3" >OrderId:<%= orderForm[i].orderId %></h6>
+          </div>
+          
+        </div>
+
+        <div class="card-body">
+          <% orderForm[i].products.forEach(product => { %>
+            <li>
+                <%= product.productName %><br>
+                <img src="/uploads/<%= product.image %>" alt="productimage" style="width: 50px; height: 60px;">
+            </li>
+        <% }) %>
+        <input value="<%= orderForm[i].orderId %>" id="orderIdInput" type="hidden"> 
+        </div>
+    </div>
+    <% } %>
+        <% } %>
+        
+
+    <!-- Start Footer Section -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="sofa-img">
+                <!--<img src="images/logo1.png" style="padding-top: 1600px;" alt="Image" class="img-fluid">-->
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="subscription-form">
+                        <h3 class="d-flex align-items-center"><span class="me-1"><img src="images/envelope-outline.svg" alt="Image" class="img-fluid"></span><span>Subscribe to Newsletter</span></h3>
+                        <form action="#" class="row g-3">
+                            <div class="col-auto">
+                                <input type="text" class="form-control" placeholder="Enter your name">
+                            </div>
+                            <div class="col-auto">
+                                <input type="email" class="form-control" placeholder="Enter your email">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary"><span class="fa fa-paper-plane"></span></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-5 mb-5">
+                <div class="col-lg-4">
+                    <div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">Trend Setter<span>.</span></a></div>
+                    <p class="mb-4">Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique. Pellentesque habitant</p>
+
+                    <ul class="list-unstyled custom-social">
+                        <li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-twitter"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-instagram"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-linkedin"></span></a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="row links-wrap">
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">About us</a></li>
+                                <li><a href="#">Services</a></li>
+                                <li><a href="#">Blog</a></li>
+                                <li><a href="#">Contact us</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Support</a></li>
+                                <li><a href="#">Knowledge base</a></li>
+                                <li><a href="#">Live chat</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Jobs</a></li>
+                                <li><a href="#">Our team</a></li>
+                                <li><a href="#">Leadership</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Nordic Chair</a></li>
+                                <li><a href="#">Kruzo Aero</a></li>
+                                <li><a href="#">Ergonomic Chair</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-top copyright">
+                <div class="row pt-4">
+                    <div class="col-lg-6">
+                        <p class="mb-2 text-center text-lg-start">Copyright &copy;<script>document.write(new Date().getFullYear());</script>. All Rights Reserved. &mdash; Designed with love by <a href="https://untree.co">Untree.co</a> Distributed By <a href="https://themewagon.com">ThemeWagon</a> <!-- License information: https://untree.co/license/ --></p>
+                    </div>
+                    <div class="col-lg-6 text-center text-lg-end">
+                        <ul class="list-unstyled d-inline-flex ms-auto">
+                            <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- End Footer Section -->
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="js/tiny-slider.js"></script>
+    <script src="js/custom.js"></script>
+    <script>
+      //order Details
+      function orderDetails(orderId) {
+        console.log(orderId, "orderid");
+        window.location.href = "/orderDetails?id=" + orderId;
+      }
+        // Changing the images
+        function changeMainImage(newImageSrc) {
+            document.getElementById('myimage').src = '/uploads/' + newImageSrc;
+        }
+        // Changing the nav bar activation
+        function changingNavBar() {
+            let bar = document.getElementById("navbarsFurni");
+            if (bar.className === 'home') {
+                bar.className += " active";
+            }
+        }
+
+        document.getElementById('cancelReason').addEventListener('change', function() {
+						if (this.value === 'Other') {
+						document.getElementById('cancelReasonOther').style.display = 'block';
+						} else {
+						document.getElementById('cancelReasonOther').style.display = 'none';
+						}
+					});
+
+					function cancelOrder() {
+						var cancelOrderModal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+						cancelOrderModal.show();
+					}
+
+					function confirmCancelOrder() {
+						const reasonSelect = document.getElementById('cancelReason');
+						let cancelReason = reasonSelect.value;
+
+						if (cancelReason === 'Other') {
+						const otherReason = document.getElementById('cancelReasonOther').value.trim();
+						if (otherReason) {
+							cancelReason = otherReason;
+						} else {
+							alert('Please specify the reason for cancellation.');
+							return;
+						}
+						}
+            const orderId = document.getElementById('orderIdInput').value;
+						fetch(`/cancelOrder`, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({
+							reason: cancelReason,
+              orderId:orderId
+						})
+						})
+						.then(response => response.json())
+						.then(data => {
+						if (data.success) {
+							alert('Order cancelled successfully.');
+							window.location.href = '/orders';
+						} else {
+							alert('Error cancelling order: ' + data.message);
+						}
+						})
+						.catch(error => {
+						console.error('Error:', error);
+						alert('An error occurred while cancelling the order.');
+						});
+					}
+    </script>
+</body>
+</html>
+>>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729

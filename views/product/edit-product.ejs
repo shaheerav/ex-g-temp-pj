@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -405,4 +406,413 @@ function addSize() {
             
                 </script>
             </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend Setter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/admin/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/admin/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/admin/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="/admin/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.css">
+    <style>
+        .image-upload-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .image-preview {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .crop-button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<div class="container-xxl position-relative bg-white d-flex p-0">
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Sidebar Start -->
+    <div class="sidebar pe-4 pb-3">
+        <nav class="navbar bg-light navbar-light">
+            <a href="/admin/home" class="navbar-brand mx-4 mb-3">
+                <h3 class="text-primary">Trend Setter</h3>
+            </a>
+            <div class="d-flex align-items-center ms-4 mb-4">
+                <div class="position-relative">
+                    
+                    <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                </div>
+                <div class="ms-3">
+                    <h6 class="mb-0"><%= admin.name  %></h6>
+                    <span>Admin</span>
+                </div>
+            </div>
+            <div class="navbar-nav w-100">
+                <a href="/admin/home" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                <a href="/admin/userdata" class="nav-item nav-link"><i class="bi bi-person"></i>Customers</a>
+                <a href="/product" class="nav-item nav-link"><i class="bi bi-minecart"></i>Products</a>
+                <a href="/category" class="nav-item nav-link"><i class="bi bi-layout-wtf"></i>Category</a>
+                <a href="chart.html" class="nav-item nav-link"><i class="bi bi-truck"></i>Orders</a>
+                <a href="chart.html" class="nav-item nav-link"><i class="bi bi-bar-chart"></i>Sales Report</a>
+                <a href="chart.html" class="nav-item nav-link"><i class="bi bi-star"></i>Coupon Management</a>
+                <a href="chart.html" class="nav-item nav-link"><i class="bi bi-file-richtext"></i>Banner Management</a>
+            </div>
+        </nav>
+    </div>
+    <!-- Sidebar End -->
+
+
+    <!-- Content Start -->
+    <div class="content">
+        <!-- Navbar Start -->
+        <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+            <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
+                <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
+            </a>
+            <a href="#" class="sidebar-toggler flex-shrink-0">
+                <i class="fa fa-bars"></i>
+            </a>
+            <form class="d-none d-md-flex ms-4">
+                <input class="form-control border-0" type="search" placeholder="Search">
+            </form>
+            <div class="navbar-nav align-items-center ms-auto">
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fa fa-envelope me-lg-2"></i>
+                        <span class="d-none d-lg-inline-flex">Message</span>
+                    </a>
+
+                </div>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fa fa-bell me-lg-2"></i>
+                        <span class="d-none d-lg-inline-flex">Notificatin</span>
+                    </a>
+                    
+                </div>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <span class="d-none d-lg-inline-flex"><%= admin.name %></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                        <a href="#" class="dropdown-item">My Profile</a>
+                        <a href="#" class="dropdown-item">Settings</a>
+                        <a href="/admin/adlogout" class="dropdown-item">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Navbar End -->
+<body>
+    <div class="row">
+        <div class="container col-md-8 bg-light">
+            <h1 class="mb-4">Edit Product</h1>
+
+            <!-- Form for adding a product -->
+            <form id="productForm" action="/product/edit-product" method="POST" enctype="multipart/form-data">
+                <% if( message){ %>
+                    <div class="alert alert-danger" role="alert">
+                        <%= message %>
+                    </div>
+                <% } %>
+                <input type="hidden" name="id" value="<%= product._id  %>">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Product Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" value="<%= product.name %>" required>
+                    <div class="error" id="name-error"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Brand</label>
+                    <input type="text" class="form-control" name="brand" id="brand" value="<%= product.brand %>" required>
+                    <div class="error" id="brand-error"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <input class="form-control" id="description" name="description" value="<%= product.description %>" required>
+                    <div class="error" id="description-error"></div>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label" for="category">Category</label>
+                    <select class="form-control" name="category" required>
+                      <% category.forEach(function(category) { %>
+                        <option value="<%= category._id %>" <%= category._id.toString() === product.category.toString() ? 'selected' : '' %>>
+                          <%= category.name %>
+                        </option>
+                      <% }); %>
+                    </select>
+                  </div>
+                  <div id="sizes-container" class="mb-3">
+                    <% product.size.forEach((size, index) => { %>
+                    <div class="size-entry mb-3">
+                        <label for="size">Size:</label>
+                        <select name="size[<%= index %>][size]">
+                            <option value="XS" <%= size.size === 'XS' ? 'selected' : '' %>>XS</option>
+                            <option value="S" <%= size.size === 'S' ? 'selected' : '' %>>S</option>
+                            <option value="M" <%= size.size === 'M' ? 'selected' : '' %>>M</option>
+                            <option value="L" <%= size.size === 'L' ? 'selected' : '' %>>L</option>
+                            <option value="XL" <%= size.size === 'XL' ? 'selected' : '' %>>XL</option>
+                            <option value="XXL" <%= size.size === 'XXL' ? 'selected' : '' %>>XXL</option>
+                        </select>
+                
+                        <label for="stock">Stock:</label>
+                        <input type="number" name="size[<%= index %>][stock]" min="0" value="<%= size.stock %>" required>
+                    </div>
+                    <% }) %>
+                </div>
+                
+                <button type="button" onclick="addSize()">Add another size</button>
+
+                
+                  
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <input type="number" class="form-control" id="price" name="price" value="<%= product.price %>" required>
+                    <div class="error" id="price-error"></div>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label">Existing Images</label>
+                    <% product.image.forEach(function(pic) { %>
+                      <img src="/uploads/<%= pic %>" alt="Product Image" style="width: 100px; height: auto; margin-right: 10px;">
+                    <% }); %>
+                  </div>
+
+                  <div class="image-upload-container">
+                    <input type="file" class="input-image" name="images[]" accept="image/*" multiple>
+                    <br><br>
+                    <div style="margin-left: 300px;">
+                    <div class="image-preview-container" style=" width: 300px;height: 300px;"></div>
+                    </div>
+                    <br>
+                </div>
+                <button type="submit" class="btn crop-button" style="margin-left: -10px;">EDIT PRODUCT</button>
+            
+                        </form>
+                    </div>
+                </div>
+                
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+            
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+            <script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
+            <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+            
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js'></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/admin/lib/chart/chart.min.js"></script>
+            <script src="/admin/lib/easing/easing.min.js"></script>
+            <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+            <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+            <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+            <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+            <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+            
+            <!-- Template Javascript -->
+            <script src="/admin/js/main.js"></script>
+            <script src="/javascripts/product.js"></script>
+                <script>
+                    let sizeIndex = 1;
+
+function addSize() {
+  const container = document.getElementById('sizes-container');
+  const newSizeEntry = document.createElement('div');
+  newSizeEntry.classList.add('size-entry');
+  newSizeEntry.innerHTML = `
+    <label for="size">Size:</label>
+    <select name="size[${sizeIndex}][size]">
+      <option value="XS">XS</option>
+      <option value="S">S</option>
+      <option value="M">M</option>
+      <option value="L">L</option>
+      <option value="XL">XL</option>
+      <option value="XXL">XXL</option>
+    </select>
+
+    <label for="stock">Stock:</label>
+    <input type="number" name="size[${sizeIndex}][stock]" min="0" required>
+  `;
+  container.appendChild(newSizeEntry);
+  sizeIndex++;
+};
+                    document.addEventListener('DOMContentLoaded', function () {
+                var input = document.querySelector('.input-image');
+                var previewContainer = document.querySelector('.image-preview-container');
+                var croppers = [];
+            
+                input.addEventListener('change', function (e) {
+                    var files = e.target.files;
+            
+                    previewContainer.innerHTML = '';
+                    croppers = [];
+                    for (var i = 0; i < files.length; i++) {
+                        var reader = new FileReader();
+            
+                        reader.onload = function (event) {
+                            var img = new Image();
+                            img.src = event.target.result;
+                            img.className = 'image-preview';
+                            img.onload = function () {
+                                var cropper = new Cropper(img, {
+                                    aspectRatio: 1, 
+                                    viewMode: 1, 
+                                    background: false, 
+                                    autoCropArea: 0.8, 
+                                    movable: true, 
+                                    zoomable: true, 
+                                    scalable: true, 
+                                    cropBoxResizable: true 
+                                });
+                                croppers.push(cropper);
+                            };
+                            previewContainer.appendChild(img);
+                        };
+            
+                        reader.readAsDataURL(files[i]);
+                    }
+                });
+            
+                document.querySelector('#product-form').addEventListener('submit', function (e) {
+                    e.preventDefault(); 
+                    if (!validateForm()) {
+                            return;
+                        }
+            
+                    var formData = new FormData(this);
+            
+                    croppers.forEach(function (cropper, index) {
+                        var canvas = cropper.getCroppedCanvas({
+                            width: 300, 
+                            height: 300 
+                        });
+            
+                        if (canvas) {
+                            
+                            canvas.toBlob(function (blob) {
+                                formData.append('images[]', blob, `image${index}.jpg`);
+                            }, 'image/jpeg');
+                        }
+                    });
+            
+                    setTimeout(function () {
+                        fetch('/product/edit-product', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to add product');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Product added:', data);
+                            
+                            window.location.href = '/product'; 
+                        })
+                        .catch(error => {
+                            console.error('Error adding product:', error);
+                        });
+                    }, 1000); 
+                });
+            });
+            
+            function validateForm() {
+                            let isValid = true;
+            
+                            // Reset previous error messages
+                            document.querySelectorAll('.error').forEach(error => error.textContent = '');
+            
+                            // Validate each form field
+                            const name = document.getElementById('name').value.trim();
+                            if (name === '') {
+                                document.getElementById('name-error').textContent = 'Please enter product name';
+                                isValid = false;
+                            }
+            
+                            const brand = document.getElementById('brand').value.trim();
+                            if (brand === '') {
+                                document.getElementById('brand-error').textContent = 'Please enter brand name';
+                                isValid = false;
+                            }
+            
+                            const description = document.getElementById('description').value.trim();
+                            if (description === '') {
+                                document.getElementById('description-error').textContent = 'Please enter product description';
+                                isValid = false;
+                            }
+            
+                            const category = document.getElementById('category').value;
+                            if (category === '') {
+                                document.getElementById('category-error').textContent = 'Please select product category';
+                                isValid = false;
+                            }
+            
+                            const price = document.getElementById('price').value.trim();
+                            if (price === '' || isNaN(price) || parseFloat(price) <= 0) {
+                                document.getElementById('price-error').textContent = 'Please enter valid product price';
+                                isValid = false;
+                            }
+            
+                            const stock = document.getElementById('stock').value.trim();
+                            if (stock === '' || isNaN(stock) || parseInt(stock) < 0) {
+                                document.getElementById('stock-error').textContent = 'Please enter valid product stock';
+                                isValid = false;
+                            }
+            
+                            const images = document.getElementById('images').files;
+                            if (images.length === 0) {
+                                document.getElementById('images-error').textContent = 'Please select product image';
+                                isValid = false;
+                            }
+            
+                            return isValid;
+                        }
+                        document.getElementById('product-form').addEventListener('submit', function(event) {
+                if (!validateForm()) {
+                    event.preventDefault();
+                }
+            });
+            
+                </script>
+            </body>
+>>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729
             </html>

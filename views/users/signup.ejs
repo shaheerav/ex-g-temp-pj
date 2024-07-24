@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <%- include('../layouts/user/header.ejs') %>
 <style>
   .form-control{
@@ -170,3 +171,177 @@ function validationForm(){
 }
 </script>
 <%- include('../layouts/user/footerlogin.ejs') %>
+=======
+<%- include('../layouts/user/header.ejs') %>
+<style>
+  .form-control{
+    color: white;
+    font-size: large;
+  }
+  .error{
+    color: red;
+  }
+</style>
+<!-- Start Hero Section -->
+<div class="hero">
+  <div class="container">
+    <div class="row justify-content-between">
+      <div class="col-lg-6">
+        <div class="hero-img-wrap">
+          <img
+            src="images/familypic.png"
+            class="img-fluid"
+            style="height: 500px"
+          />
+        </div>
+      </div>
+      <div class="col-lg-6" style="margin-top: -40px">
+        <h2 style="color: white">Sign Up</h2>
+        <div class="intro-excerpt">
+          <% if(typeof message!=='undefined'){ %>
+          <p><%= message %></p>
+          <% } %>
+          <form action="" method="post" name="form1" onsubmit="return validationForm()" id="registration">
+            <div class="form-group">
+              <label style="color: white">Name</label><br />
+              <input
+                id="name"
+                type="text"
+                class="form-control"
+                name="name"
+                style="background: transparent; font-size: large;;"
+                minlength="6"
+              />
+              <div id="messageid" class="error"></div>
+            </div>
+            <div class="form-group">
+              <label style="color: white">Username</label><br />
+              <input
+                type="text"
+                class="form-control"
+                name="username"
+                style="background: transparent"
+
+                minlength="4"
+                maxlength="10"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-lebel" style="color: white">Password</label
+              ><br />
+              <div style="position: relative">
+                <input
+                  type="password"
+                  class="form-control"
+                  name="password"
+                  id="password"
+                  style="background: transparent; padding-right: 30px"
+                  minlength="4"
+                  maxlength="10"
+                />
+                <i
+                  class="bi bi-eye-slash"
+                  id="eyeIcon"
+                  style="
+                    position: absolute;
+                    top: 50%;
+                    right: 10px;
+                    transform: translateY(-50%);
+                    cursor: pointer;
+                    color: white;
+                  "
+                ></i>
+              </div>
+              </div>
+              <div class="form-group">
+                <label class="form-lebel" style="color: white">Conform Password</label
+                ><br />
+                <input
+                  type="password"
+                  class="form-control"
+                  name="conformPassword"
+                  id="conformPassword"
+                  style="background: transparent; padding-right: 30px"
+                  minlength="4"
+                  maxlength="10"
+                />
+                </div>
+              <div class="form-group">
+                <label style="color: white">Email</label><br />
+                <input
+                  type="email"
+                  class="form-control"
+                  name="email"
+                  style="background: transparent"
+                />
+              </div>
+              <div class="form-group">
+                <label style="color: white">phone</label><br />
+                <input
+                  type="number"
+                  class="form-control"
+                  name="mobile"
+                  style="background: transparent"
+                  minlength="10"
+                  maxlength="10"
+                />
+              </div>
+              <div class="form-group">
+                <label style="color: white">Referral Code</label><br />
+                <input
+                  type="text"
+                  class="form-control"
+                  name="referralCode"
+                  style="background: transparent"
+                  placeholder="Referral Code (optional)"
+                />
+              </div>
+
+              <a href="/forget" style="margin-left: 280px">Forget Password</a>
+            </div>
+            <p>
+              By login, you agree to Trend Setter
+              <a href="/termsofuse">Terms of Use</a> &
+              <a href="/privacypolicy">Privacy Policy</a>
+            </p>
+            <div class="col">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                style="margin-left: 160px"
+                value="submit"
+                onclick="allLetter(document.form1.name)"
+              >
+                Signup
+              </button>
+            </div>
+            <div>
+              <p>Already a member <a href="/login">Login</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Hero Section -->
+<script>
+function validationForm(){
+  let nameFirst = document.getElementById('name');
+  let letters = /^[A-Za-z]+(\s[A-Za-z]+)*$/;
+  let message = document.getElementById('messageid');
+  if(nameFirst.value.trim()===''){
+    message.innerText = '';
+    return false
+  }
+  if(!nameFirst.value.match(letters)){
+    message.innerText = 'Please input alphabet characters only'
+    message.style.color ='red';
+    return false;
+  }
+  message.innerText = '';
+  return true
+}
+</script>
+<%- include('../layouts/user/footerlogin.ejs') %>
+>>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const mongoose = require('mongoose');
 
 const paymentSchema = new mongoose.Schema({
@@ -22,4 +23,30 @@ const paymentSchema = new mongoose.Schema({
     },
 },{timestamps:true});
 
+=======
+const mongoose = require('mongoose');
+
+const paymentSchema = new mongoose.Schema({
+    orderId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Order',
+        require:true
+    },
+    paymentMethod:{
+        type:String,
+        enum:['COD','Cart-Payment','Bank-transger','PayPal','Razorpay','Wallet'],
+        require:true
+    },
+    amount:{
+        type:Number,
+        require:true
+    },
+    status:{
+        type:String,
+        enum:['pending','paid','failed'],
+        require:true
+    },
+},{timestamps:true});
+
+>>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729
 module.exports = mongoose.model('Payment',paymentSchema);

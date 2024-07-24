@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <%- include ('../layouts/user/header.ejs') %>
 
 <div class="borderNav">
@@ -161,3 +162,168 @@
 <%- include ('../layouts/user/footer.ejs') %>
 
 
+=======
+<%- include ('../layouts/user/header.ejs') %>
+
+<div class="borderNav">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-lg-5">
+          <div class="intro-excerpt">
+            <h1>Hello, <%= isLoggedIn.name  %></h1>
+          </div>
+        </div>
+        <div class="col-lg-7"></div>
+      </div>
+    </div>
+  </div>
+<%- include('../partials/breadcrumbs.ejs')  %>
+
+<style>
+  .profile-header .profile-img img {
+    width: 100%;
+    height: 100%;
+  }
+  .profile-header .profile-nav {
+    margin-top: 90px;
+  }
+  .profile-header .profile-nav .nav-item {
+    margin-right: 20px;
+  }
+  .profile-content {
+    margin-top: 20px;
+  }
+  .profile-content .card {
+    margin-bottom: 20px;
+  }
+  .profile-content .card-header {
+    background: #007bff;
+    color: #fff;
+  }
+  .profile-content .list-group-item {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+<div class="container" style="margin-bottom: 200px;">
+  <div class="profile-header text-center">
+    <h2><%= isLoggedIn.name %></h2>
+    <p class="lead"><%= isLoggedIn.email %></p>
+    <button style="padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;"><a href="/editProfile?id=<%= isLoggedIn._id %>"style="color:white;" class="text-start">Edit Profile</a></button>
+    <ul class="nav nav-pills profile-nav justify-content-center">
+      <li class="nav-item">
+        <a class="nav-link active" href="/userDetails" >Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/orders" >Orders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#wishlist" data-toggle="tab">Wishlist</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/showAddress?id=<%= isLoggedIn._id %>" >Address</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#wallet" data-toggle="tab" >Wallet</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="tab-content profile-content">
+    <div class="tab-pane fade show active" id="profile">
+      <div class="card">
+        <div class="card-header">Profile Information</div>
+        <div class="card-body">
+          <p><strong>Name:</strong> <%= isLoggedIn.name %></p>
+          <p><strong>Email:</strong> <%= isLoggedIn.email %></p>
+          <p><strong>Phone:</strong> <%= isLoggedIn.mobile %></p>
+          <p><strong>Username:</strong><%= isLoggedIn.username  %> </p>
+          <p><Strong>Refferal code:</Strong><%= isLoggedIn.referralCode  %></p>
+          <a href="/changePassword">Chanage password</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="wishlist">
+      <div class="card">
+        <div class="card-header">My Wishlist</div>
+        <div class="card-body">
+          <div class="row">
+            <% wishlistItems.forEach(function(item) { %>
+            <div class="col-12 col-md-4 col-lg-3 mb-5 wishlist-item" data-product-id="<%= item.productId %>">
+              
+              <a class="product-item" onclick="showDetails('<%= item.productId %>')">
+                <img src="/uploads/<%= item.image[0] %>" img-fluid product-thumbnail style="height: 300px; width: 250px" />
+                <h3 class="product-title"><%= item.name%></h3><p><%= item.id %></p>
+                <strong class="product-price">
+                  <i class="bi bi-currency-rupee"></i><%= item.price%>
+                </strong>
+                <span class="icon-cross">
+                  <img src="images/cross.svg" class="img-fluid" />
+                </span>
+              </a>
+              <a href="#" onclick="addToWishlist('<%= item.productId%>')" id="wishlistIcon_123">remove</a>
+            </div>
+            <% }) %>
+            <!-- Add more products as needed -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="wallet">
+      <div class="card">
+        <div class="card-header">My Wallet</div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12 col-md-4 col-lg-3 mb-5 " >
+                <h3 class="product-title"><i class="bi bi-currency-rupee"></i><%= amount%></h3>
+                <span class="icon-cross">
+                  <img src="images/cross.svg" class="img-fluid" />
+                </span>
+              
+            </div>
+            <!-- Add more products as needed -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function addToWishlist(productId){
+    fetch('/removeFromWishlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+              const item = document.querySelector(`.wishlist-item[data-product-id="${productId}"]`);
+                if (item) {
+                    item.remove();
+                }
+                swal("Removed", "product removed from wishlist!", "success", {
+      button: "ok",});
+            } else {
+                swal('Failed','Failed to remove product from wishlist.','error',{
+                  button: "ok"});
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            swal('error','An error occurred while removing product from wishlist.','error',{button:'ok'});
+        });
+  }
+</script>
+<%- include ('../layouts/user/footer.ejs') %>
+
+
+>>>>>>> 5b98995eedf57a81eaa6279a9ee8017d69a64729
