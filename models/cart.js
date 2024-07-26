@@ -18,7 +18,7 @@ const cartSchema = new mongoose.Schema({
     },
     name:{type:String,require:true},
     price:{type:String,require:true},
-    size:{type:String,require:true}
+    size:{type:String,require:true},
   }],
   active: {
     type: Boolean,

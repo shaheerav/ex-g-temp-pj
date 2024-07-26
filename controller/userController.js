@@ -11,7 +11,7 @@ const OTPGenerator = require("otp-generator");
 const randonString = require("randomstring");
 const Category = require("../models/category");
 const Razorpay = require("razorpay");
-const uuid = require("uuid");
+const {v4:uuidv4} = require("uuid");
 const Product = require("../models/products");
 const Address = require("../models/address");
 const Order = require("../models/order");
@@ -1583,7 +1583,23 @@ const placeOrder = async (req, res) => {
       quantity: product.quantity,
       size: product.size,
     }));
+    const productsWithPricing = [];
 
+    for (const item of userCart.products) {
+      const product = await Product.findById(item.productId);
+      if (product) {
+        let productPrice = product.price;
+        let discount = 0;
+
+        productsWithPricing.push({
+          productId: item.productId,
+          quantity: item.quantity,
+          size: item.size,   
+          discount: (productPrice-item.price),
+          price:productPrice,
+        });
+      }
+    }
     // Save payment details
     const payment = new Payment({
       orderId: null,
@@ -1592,12 +1608,13 @@ const placeOrder = async (req, res) => {
       status: "pending",
     });
     await payment.save();
-
+const orderId = uuidv4();
     // Save order details
     const order = new Order({
+      orderId:orderId,
       userId: userId,
       address: addressId,
-      products: productIds,
+      products: productsWithPricing,
       payment: payment._id,
       totalAmount: totalAmount,
       shippingCharge:shippingCharge,
@@ -2011,7 +2028,7 @@ const allProduct = async (req, res, next) => {
         breadcrumbs,
         wishlistItems: [],
       });
-    }
+    }else{
     const id = isLoggedIn._id;
     const wishlistItems = await Wishlist.aggregate([
       { $match: { userId: new mongoose.Types.ObjectId(id) } },
@@ -2045,6 +2062,7 @@ const allProduct = async (req, res, next) => {
       breadcrumbs,
       wishlistItems,
     });
+  }
   } catch (error) {
     next(error);
   }
@@ -2491,7 +2509,7 @@ const invoiceDownload = async (req, res, next) => {
     const order = await getOderDetails(orderId);
 
     if (!order) {
-        return res.status(404).send('Order not found');
+      return res.status(404).send('Order not found');
     }
 
     // Create a new PDF document
@@ -2503,44 +2521,82 @@ const invoiceDownload = async (req, res, next) => {
 
     // Pipe the PDF document to the response stream
     doc.pipe(res);
-    doc.fontSize(25).text('TrendSetter', { align: 'center' }); // Your website name
+
+    // Add document title and basic details
+    doc.fontSize(25).text('TrendSetter', { align: 'center' });
     doc.moveDown();
-    // Add content to the PDF
     doc.fontSize(25).text('Invoice', { align: 'center' });
     doc.moveDown();
 
     // Order details section
     doc.fontSize(12);
-    doc.text(`Order ID: ${order._id}`);
-    doc.text(`Date: ${moment(order.DateOrder).format('MMMM Do YYYY, h:mm:ss a')}`); // Format date as desired
-
+    doc.text(`Order ID: ${order.orderId}`);
+    doc.text(`Date: ${moment(order.DateOrder).format('MMMM Do YYYY, h:mm:ss a')}`);
     doc.moveDown();
     doc.text(`Customer Name: ${order.address.fullname}`);
-    doc.text(`Customer Email: ${order.address.email}`);
+    doc.text(`Customer Mobile: ${order.address.mobile || 'N/A'}`);
+    doc.moveDown();
 
-    // Display discount if available
-    if (order.discount) {
-        doc.text(`Discount: ${order.discount}%`);
+    const tableTop = 400;
+    const itemX = 50;
+    const quantityX = 250;
+    const priceX = 350;
+    const discountX = 450;
+    const totalX = 550;
+
+    // Set fonts
+    try {
+      doc.font('Helvetica-Bold');
+      doc.fontSize(12).text('Item', itemX, tableTop);
+      doc.text('Quantity', quantityX, tableTop);
+      doc.text('Price (₹)', priceX, tableTop);
+      doc.text('Discount (₹)', discountX, tableTop);
+      doc.text('Total (₹)', totalX, tableTop);
+      doc.moveTo(itemX, tableTop + 15).lineTo(totalX + 50, tableTop + 15).stroke();
+    } catch (err) {
+      console.error('Error setting font:', err);
+      return res.status(500).send('Internal Server Error');
     }
 
-    doc.moveDown();
-    doc.fontSize(14).text('Items:', { underline: true });
+    // Draw table rows
+    try {
+      doc.font('Helvetica');
+      let yPosition = tableTop + 20;
+      order.products.forEach(item => {
+        const discount = item.discount || 0;
+        const price = item.product.price || 0;
+        const name = item.product.name || 'Unknown Item';
+        const total = (price - discount) * item.quantity;
 
-    // List of ordered items
-    doc.fontSize(12);
-    order.products.forEach(item => {
-        doc.text(`- ${item.product.name}: ₹${item.product.price.toFixed(2)} x ${item.quantity}`);
-    });
+        doc.text(name, itemX, yPosition);
+        doc.text(item.quantity.toString(), quantityX, yPosition);
+        doc.text(price.toFixed(2), priceX, yPosition);
+        doc.text(discount.toFixed(2), discountX, yPosition);
+        doc.text(total.toFixed(2), totalX, yPosition);
+        yPosition += 20;
+      });
 
-    doc.moveDown();
-    doc.fontSize(16).text(`Total Amount: ₹${order.totalAmount.toFixed(2)}`, { align: 'right' });
+      doc.moveTo(itemX, yPosition + 10).lineTo(totalX + 50, yPosition + 10).stroke();
+      let yPositionAfterTable = yPosition + 20; // Adjust this as needed
+      doc.font('Helvetica-Bold');
+      doc.fontSize(12).text('Shipping Charge:', itemX, yPositionAfterTable);
+      doc.text(`₹${order.shippingCharge.toFixed(2)}`, totalX, yPositionAfterTable, { align: 'right' });
+      yPositionAfterTable += 20;
+
+      doc.fontSize(12).text('Total Amount:', itemX, yPositionAfterTable);
+      doc.text(`₹${order.totalAmount.toFixed(2)}`, totalX, yPositionAfterTable, { align: 'right' });
+    } catch (err) {
+      console.error('Error drawing table rows:', err);
+      return res.status(500).send('Internal Server Error');
+    }
 
     // Finalize the PDF and end the stream
     doc.end();
-
-} catch (error) {
+    
+  } catch (error) {
+    console.error('Error generating PDF:', error);
     next(error);
-}
+  }
 };
 
 const paymentProcess = async(req,res)=>{

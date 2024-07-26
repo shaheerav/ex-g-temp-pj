@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
+const { text } = require('pdfkit');
 
 const orderSchema = new mongoose.Schema({
+    orderId:{
+        type:String,
+        require:true
+    },
     userId :{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
@@ -31,6 +36,14 @@ const orderSchema = new mongoose.Schema({
             enum: ['Pending', 'Cancelled', 'Delivered'],
             default: 'Pending'
         },
+        discount:{
+            type:Number,
+            require:true
+        },
+        price:{
+            type:Number,
+            require:true
+        }
 }],
     DateOrder:{
         type:Date,

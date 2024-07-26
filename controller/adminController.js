@@ -71,6 +71,8 @@ const adminhome = async (req,res)=>{
             }}
           ]);
           const topProducts = await getTop10Products();
+          console.log(totalUsers,'user');
+          console.log(totalSale,'sale')
           const topCategories = await getTop10Categories();
           const topBrands = await getTop10Brands();
         res.render('home',{admin:adminData,totalSale,totalorder,totalProduct,totalUsers,categorySales,topBrands,topProducts,topCategories});
@@ -583,7 +585,7 @@ const fileredSalesReport = async (req, res) => {
             admin: adminData,
             order: orders,
             totalSales,
-            orderCount
+            orderCount,startDate,endDate
         });
 
     } catch (error) {

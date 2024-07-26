@@ -30,21 +30,26 @@ const getOderDetails = async (orderId)=>{
             {$unwind:'$paymentMethod'},
             {$group:{
                 _id:'$_id',
+                orderId:{'$first':'$orderId'},
                 payment:{'$first':'$paymentMethod'},
                 totalAmount:{'$first':'$totalAmount'},
                 DateOrder:{'$first':'$DateOrder'},
                 products:{'$push':{
                     product:'$productList',
                     productId:'$products.productId',
-                    quantity:'$products.quantity'}},
+                    quantity:'$products.quantity',
+                    discount:'$products.discount'
+                }},
                 address:{'$first':'$userAddress'},
                 tax:{'$first':'$tax'},
                 shippingCharge:{'$first':'$shippingCharge'},
-                status:{'$first':'$status'}
+                status:{'$first':'$status'},
+                
               }},
               {
                 $project: {
                   _id: 1,
+                  orderId:1,
                   payment: 1,
                   totalAmount: 1,
                   DateOrder: { $dateToString: { format: "%Y-%m-%d %H:%M:%S", date: "$DateOrder" } },

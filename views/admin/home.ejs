@@ -29,7 +29,7 @@
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <i class="fa fa-chart-line fa-3x text-primary"></i>
                             <div class="ms-3">
-                              <% if(totalSale >0) {%>
+                              <% if(totalSale[0].totalSale >0) {%>
                                 <p class="mb-2">Total Sale</p>
                                 <h6 class="mb-0">&#8377;<%= totalSale[0].totalSale%></h6>
                                 <% } %>
@@ -40,7 +40,7 @@
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <i class="fa fa-chart-bar fa-3x text-primary"></i>
                             <div class="ms-3">
-                              <% if(totalorder >0) {%>
+                              <% if(totalorder[0].totalOrder >0) {%>
                                 <p class="mb-2">Total Order</p>
                                 <h6 class="mb-0"><%= totalorder[0].totalOrder%></h6>
                                 <% } %>
@@ -51,7 +51,7 @@
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <i class="fa fa-chart-area fa-3x text-primary"></i>
                             <div class="ms-3">
-                              <% if(totalUsers>0){ %>
+                              <% if(totalUsers[0].totalUsers>0){ %>
                                 <p class="mb-2">Total Users</p>
                                 <h6 class="mb-0"><%= totalUsers[0].totalUsers%></h6>
                                 <% } %>
@@ -62,7 +62,7 @@
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <i class="fa fa-chart-pie fa-3x text-primary"></i>
                             <div class="ms-3">
-                              <% if(totalProduct>0){ %>
+                              <% if(totalProduct[0].totalProduct>0){ %>
                                 <p class="mb-2">Total product</p>
                                 <h6 class="mb-0"><%= totalProduct[0].totalProduct%></h6>
                                 <% } %>
@@ -77,19 +77,18 @@
             <!-- Sales Chart Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-4">
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="filter-options">
-                            <select id="chartFilter">
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="yearly">Yearly</option>
-                              </select>
-                          </div>
-                          
-                          <!-- Your chart container -->
-                          <canvas id="myorder" style="width:100%;max-width:600px"></canvas>
+                  <div class="col-sm-12 col-xl-6">
+                    <div class="filter-options">
+                        <select id="chartFilter">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
                     </div>
+                    <canvas id="myorder" style="width:100%;max-width:600px"></canvas>
+                </div>
+                
                     <div class="col-sm-12 col-xl-6">
                         <div class="bg-light text-center rounded p-4">
                           <div class="d-flex align-items-center justify-content-between mb-4">
@@ -155,7 +154,7 @@
   // Extract values
   var xValues = categorySales.map(sale => sale._id.toString());
   var yValues = categorySales.map(sale => sale.totalSales);
-  var barColors = ["#b91d47", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145"];
+  var barColors = ["#7CB9E8", "#00aba9", "#00FFFF", "#007FFF", "#1e7145"];
   console.log(xValues,'label');
   // Create the chart
   new Chart("myChart", {
@@ -179,51 +178,70 @@
   fetchChartData(filter);
 });
 
-function fetchChartData(filter) {
-  fetch(`/admin/chart-data?filter=${filter}`)
-    .then(response => response.json())
-    .then(data => updateChart(data))
-    .catch(error => console.error('Error fetching chart data:', error));
-}
+document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('myorder').getContext('2d');
+    let chart;
 
-let myChart; // Make sure myChart is defined in a scope accessible to all functions
-
-function updateChart(data) {
-  // Example assumes data structure like [{ _id: { year: 2024 }, totalSales: 1000 }, ...]
-  const labels = data.map(item => {
-    if (item._id.day) return `${item._id.day}-${item._id.month}-${item._id.year}`;
-    else if (item._id.week) return `${item._id.week}-${item._id.year}`;
-    else if (item._id.month) return `${item._id.month}-${item._id.year}`;
-    else return `${item._id.year}`;
-  });
-  const values = data.map(item => item.totalSales);
-
-  if (myChart) {
-    myChart.destroy(); // Destroy old chart instance if it exists
-  }
-
-  const ctx = document.getElementById('myorder').getContext('2d');
-  myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Sales',
-        data: values,
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
+    // Sample data for different filter options
+    const data = {
+        daily: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            data: [12, 19, 3, 5, 2, 3, 7]
+        },
+        weekly: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            data: [45, 67, 89, 34]
+        },
+        monthly: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            data: [123, 234, 345, 456, 567, 678, 789, 890, 901, 1012, 1123, 1234]
+        },
+        yearly: {
+            labels: ['2019', '2020', '2021', '2022', '2023'],
+            data: [400, 500, 300, 700, 800]
         }
-      }
+    };
+
+    function createChart(labels, data) {
+        if (chart) {
+            chart.destroy();
+        }
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Orders',
+                    data: data,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
     }
-  });
-}
+
+    // Initialize chart with default data (daily)
+    createChart(data.daily.labels, data.daily.data);
+
+    // Event listener for filter change
+    document.getElementById('chartFilter').addEventListener('change', function (event) {
+        const filterValue = event.target.value;
+        createChart(data[filterValue].labels, data[filterValue].data);
+    });
+});
 
 // Initial load
 fetchChartData('daily');
