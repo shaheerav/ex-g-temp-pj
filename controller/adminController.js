@@ -296,6 +296,7 @@ const orderList = async (req,res)=>{
                 payment:{'$first':'$paymentInfo'},
                 userId:{'$first':'$userInfo'},
                 totalAmount:{'$first':'$totalAmount'},
+                orderId:{'$first':'$orderId'},
                 DateOrder :{'$first':'$DateOrder'},
                 status:{'$first':'$status'}
             }},
@@ -305,6 +306,7 @@ const orderList = async (req,res)=>{
                 payment:1,
                 userId:1,
                 totalAmount:1,
+                orderId:1,
                 DateOrder:{$dateToString:{format:"%Y-%m-%d %H:%M:%S",date:"$DateOrder"}},
                 status:1
             }},{ $sort: { DateOrder: -1 } }, 
@@ -555,7 +557,7 @@ const fileredSalesReport = async (req, res) => {
                     productImage: '$productDetails.image',
                     productPrice: '$productDetails.price',
                     quantity: '$products.quantity',
-                    discount: '$products.discount' // Assuming discount is a field in products
+                    discount: { $ifNull: ['$products.discount', 0] }  // Assuming discount is a field in products
                 }},
                 payment: { $first: '$paymentInfo' },
                 userId: { $first: '$userInfo' },
@@ -580,12 +582,14 @@ const fileredSalesReport = async (req, res) => {
         // Calculating grand total amount and total number of orders
         const totalSales = orders.reduce((acc, order) => acc + order.totalAmount, 0);
         const orderCount = orders.length;
-
+        const totalDiscount = orders.reduce((acc, order) => acc + order.totalDiscount, 0);
+        console.log(totalDiscount,'discout')
         res.render('filteredSalesReport', {
             admin: adminData,
             order: orders,
             totalSales,
-            orderCount,startDate,endDate
+            orderCount,startDate,endDate,
+            totalDiscount
         });
 
     } catch (error) {

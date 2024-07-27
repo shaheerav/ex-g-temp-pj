@@ -130,63 +130,69 @@ body{
                 </div>
             </nav>
 
-<div class="container m-5" >
-    <form action="/admin/filtered-report" method="GET">
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDate" name="startDate">
-      
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDate" name="endDate">
-      
-        <button type="submit">Filter</button>
-      </form>
-      <h2>Sales Report</h2>
-        <p>Total Sales: <%= totalSales %> INR</p>
-        <p>Total Orders: <%= orderCount %></p>
-	<table id="example" class="display nowrap" style="width:100%">
-        <thead>
-            <tr>
-                <th>Buyer</th>
-                <th>Product name</th>
-                <th>Quantity</th>
-                <th>price</th>
-                <th>Date</th>
-                <th>total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% if(order.length > 0) { %>
-                <% for(let i = 0; i < order.length; i++) { %>
-            <tr>
-                <td><%= order[i].userId.name %></td>
-                <% order[i].products.forEach(product => { %>
-                <td><%= product.productName %></td>
-                <td><%= product.quantity %></td>
-                <td><%= product.productPrice  %></td>
-                <% }); %>
+            <div class="container m-5">
+                <form action="/admin/filtered-report" method="GET">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" name="startDate">
+                  
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate" name="endDate">
+                  
+                    <button type="submit">Filter</button>
+                </form>
+            
+                <div id="report-summary">
+                    <h2>Sales Report</h2>
+                    <p>Date Range: <span id="date-range"><%= startDate %> to <%= endDate %></span></p>
+                    <p>Total Sales: <%= totalSales %> INR</p>
+                    <p>Total Orders: <%= orderCount %></p>
+                    <p>Total Discount: <%= totalDiscount %> INR</p>
+                </div>
                 
-                <td><%= order[i].DateOrder %></td>
-                <td><%= order[i].totalAmount%></td>
-            </tr>
-            <% } %>
-          <% } else { %>
-            <tr>
-              <td colspan="10">No orders found</td>
-            </tr>
-          <% } %>
-        </tbody>
-        <tfoot>
-            <tr>
-                <th>Buyer</th>
-                <th>Product name</th>
-                <th>Quantity</th>
-                <th>price</th>
-                <th>Date</th>
-                <th>total</th>
-            </tr>
-        </tfoot>
-    </table>
-</div>
+                <table id="example" class="display nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Buyer</th>
+                            <th>Product name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(order.length > 0) { %>
+                            <% for(let i = 0; i < order.length; i++) { %>
+                        <tr>
+                            <td><%= order[i].userId.name %></td>
+                            <% order[i].products.forEach(product => { %>
+                            <td><%= product.productName %></td>
+                            <td><%= product.quantity %></td>
+                            <td><%= product.productPrice %></td>
+                            <% }); %>
+                            
+                            <td><%= order[i].DateOrder %></td>
+                            <td><%= order[i].totalAmount %></td>
+                        </tr>
+                        <% } %>
+                        <% } else { %>
+                        <tr>
+                            <td colspan="10">No orders found</td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Buyer</th>
+                            <th>Product name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
 
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light rounded-top p-4">
@@ -221,13 +227,52 @@ body{
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
 <script>
     $(document).ready(function() {
-    $('#example').DataTable( {
-        dom: 'Bfrtip',
-        buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
-        ]
-    } );
-} );
+        $('#example').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'print',
+                    title: '',
+                    customize: function (win) {
+                        // Add the summary information to the print view
+                        $(win.document.body).prepend(`
+                            <div>
+                                <h2>Sales Report : Trend Setter</h2>
+                                <p>Date Range: ${startDate} to ${endDate}</p>
+                                <p>Total Sales: ${totalSales} INR</p>
+                                <p>Total Orders: ${orderCount}</p>
+                                <p>Total Discount: ${totalDiscount} INR</p>
+                            </div>
+                        `);
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: 'Sales Report',
+                    messageTop: function () {
+                        return `
+                            Sales Report\n
+                            Date Range: ${startDate} to ${endDate}\n 
+                            Total Sales: ${totalSales} INR\n
+                            Total Orders: ${orderCount}\n
+                            Total Discount: ${totalDiscount} INR
+                        `;
+                    },
+                    orientation: 'landscape',
+                    pageSize: 'A4'
+                },
+                'copy', 'csv', 'excel'
+            ]
+        });
+    });
+
+    // Dummy values for the summary information (you should replace these with your actual values)
+    var totalSales = '<%= totalSales %>';
+    var orderCount = '<%= orderCount %>';
+    var totalDiscount = '<%= totalDiscount %>';
+    var startDate = '<%= startDate%>';
+    var endDate = '<%= endDate%>'
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/admin/lib/chart/chart.min.js"></script>

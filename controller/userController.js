@@ -12,6 +12,7 @@ const randonString = require("randomstring");
 const Category = require("../models/category");
 const Razorpay = require("razorpay");
 const {v4:uuidv4} = require("uuid");
+const crypto = require('crypto');
 const Product = require("../models/products");
 const Address = require("../models/address");
 const Order = require("../models/order");
@@ -21,6 +22,7 @@ const Wallet = require("../models/wallet");
 const Coupon = require("../models/coupon");
 const Wishlist = require("../models/wishList");
 const Review = require("../models/review");
+
 const { getOderDetails,getOderDetailsList } = require("../config/aggregation");
 const { session, use } = require("passport");
 const { getTestError } = require("razorpay/dist/utils/razorpay-utils");
@@ -1394,6 +1396,7 @@ const showOrder = async (req, res,next) => {
           products: { $push: "$productDetails" },
           address: { $first: "$AddressOn" },
           status: { $first: "$status" },
+          orderId:{$first:"$orderId"}
         },
       },
       {
@@ -1407,6 +1410,7 @@ const showOrder = async (req, res,next) => {
           products: 1,
           address: 1,
           status: 1,
+          orderId:1
         },
       },
       { $sort: { DateOrder: -1 } },
@@ -1428,6 +1432,7 @@ const showOrder = async (req, res,next) => {
 
       return {
         orderId: order._id,
+        order:order.orderId,
         status: order.status,
         payment: payment.paymentMethod,
         paymentStatus:payment.status,
@@ -1549,6 +1554,11 @@ const checkoutLoad = async (req, res ,next) => {
     next(error);
   }
 };
+
+const generateShortId = () => {
+  return crypto.randomBytes(3).toString('hex').toUpperCase(); // 6 characters (3 bytes * 2 hex chars per byte)
+};
+
 const placeOrder = async (req, res) => {
   try {
     const { addressId, paymentMethod, totalAmount, productName,shippingCharge, bonus } = req.body;
@@ -1608,7 +1618,7 @@ const placeOrder = async (req, res) => {
       status: "pending",
     });
     await payment.save();
-const orderId = uuidv4();
+const orderId = generateShortId();
     // Save order details
     const order = new Order({
       orderId:orderId,
