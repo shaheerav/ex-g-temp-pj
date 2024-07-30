@@ -6,7 +6,7 @@
       <div class="row justify-content-between">
         <div class="col-lg-5">
           <div class="intro-excerpt">
-            <h1>Hello, <%= isLoggedIn.name  %></h1>
+            <h3>Hello, <%= isLoggedIn.name  %></h3>
           </div>
         </div>
         <div class="col-lg-7"></div>
@@ -33,7 +33,7 @@
     margin-bottom: 20px;
   }
   .profile-content .card-header {
-    background: #007bff;
+    background: #3b5d50;
     color: #fff;
   }
   .profile-content .list-group-item {
@@ -46,13 +46,13 @@
     <h2><%= isLoggedIn.name %></h2>
     <p class="lead"><%= isLoggedIn.email %></p>
     <button style="padding: 10px 20px;
-            background-color: #007bff;
+            background-color: #3b5d50;
             color: white;
             border: none;
             cursor: pointer;"><a href="/editProfile?id=<%= isLoggedIn._id %>"style="color:white;" class="text-start">Edit Profile</a></button>
     <ul class="nav nav-pills profile-nav justify-content-center">
       <li class="nav-item">
-        <a class="nav-link active" href="/userDetails" >Profile</a>
+        <a class="nav-link" href="/userDetails" >Profile</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/orders" >Orders</a>
